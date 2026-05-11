@@ -6,12 +6,12 @@ skinparam shadowing false
 skinparam roundcorner 5
 
 ' Define Hardware Components
-component "Arturia MiniBrute\n(Master / Filter Stage)" as MB #E6F3FF
+component "Arturia MiniBrute Mk1\n(Master / Filter Stage)" as MB #E6F3FF
 component "Behringer TD-3-MO-AM\n(Signal Generator)" as TD3 #FFF0F0
 component "Korg MS2000BR\n(FX / Vocoder Stage)" as MS2K #F8F9FA
 component "Yamaha MG06X\n(Professional Compact Mixer)" as Mixer #E8F5E9
 
-' MIDI Synchronization (Control Path - RED)
+' MIDI Synchronisation (Control Path - RED)
 ' Logic: MB triggers Korg (Notes+Clock), Korg passes Clock to TD-3
 MB -[#D32F2F,bold]-> MS2K : " MIDI OUT → MIDI IN "
 MS2K -[#D32F2F,bold]-> TD3 : " MIDI THRU → MIDI IN "
@@ -28,7 +28,8 @@ note bottom of MB
   **MIDI Out Ch:** 1
   --
   *Gate Source: 'Hold'*
-  *Ext In Fader: ~70%*
+  *Arpeg/Free: 'Arpeg'*
+  *Ext In Fader: ~50-60%*
 end note
 
 note bottom of MS2K
@@ -48,9 +49,9 @@ note bottom of TD3
 end note
 
 legend right
-  |= Color |= Connection Type |
+  |= Colour |= Connection Type |
   |<#D32F2F>| MIDI Sync (5-Pin DIN) |
-  |<#1976D2>| Analog Audio (1/4" TS) |
+  |<#1976D2>| Analogue Audio (1/4" TS) |
 endlegend
 
 @enduml
