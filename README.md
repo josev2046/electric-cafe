@@ -1,13 +1,9 @@
 # JV's integrated synth workstation
 
 ## Overview
-This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of my unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and a Korg MS2000BR.
+This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of a unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and Korg MS2000BR.
 
-The configuration leverages a **serial audio path** and a **daisy-chain MIDI topology** to ensure total interconnectivity, allowing for advanced filtering and temporal processing across all units.
-
-This configuration provides a robust, "DAWless" workflow focused on high-fidelity analog signal preservation. The serial routing allows for unique sound design possibilities that traditional parallel mixing cannot achieve.
-
-
+The configuration leverages a **serial audio path** and a **daisy-chain MIDI topology** to ensure total interconnectivity, allowing for advanced filtering and temporal processing across all units. This setup provides a robust, "DAWless" workflow focused on high-fidelity analogue signal preservation and unique sound design possibilities.
 
 ---
 
@@ -17,18 +13,18 @@ This configuration provides a robust, "DAWless" workflow focused on high-fidelit
 To maintain rhythmic integrity across sequencers and arpeggiators, the Arturia MiniBrute serves as the master clock.
 
 * **Master (Arturia MiniBrute):** Generates the internal clock and transmits note data.
-    * *Connection:* MIDI OUT to Korg MIDI IN.
+    * *Connection:* MIDI OUT → Korg MIDI IN.
 * **Slave 1 (Korg MS2000BR):** Synchronises internal LFOs and delays to the master clock. Receives note data on MIDI channel 1.
-    * *Connection:* MIDI THRU to Behringer MIDI IN.
-* **Slave 2 (Behringer TD-3-MO-AM):** Synchronises the internal acid sequencer to the master clock. Set to MIDI channel 2 to ignore external note data.
+    * *Connection:* MIDI THRU → Behringer MIDI IN.
+* **Slave 2 (Behringer TD-3-MO-AM):** Synchronises the internal acid sequencer to the master clock. Set to MIDI channel 2 to ignore external note data from the MiniBrute keyboard.
 
 ### B. Audio path (serial processing)
-The audio is routed serially to allow the final stage (Korg MS2000BR) to apply stereo effects to the combined output of the previous analog stages.
+The audio is routed serially to allow the final stage (Korg MS2000BR) to apply stereo effects to the combined output of the previous analogue stages.
 
-1.  **Stage 1:** The **Behringer TD-3-MO-AM** output is routed into the **Arturia MiniBrute** external audio input.
-2.  **Stage 2:** The **Arturia MiniBrute** processes the combined signal through its Steiner-Parker filter and Brute Factor overdrive.
-3.  **Stage 3:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1.
-4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a line-level stereo signal to the **Yamaha MG06X** mixer.
+1.  **Stage 1:** The **Behringer TD-3-MO-AM** generates raw acid bass and feeds into the **Arturia MiniBrute** external audio input.
+2.  **Stage 2:** The MiniBrute shapes the combined signal through its Steiner-Parker filter and Brute factor overdrive.
+3.  **Stage 3:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1 for effects processing and vocoding.
+4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a line-level stereo signal to the **Yamaha MG06X** mixer for final output control.
 
 ---
 
@@ -37,8 +33,8 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 | Quantity | Item | Specification | Purpose |
 | :--- | :--- | :--- | :--- |
 | 2 | MIDI cable | 5-pin DIN (2m) | System synchronisation |
-| 2 | Mono patch cable | 1/4" TS mono (0.6m - 0.9m) | Inter-unit audio linking |
-| 2 | Instrument cable | 1/4" TS mono (1.5m - 3.0m) | Master stereo out to mixer |
+| 2 | Mono patch cable | 1/4" TS mono (0.6m – 0.9m) | Inter-unit audio linking |
+| 2 | Instrument cable | 1/4" TS mono (1.5m – 3.0m) | Master stereo out to mixer |
 | 1 | Power strip | Surge protected (6-way) | Centralised power distribution |
 
 ---
@@ -47,7 +43,7 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 
 ### Arturia MiniBrute settings
 * **Gate source:** Set to 'Hold' or 'Audio' (rear panel) to allow external audio throughput without active key-triggering.
-* **Mixer section:** Raise the 'Ext In' fader to approximately 70% to integrate the TD-3 signal without clipping the pre-amp.
+* **Mixer section:** Raise the 'Ext in' fader to approximately 70% to integrate the TD-3 signal without clipping the pre-amp.
 
 ### Behringer TD-3-MO-AM settings
 * **Clock source:** Set to 'MIDI' (hold BACK + WRITE/NEXT, press step 2).
@@ -55,21 +51,10 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 
 ### Korg MS2000BR settings
 * **Clock:** Set to 'External' in the global menu.
-* **Input gain:** Adjust the 'Audio In 1' trim to ensure a clean signal level for the DSP effects engine.
-* **Routing:** Utilise 'Audio In' as the modulator for vocoder patches or as a source for the internal FX bus.
+* **Input gain:** Adjust the 'Audio in 1' trim to ensure a clean signal level for the DSP effects engine.
+* **Routing:** Utilise 'Audio in' as the modulator for vocoder patches or as a source for the internal FX bus.
 
 ---
 
 ## 4. Hardware connectivity diagram
 <img width="795" height="611" alt="image" src="https://github.com/user-attachments/assets/835a311a-49c8-4345-9e98-59613e9d928a" />
-
-The TD-3 generates raw acid bass and feeds into the MiniBrute where it gets shaped by the filter
-The MiniBrute then sends its output to the Korg MS2000BR for effects processing and vocoding
-The Korg's stereo output goes into your Yamaha mixer for final output control
-
-* **MIDI control:**
-
-The MiniBrute acts as the master clock and sequencer, sending MIDI to the Korg on channel 1
-The Korg forwards clock information through MIDI THRU to the TD-3 on channel 2, keeping everything in sync
-This creates a synchronized trio where the MiniBrute controls the timing and the TD-3 and Korg follow along
-
