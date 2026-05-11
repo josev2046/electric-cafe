@@ -1,6 +1,6 @@
 # Suicide - "Ghost rider" 
 
-Operational steps to perform "Ghost rider" using a serial signal path. The **Arturia MiniBrute** serves as the master clock and keyboard, the **Behringer TD-3-MO** provides the hypnotic bass, and the **Korg MS2000BR** handles the lead textures.
+Operational steps to perform "Ghost rider" using a serial signal path. The **Arturia MiniBrute Mk1** serves as the master clock and keyboard, the **Behringer TD-3-MO** provides the hypnotic bass, and the **Korg MS2000BR** handles the lead textures.
 
 ---
 
@@ -22,7 +22,7 @@ Operational steps to perform "Ghost rider" using a serial signal path. The **Art
 ## 2. Step-by-step configuration
 
 ### Step 1: Synchronise the instruments
-* **MiniBrute:** Set the rear **GATE SOURCE** switch to **HOLD**. On the front mixer, set **Audio in** to 100% and all internal oscillators to 0%.
+* **MiniBrute Mk1:** Set the rear **GATE SOURCE** switch to **HOLD**. Set the **Arpeg/Free** switch to **Arpeg** (essential for master clock). In the mixer section, set **Audio in** to **60%** and all internal oscillators to 0%.
 * **TD-3-MO:** Set clock to **MIDI** (Hold `BACK` + `WRITE/NEXT`, then press `Step 2`). Ensure it is on MIDI Channel 2.
 * **Korg MS2000BR:** Set **Global MIDI** to **Channel 1**. Set **Clock** to **External**.
 
@@ -32,10 +32,10 @@ Operational steps to perform "Ghost rider" using a serial signal path. The **Art
 3.  **Time:** Press `TIME MODE`. Tap the **Note button** 16 times.
 4.  **Test:** Press `RUN`. You should hear a steady, dark "donk-donk" pulse.
 
-### Step 3: Sculpt the grime (MiniBrute)
+### Step 3: Sculpt the grime (MiniBrute Mk1)
 1.  **Cutoff:** Set to 20% (Muffled).
 2.  **Resonance:** Set to 20%.
-3.  **Brute factor:** Set to 50%. This adds the essential NYC grit.
+3.  **Brute factor:** Set to 50%. This adds the essential NYC grit without losing the bass fundamental.
 
 ### Step 4: Prepare the void (Korg)
 1.  **Patch:** Select a thin organ or sine lead.
@@ -47,13 +47,13 @@ Operational steps to perform "Ghost rider" using a serial signal path. The **Art
 
 ### 0:00–0:30 – The intro
 * Press **RUN** on the TD-3.
-* Slowly turn the MiniBrute **Cutoff** from 20% to 60%. Imagine the sound emerging from a dark tunnel.
+* Slowly turn the MiniBrute **Cutoff** knob from 20% to 60%. Imagine the sound emerging from a dark tunnel.
 
 ### 0:30–1:00 – The lead hook
 * Using the MiniBrute keys, play the eerie G–E cycle:
     * **G** (High octave): Hold for 2 beats.
     * **E**: Hold for 2 beats.
-* The Korg will provide the melody; the MiniBrute provides the grit.
+* The Korg will provide the melody; the MiniBrute filter provides the grit.
 
 ### 1:00–1:30 – The tension
 * Continue the G–E melody with your right hand.
@@ -67,6 +67,6 @@ Operational steps to perform "Ghost rider" using a serial signal path. The **Art
 ---
 
 ## 4. Troubleshooting
-* **No sync:** Check that TD-3 is definitely in MIDI clock mode, not Internal.
-* **No audio:** Ensure the MiniBrute **Gate source** is on **HOLD**; otherwise, the TD-3 audio is blocked until you hit a key.
-* **Distortion too high:** Back off the **Brute factor**. It is a powerful feedback loop that can quickly overwhelm the mix.
+* **No sync:** Ensure the MiniBrute Mk1 is in **Arpeg** mode; it will not send MIDI clock in 'Free' mode.
+* **No audio:** Verify the rear **Gate source** is on **HOLD**.
+* **Audio is too distorted:** Lower the **Audio in** fader on the MiniBrute mixer; the Mk1 input is very sensitive to line-level signals.
