@@ -1,7 +1,7 @@
-# JV's integrated synth workstation
+# JV's integrated synth workstation (Mk1 edition)
 
 ## Overview
-This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of my unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and Korg MS2000BR.
+This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of a unified synth rig comprising the Arturia MiniBrute Mk1, Behringer TD-3-MO-AM, and Korg MS2000BR.
 
 The configuration leverages a **serial audio path** and a **daisy-chain MIDI topology** to ensure total interconnectivity, allowing for advanced filtering and temporal processing across all units. This setup provides a robust, "DAWless" workflow focused on high-fidelity analogue signal preservation and unique sound design possibilities.
 
@@ -10,9 +10,9 @@ The configuration leverages a **serial audio path** and a **daisy-chain MIDI top
 ## 1. Signal architecture
 
 ### A. Control path (MIDI synchronisation)
-To maintain rhythmic integrity across sequencers and arpeggiators, the Arturia MiniBrute serves as the master clock.
+To maintain rhythmic integrity across sequencers and arpeggiators, the Arturia MiniBrute Mk1 serves as the master clock.
 
-* **Master (Arturia MiniBrute):** Generates the internal clock and transmits note data.
+* **Master (Arturia MiniBrute Mk1):** Generates the internal clock and transmits note data. The arpeggiator must be active to transmit MIDI clock pulses.
     * *Connection:* MIDI OUT → Korg MIDI IN.
 * **Slave 1 (Korg MS2000BR):** Synchronises internal LFOs and delays to the master clock. Receives note data on MIDI channel 1.
     * *Connection:* MIDI THRU → Behringer MIDI IN.
@@ -21,7 +21,7 @@ To maintain rhythmic integrity across sequencers and arpeggiators, the Arturia M
 ### B. Audio path (serial processing)
 The audio is routed serially to allow the final stage (Korg MS2000BR) to apply stereo effects to the combined output of the previous analogue stages.
 
-1.  **Stage 1:** The **Behringer TD-3-MO-AM** generates raw acid bass and feeds into the **Arturia MiniBrute** external audio input.
+1.  **Stage 1:** The **Behringer TD-3-MO-AM** generates raw acid bass and feeds into the **Arturia MiniBrute Mk1** external audio input.
 2.  **Stage 2:** The MiniBrute shapes the combined signal through its Steiner-Parker filter and Brute factor overdrive.
 3.  **Stage 3:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1 for effects processing and vocoding.
 4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a line-level stereo signal to the **Yamaha MG06X** mixer for final output control.
@@ -41,9 +41,10 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 
 ## 3. Configuration & calibration
 
-### Arturia MiniBrute settings
-* **Gate source:** Set to 'Hold' or 'Audio' (rear panel) to allow external audio throughput without active key-triggering.
-* **Mixer section:** Raise the 'Ext in' fader to approximately 70% to integrate the TD-3 signal without clipping the pre-amp.
+### Arturia MiniBrute Mk1 settings
+* **Gate source:** Set to 'Hold' (rear panel) to allow the TD-3 audio to pass through the filter without active key-triggering.
+* **Arpeg/Free:** Set to 'Arpeg' to engage the master clock.
+* **Mixer section:** Raise the 'Ext in' fader to approximately 50–60%. The Mk1 input is highly sensitive; avoid 100% to prevent unwanted clipping before the filter.
 
 ### Behringer TD-3-MO-AM settings
 * **Clock source:** Set to 'MIDI' (hold BACK + WRITE/NEXT, press step 2).
