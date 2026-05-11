@@ -7,7 +7,6 @@ The configuration leverages a **serial audio path** and a **daisy-chain MIDI top
 
 This configuration provides a robust, "DAWless" workflow focused on high-fidelity analog signal preservation. The serial routing allows for unique sound design possibilities that traditional parallel mixing cannot achieve.
 
-<img width="2816" height="1536" alt="Gemini_Generated_Image_lwdrr5lwdrr5lwdr" src="https://github.com/user-attachments/assets/2a243f36-f7fe-4b74-aa66-1c095cf5994f" />
 
 
 ---
