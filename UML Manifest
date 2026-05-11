@@ -1,0 +1,54 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam backgroundColor white
+skinparam arrowColor #333333
+skinparam shadowing false
+skinparam roundcorner 5
+
+' Define Hardware Components
+component "Arturia MiniBrute\n(Master / Filter Stage)" as MB #E6F3FF
+component "Behringer TD-3-MO-AM\n(Signal Generator)" as TD3 #FFF0F0
+component "Korg MS2000BR\n(FX / Vocoder Stage)" as MS2K #F8F9FA
+component "Behringer QX1204USB\n(Mixing Hub)" as Mixer #E8F5E9
+
+' MIDI Synchronization (Control Path - RED)
+MB -[#D32F2F,bold]-> MS2K : " MIDI OUT → MIDI IN "
+MS2K -[#D32F2F,bold]-> TD3 : " MIDI THRU → MIDI IN "
+
+' Audio Signal Flow (Audio Path - BLUE)
+TD3 -[#1976D2,bold]-> MB : " Line Out → Audio In "
+MB -[#1976D2,bold]-> MS2K : " Line Out → Audio In 1 "
+MS2K -[#1976D2,bold]-> Mixer : " Stereo Out → Ch 5/6 "
+
+' Technical Configuration Notes
+note bottom of MB
+  **Role:** Master Clock
+  **MIDI Out Ch:** 1
+  --
+  *Gate Source: 'Hold'*
+  *Ext In Fader: ~70%*
+end note
+
+note bottom of MS2K
+  **Role:** MIDI Slave / FX
+  **Global MIDI Ch:** 1
+  --
+  *Clock: External*
+  *Receives Notes from MB*
+end note
+
+note bottom of TD3
+  **Role:** MIDI Slave / Acid
+  **MIDI Input Ch:** 2
+  --
+  *Clock: MIDI*
+  *Ignores MB Keyboard*
+end note
+
+legend right
+  |= Color |= Connection Type |
+  |<#D32F2F>| MIDI Sync (5-Pin DIN) |
+  |<#1976D2>| Analog Audio (1/4" TS) |
+endlegend
+
+@enduml
