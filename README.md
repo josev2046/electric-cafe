@@ -1,4 +1,4 @@
-# JV's integrated synth workstation (Mk1 edition)
+# JV's integrated synth workstation 
 
 ## Overview
 This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of a unified synth rig comprising the Arturia MiniBrute Mk1, Behringer TD-3-MO-AM, and Korg MS2000BR.
