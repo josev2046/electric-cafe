@@ -26,7 +26,7 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 1.  **Stage 1:** The **Behringer TD-3-MO-AM** output is routed into the **Arturia MiniBrute** external audio input.
 2.  **Stage 2:** The **Arturia MiniBrute** processes the combined signal through its Steiner-Parker filter and Brute Factor overdrive.
 3.  **Stage 3:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1.
-4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a professional line-level stereo signal to the **Yamaha MG06X** mixer.
+4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a line-level stereo signal to the **Yamaha MG06X** mixer.
 
 ---
 
