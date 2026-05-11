@@ -1,11 +1,11 @@
 # JV's integrated synth workstation
 
 ## Overview
-This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of my unified synth rig comprising my Arturia MiniBrute, Behringer TD-3-MO-AM, and Korg MS2000BR.
+This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of my unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and a Korg MS2000BR.
 
 The configuration leverages a **serial audio path** and a **daisy-chain MIDI topology** to ensure total interconnectivity, allowing for advanced filtering and temporal processing across all units.
 
-This configuration provides a robust, "DAWless" workflow while maintaining the ability to record a polished stereo master via the USB interface. The serial routing allows for unique sound design possibilities that traditional parallel mixing cannot achieve.
+This configuration provides a robust, "DAWless" workflow focused on high-fidelity analog signal preservation. The serial routing allows for unique sound design possibilities that traditional parallel mixing cannot achieve.
 
 ---
 
@@ -25,19 +25,18 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 
 1.  **Stage 1:** The **Behringer TD-3-MO-AM** output is routed into the **Arturia MiniBrute** external audio input.
 2.  **Stage 2:** The **Arturia MiniBrute** processes the combined signal through its Steiner-Parker filter and Brute Factor overdrive.
-3.  **Stage 4:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1.
-4.  **Stage 5:** The Korg applies stereo DSP effects (delay, chorus, flanger) and outputs a professional line-level stereo signal to the **Behringer Xenyx QX1204USB** mixer.
+3.  **Stage 3:** The composite mono signal is routed from the MiniBrute output into the **Korg MS2000BR** audio in 1.
+4.  **Stage 4:** The Korg applies stereo DSP effects and outputs a professional line-level stereo signal to the **Yamaha MG06X** professional compact mixer.
 
 ---
 
-## 2. Cabling inventory
+## 2. Professional cabling inventory
 
 | Quantity | Item | Specification | Purpose |
 | :--- | :--- | :--- | :--- |
 | 2 | MIDI cable | 5-pin DIN (2m) | System synchronisation |
 | 2 | Mono patch cable | 1/4" TS mono (0.6m - 0.9m) | Inter-unit audio linking |
 | 2 | Instrument cable | 1/4" TS mono (1.5m - 3.0m) | Master stereo out to mixer |
-| 1 | USB cable | Type-A to Type-B | Mixer to PC/Mac recording |
 | 1 | Power strip | Surge protected (6-way) | Centralised power distribution |
 
 ---
