@@ -59,4 +59,5 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 ---
 
 ## 4. Hardware connectivity diagram
-<img width="755" height="612" alt="image" src="https://github.com/user-attachments/assets/45a5eb12-6b8e-44c3-8c03-1a3286848a86" />
+<img width="795" height="611" alt="image" src="https://github.com/user-attachments/assets/835a311a-49c8-4345-9e98-59613e9d928a" />
+
