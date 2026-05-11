@@ -30,7 +30,7 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 
 ---
 
-## 2. Professional cabling inventory
+## 2. Cabling inventory
 
 | Quantity | Item | Specification | Purpose |
 | :--- | :--- | :--- | :--- |
