@@ -1,7 +1,7 @@
 # JV's integrated synth workstation
 
 ## Overview
-This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of a unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and Korg MS2000BR.
+This document outlines the signal architecture, MIDI synchronisation, and physical cabling requirements of my unified synth rig comprising the Arturia MiniBrute, Behringer TD-3-MO-AM, and Korg MS2000BR.
 
 The configuration leverages a **serial audio path** and a **daisy-chain MIDI topology** to ensure total interconnectivity, allowing for advanced filtering and temporal processing across all units. This setup provides a robust, "DAWless" workflow focused on high-fidelity analogue signal preservation and unique sound design possibilities.
 
