@@ -63,3 +63,13 @@ The audio is routed serially to allow the final stage (Korg MS2000BR) to apply s
 ## 4. Hardware connectivity diagram
 <img width="795" height="611" alt="image" src="https://github.com/user-attachments/assets/835a311a-49c8-4345-9e98-59613e9d928a" />
 
+The TD-3 generates raw acid bass and feeds into the MiniBrute where it gets shaped by the filter
+The MiniBrute then sends its output to the Korg MS2000BR for effects processing and vocoding
+The Korg's stereo output goes into your Yamaha mixer for final output control
+
+* **MIDI control:**
+
+The MiniBrute acts as the master clock and sequencer, sending MIDI to the Korg on channel 1
+The Korg forwards clock information through MIDI THRU to the TD-3 on channel 2, keeping everything in sync
+This creates a synchronized trio where the MiniBrute controls the timing and the TD-3 and Korg follow along
+
