@@ -1,10 +1,8 @@
-## Korg MS2000BR: The Ultimate Quick Reference
-
-An essential guide to maximising the potential of your 4-voice virtual analogue synthesiser. 
+## Korg MS2000BR: Quick reference
 
 ---
 
-### 1. Architecture at a Glance
+### 1. Architecture at a glance
 * **Polyphony:** 4 voices (Mono, Poly, Unison).
 * **Oscillators:** 2 per voice + Noise. OSC 1 features 7 waveforms (including 64 DWGS digital waves). OSC 2 features 3 waveforms plus Ring Modulation and Sync.
 * **Filter:** Multi-mode resonant filter (24dB/octave Low Pass, 12dB/octave Low Pass, Band Pass, High Pass).
@@ -13,7 +11,7 @@ An essential guide to maximising the potential of your 4-voice virtual analogue 
 
 ---
 
-### 2. The Virtual Patch System (Modulation Matrix)
+### 2. The virtual patch system (Modulation Matrix)
 This is where the heavy lifting happens. You have four virtual patches per timbre to route modulation sources to various destinations.
 
 | Source (Modulator) | Destination (Target) | Expert Tip |
@@ -25,7 +23,7 @@ This is where the heavy lifting happens. You have four virtual patches per timbr
 
 ---
 
-### 3. Mastering the Mod Sequence
+### 3. Mastering the mod sequence
 The Mod Sequencer is your secret weapon. It is a 3-track, 16-step motion sequencer that automates parameter changes over time.
 
 * **Track Setup:** Choose one of the three available tracks.
@@ -36,7 +34,7 @@ The Mod Sequencer is your secret weapon. It is a 3-track, 16-step motion sequenc
 
 ---
 
-### 4. Setting Up the 16-Band Vocoder
+### 4. Setting up the 16-band vocoder
 The MS2000BR is highly regarded for its crisp, robotic vocoder capabilities.
 
 * **Audio Routing:** Plug your microphone into Audio In 2 on the rear panel and ensure the Mic/Line switch is set to Mic.
@@ -48,7 +46,7 @@ The MS2000BR is highly regarded for its crisp, robotic vocoder capabilities.
 
 ---
 
-### 5. Effects and Equalisation
+### 5. Effects and equalisation
 Do not overlook the onboard effects; they add vital colour and polish to the raw oscillators.
 
 * **Modulation:** Choose between Chorus, Flanger, or Ensemble. The Ensemble effect instantly provides a lush, 80s string machine vibe.
@@ -58,9 +56,15 @@ Do not overlook the onboard effects; they add vital colour and polish to the raw
 
 ---
 
-### 6. Workflow Tips & Hidden Tricks
+### 6. Workflow tips & hidden tricks
 
 * **Initialise a Patch:** To start from a completely blank slate, press the `Global` button, navigate to the `Utility` menu, select `Init Prog`, and confirm.
 * **Unison Mode:** Stack all 4 voices onto a single note for enormous, fat basslines (bear in mind this makes the synthesiser strictly monophonic).
 * **Explore DWGS Waves:** Dive into the DWGS (Digital Waveform Generator System) waves on OSC 1 to access classic digital bell, electric piano, and organ tones lifted from the vintage Korg DW-8000.
 * **Arpeggiator Sync:** Hit `Global`, navigate to the `MIDI Clock` page, and set it to `Ext` if you want the arpeggiator and delay effects to flawlessly follow your DAW's master tempo.
+
+### 7. Cheatsheet
+
+
+<img width="1316" height="1851" alt="korg_cheatsheet" src="https://github.com/user-attachments/assets/323435c7-3498-448a-9580-89cce9799127" />
+
