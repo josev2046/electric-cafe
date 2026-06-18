@@ -80,6 +80,11 @@
         /* General text overrides */
         .txt-dim { color: #008f11; }
         .txt-bright { color: #00ff41; }
+        
+        /* Custom Select */
+        select {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 flex flex-col items-center justify-center">
@@ -90,9 +95,18 @@
                 <h1 class="text-2xl font-bold tracking-widest">Electric Cafe Groove Emulator</h1>
                 <p class="txt-dim text-xs mt-1">Web Audio Sequencer & Synthesizer</p>
             </div>
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 px-3 py-2 border border-[#00ff41]" title="Changes the order steps are played">
+                    <label class="text-xs font-bold txt-dim">MODE</label>
+                    <select id="playMode" class="bg-black text-[#00ff41] outline-none font-bold cursor-pointer uppercase text-xs">
+                        <option value="forward">Forward</option>
+                        <option value="reverse">Reverse</option>
+                        <option value="pingpong">Ping-Pong</option>
+                        <option value="random">Random</option>
+                    </select>
+                </div>
                 <div class="flex items-center gap-3 px-4 py-2 border border-[#00ff41]" title="Controls the speed of the track">
-                    <label class="text-xs font-bold txt-dim">Tempo (BPM)</label>
+                    <label class="text-xs font-bold txt-dim">BPM</label>
                     <input type="range" id="tempoSlider" min="80" max="180" value="120" class="w-24">
                     <span id="tempoDisplay" class="font-bold w-8 text-right">120</span>
                 </div>
@@ -151,6 +165,9 @@
         const lookahead = 25.0, scheduleAheadTime = 0.1, baseFreq = 65.41, NUM_STEPS = 16;
         let rootNoteOffset = 0; // Defines the base key. 0 = C.
         
+        let playMode = 'forward'; // forward, reverse, pingpong, random
+        let pingPongDir = 1; // 1 for forward, -1 for backward
+
         const sequence = {
             pitch:  [0, 0, 12, 0, 3, 0, 12, 0, 0, 0, 7, 0, 12, 0, 3, 0],
             filter: [0, 0, 40, 0, 60, 0, 40, 0, 0, 0, 60, 0, 40, 0, 60, 0],
@@ -192,7 +209,6 @@
         
         notes.forEach((note, index) => {
             const btn = document.createElement('button');
-            // Style differently if it's the active starting note (C)
             const activeStyle = index === 0 ? 'bg-[#00ff41] text-black' : 'bg-black text-[#00ff41] hover:bg-[#003300]';
             btn.className = `flex-1 text-[9px] font-bold border border-[#00ff41] transition-colors ${activeStyle}`;
             btn.innerText = note;
@@ -200,12 +216,10 @@
             
             btn.addEventListener('click', (e) => {
                 rootNoteOffset = parseInt(e.target.dataset.offset);
-                // Reset all keys to inactive style
                 Array.from(keyboardContainer.children).forEach(child => {
                     child.classList.remove('bg-[#00ff41]', 'text-black');
                     child.classList.add('bg-black', 'text-[#00ff41]');
                 });
-                // Highlight clicked key
                 e.target.classList.remove('bg-black', 'text-[#00ff41]');
                 e.target.classList.add('bg-[#00ff41]', 'text-black');
             });
@@ -227,7 +241,6 @@
             const osc = audioCtx.createOscillator(), filter = audioCtx.createBiquadFilter(), env = audioCtx.createGain();
             osc.type = 'sawtooth';
             
-            // Calculate final pitch including sequence note, octave shift, and keyboard root note
             const octaveShift = parseInt(document.getElementById('octaveShift').value);
             const totalPitch = sequence.pitch[step] + (octaveShift * 12) + rootNoteOffset;
             osc.frequency.value = baseFreq * Math.pow(2, totalPitch / 12);
@@ -277,15 +290,38 @@
             }
         }
 
+        function getNextStep() {
+            switch(playMode) {
+                case 'reverse':
+                    return (currentStep - 1 + NUM_STEPS) % NUM_STEPS;
+                case 'pingpong':
+                    if (pingPongDir === 1) {
+                        if (currentStep >= NUM_STEPS - 1) { pingPongDir = -1; return currentStep - 1; }
+                        return currentStep + 1;
+                    } else {
+                        if (currentStep <= 0) { pingPongDir = 1; return currentStep + 1; }
+                        return currentStep - 1;
+                    }
+                case 'random':
+                    return Math.floor(Math.random() * NUM_STEPS);
+                case 'forward':
+                default:
+                    return (currentStep + 1) % NUM_STEPS;
+            }
+        }
+
         function scheduler() {
             while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-                playVoices(currentStep, nextNoteTime);
+                const stepToPlay = currentStep; // Capture the current step before mutating it
+                playVoices(stepToPlay, nextNoteTime);
                 nextNoteTime += 0.25 * (60.0 / parseInt(document.getElementById('tempoSlider').value));
+                
                 requestAnimationFrame(() => { 
                     stepElements.forEach(el => el.classList.remove('active')); 
-                    stepElements[currentStep === 0 ? 15 : currentStep - 1].classList.add('active'); 
+                    stepElements[stepToPlay].classList.add('active'); 
                 });
-                currentStep = (currentStep + 1) % NUM_STEPS;
+                
+                currentStep = getNextStep();
             }
             timerID = window.setTimeout(scheduler, lookahead);
         }
@@ -300,7 +336,15 @@
                 stepElements.forEach(el => el.classList.remove('active'));
             } else {
                 if(audioCtx.state === 'suspended') audioCtx.resume();
-                isPlaying = true; currentStep = 0; nextNoteTime = audioCtx.currentTime + 0.05;
+                isPlaying = true; 
+                
+                // Reset step tracking based on mode
+                if (playMode === 'reverse') currentStep = NUM_STEPS - 1;
+                else if (playMode === 'random') currentStep = Math.floor(Math.random() * NUM_STEPS);
+                else currentStep = 0;
+                
+                pingPongDir = 1;
+                nextNoteTime = audioCtx.currentTime + 0.05;
                 scheduler(); 
                 playBtn.innerText = '[ STOP ]';
                 playBtn.classList.add('bg-[#00ff41]', 'text-black');
@@ -312,6 +356,9 @@
         document.getElementById('octaveShift').addEventListener('input', (e) => {
             let val = parseInt(e.target.value);
             document.getElementById('octaveDisplay').innerText = val > 0 ? '+' + val : val;
+        });
+        document.getElementById('playMode').addEventListener('change', (e) => {
+            playMode = e.target.value;
         });
     </script>
 </body>
