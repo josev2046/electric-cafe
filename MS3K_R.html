@@ -11,37 +11,66 @@
 
         body { 
             background-color: #1e1e1e; 
-            color: #e5e3d8; /* Korg silkscreen cream/off-white */
+            color: #e5e3d8; 
             font-family: 'Inter', sans-serif; 
             text-transform: uppercase;
             padding: 2rem 1rem;
         }
+
+        /* --- WOODEN END CHEEKS --- */
+        .synth-wrapper {
+            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.9), 0 15px 20px -5px rgba(0,0,0,0.8);
+            border-radius: 10px;
+        }
+
+        .wood-cheek {
+            width: 44px;
+            background: linear-gradient(90deg, #2b1104 0%, #4a210d 15%, #5e2c13 40%, #4a210d 65%, #6e3518 85%, #2b1104 100%);
+            position: relative;
+            z-index: 20;
+            border-top: 1px solid #824322;
+            border-bottom: 2px solid #1a0801;
+        }
+        .wood-left {
+            border-radius: 10px 0 0 10px;
+            border-right: 6px solid #080808;
+            box-shadow: inset 4px 0 6px rgba(255,255,255,0.05), inset -4px 0 10px rgba(0,0,0,0.8);
+        }
+        .wood-right {
+            border-radius: 0 10px 10px 0;
+            border-left: 6px solid #080808;
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.8), inset 2px 0 6px rgba(255,255,255,0.05);
+        }
+
+        /* Wood panel screws */
+        .wood-cheek::before, .wood-cheek::after {
+            content: ''; position: absolute; width: 12px; height: 12px;
+            background: linear-gradient(45deg, #111, #444);
+            border-radius: 50%; left: 16px; 
+            box-shadow: inset 0 -2px 3px #000, 0 1px 1px rgba(255,255,255,0.1);
+            border: 1px solid #000;
+        }
+        .wood-cheek::before { top: 40px; }
+        .wood-cheek::after { bottom: 40px; }
         
+        /* --- MAIN CHASSIS --- */
         .chassis {
-            background: #111; /* Matte black faceplate */
-            border: 8px solid #080808;
-            border-radius: 6px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.05);
+            background: #111; 
+            border-top: 8px solid #080808;
+            border-bottom: 8px solid #080808;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 -2px 10px rgba(0,0,0,1);
             padding: 24px;
             position: relative;
         }
 
-        /* Decorative chassis screws */
-        .chassis::before, .chassis::after {
-            content: ''; position: absolute; width: 14px; height: 14px;
-            background: radial-gradient(circle, #555 20%, #111 80%);
-            border-radius: 50%; top: 12px; box-shadow: inset 0 -1px 2px rgba(0,0,0,0.9);
-        }
-        .chassis::before { left: 12px; }
-        .chassis::after { right: 12px; }
-
         .korg-panel { 
-            border: 2px solid #e5e3d8; /* Crisp silkscreen boxes */
+            border: 2px solid #e5e3d8; 
             border-radius: 2px;
             margin-bottom: 2rem;
             position: relative;
             padding: 16px 12px 12px 12px;
             background: #151515;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
         }
         
         .korg-header {
@@ -95,7 +124,7 @@
             height: 22px; width: 14px; background: #1a1a1a; cursor: pointer; -webkit-appearance: none; 
             margin-top: -9px; border-radius: 2px;
             border: 1px solid #000;
-            border-top: 3px solid #e5e3d8; /* White indicator stripe */
+            border-top: 3px solid #e5e3d8; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.8);
         }
         
@@ -150,9 +179,9 @@
             background: #e5e3d8; color: #111; font-weight: 900;
             border: 2px solid #fff; border-bottom: 4px solid #aaa;
             border-radius: 3px; cursor: pointer; transition: all 0.05s;
-            padding: 8px 24px; text-align: center;
+            padding: 0 24px; display: flex; align-items: center; justify-content: center;
         }
-        .action-btn:active {
+        .action-btn:active, .action-btn.active-press {
             border-bottom: 2px solid #aaa; border-top: 4px solid #fff; transform: translateY(2px);
         }
 
@@ -161,6 +190,7 @@
             border: 2px solid #111; border-bottom: 3px solid #000;
             border-radius: 3px; cursor: pointer; transition: all 0.05s;
             font-size: 10px; padding: 4px 12px; letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center;
         }
         .btn-small:active { border-bottom: 1px solid #000; border-top: 3px solid #111; transform: translateY(1px); }
 
@@ -185,181 +215,184 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start">
 
-    <div class="w-full max-w-7xl flex flex-col gap-4 chassis">
+    <div class="w-full max-w-[84rem] flex synth-wrapper">
         
-        <!-- TOP BRANDING & TRANSPORT -->
-        <div class="flex flex-wrap justify-between items-end mb-6 px-2">
-            <div>
-                <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Archivo Black', sans-serif;">
-                    <span class="txt-korg-red">MS</span>-3000
-                </h1>
-                <p class="text-[11px] font-bold tracking-[0.25em] mt-2 text-[#888]">PROGRAMMABLE ANALOG SEQUENCER</p>
-            </div>
+        <div class="wood-cheek wood-left"></div>
+
+        <div class="flex-1 flex flex-col gap-4 chassis">
             
-            <div class="flex flex-wrap items-end gap-6">
-                <!-- Master Routing -->
-                <div class="module-group flex flex-col gap-3">
-                    <span class="module-group-title">MASTER ROUTING</span>
-                    <div class="flex items-center gap-4">
-                        <select id="masterPlayMode" class="text-[11px]">
-                            <option value="forward">SEQ: FORWARD</option>
-                            <option value="reverse">SEQ: REVERSE</option>
-                            <option value="pingpong">SEQ: PING-PONG</option>
-                            <option value="random">SEQ: RANDOM</option>
-                        </select>
-                        <div id="keyboard" class="flex w-64 h-8 gap-1"></div>
+            <div class="flex flex-wrap justify-between items-end mb-6 px-2">
+                <div>
+                    <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Archivo Black', sans-serif;">
+                        <span class="txt-korg-red">MS</span>-3000
+                    </h1>
+                    <p class="text-[11px] font-bold tracking-[0.25em] mt-2 text-[#888]">PROGRAMMABLE ANALOG SEQUENCER</p>
+                </div>
+                
+                <div class="flex flex-wrap items-end gap-6">
+                    <div class="module-group flex flex-col gap-3">
+                        <span class="module-group-title">MASTER ROUTING</span>
+                        <div class="flex items-center gap-4">
+                            <select id="masterPlayMode" class="text-[11px] h-8">
+                                <option value="forward">SEQ: FORWARD</option>
+                                <option value="reverse">SEQ: REVERSE</option>
+                                <option value="pingpong">SEQ: PING-PONG</option>
+                                <option value="random">SEQ: RANDOM</option>
+                            </select>
+                            <div id="keyboard" class="flex w-64 h-8 gap-1"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-group flex items-center gap-6">
+                        <span class="module-group-title">CLOCK & BEND</span>
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="pitchWheel" min="-2" max="2" value="0" step="0.01">
+                            <span class="text-[10px] mt-3 font-bold text-[#888]">PITCH BEND</span>
+                        </div>
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="tempoSlider" min="80" max="180" value="120">
+                            <span class="text-[10px] mt-3 font-bold text-[#888]">TEMPO: <span id="tempoDisplay" class="text-white">120</span></span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button id="playBtn" class="action-btn text-xl h-14 shadow-lg w-40">PLAY / STOP</button>
+                        <button id="syncBtn" class="action-btn text-sm h-14 shadow-lg w-20" title="Snap all sequences back to step 1">SYNC</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- Clock & Bend -->
-                <div class="module-group flex items-center gap-6">
-                    <span class="module-group-title">CLOCK & BEND</span>
-                    <div class="flex flex-col items-center w-24">
-                        <input type="range" id="pitchWheel" min="-2" max="2" value="0" step="0.01">
-                        <span class="text-[10px] mt-3 font-bold text-[#888]">PITCH BEND</span>
+            <div class="korg-panel">
+                <div class="korg-header">VCO 1 / VCF 1</div>
+                
+                <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <button class="btn-small mute-btn h-6" data-track="A">MUTE</button>
+                            <button class="btn-small rand-btn h-6" data-track="A">RANDOM</button>
+                            <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="A">
+                                <option value="forward">MODE: FWD</option>
+                                <option value="reverse">MODE: REV</option>
+                                <option value="pingpong">MODE: PING</option>
+                                <option value="random">MODE: RAND</option>
+                            </select>
+                        </div>
+                        <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK A</div>
                     </div>
-                    <div class="flex flex-col items-center w-24">
-                        <input type="range" id="tempoSlider" min="80" max="180" value="120">
-                        <span class="text-[10px] mt-3 font-bold text-[#888]">TEMPO: <span id="tempoDisplay" class="text-white">120</span></span>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex gap-2" id="waveGroupA">
+                            <button class="wave-btn active" data-track="A" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
+                        </div>
+                        <div class="flex gap-8">
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="noiseA" min="0" max="1" value="0" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE MIX</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="cutoffA" min="50" max="2500" value="200">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">VCF CUTOFF</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="decayA" min="0.05" max="0.5" value="0.15" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">EG DECAY</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="octaveA" min="-2" max="2" value="0">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <button id="playBtn" class="action-btn text-xl h-14 shadow-lg">PLAY / STOP</button>
+                
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridA"></div>
             </div>
-        </div>
 
-        <!-- TRACK A: VCO 1 -->
-        <div class="korg-panel">
-            <div class="korg-header">VCO 1 / VCF 1</div>
-            
-            <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
-                <!-- Header Row 1: Routing -->
-                <div class="flex justify-between items-center">
+            <div class="korg-panel">
+                <div class="korg-header">VCO 2 / VCF 2</div>
+                
+                <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <button class="btn-small mute-btn h-6" data-track="B">MUTE</button>
+                            <button class="btn-small rand-btn h-6" data-track="B">RANDOM</button>
+                            <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="B">
+                                <option value="forward">MODE: FWD</option>
+                                <option value="reverse">MODE: REV</option>
+                                <option value="pingpong">MODE: PING</option>
+                                <option value="random">MODE: RAND</option>
+                            </select>
+                        </div>
+                        <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK B</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex gap-2" id="waveGroupB">
+                            <button class="wave-btn" data-track="B" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
+                            <button class="wave-btn active" data-track="B" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="B" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="B" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
+                        </div>
+                        <div class="flex gap-8">
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="noiseB" min="0" max="1" value="0" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE MIX</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="cutoffB" min="50" max="2500" value="100">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">VCF CUTOFF</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="decayB" min="0.05" max="0.5" value="0.2" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">EG DECAY</span>
+                            </div>
+                            <div class="flex flex-col items-center w-20">
+                                <input type="range" id="octaveB" min="-2" max="2" value="-1">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridB"></div>
+            </div>
+
+            <div class="korg-panel">
+                <div class="korg-header">RHYTHM GENERATOR</div>
+                
+                <div class="flex justify-between items-center px-2 pb-4 border-b border-[#2a2a2a] mb-4">
                     <div class="flex items-center gap-3">
-                        <button class="btn-small mute-btn" data-track="A">MUTE</button>
-                        <button class="btn-small rand-btn" data-track="A">RANDOM</button>
-                        <select class="track-mode-select text-[10px] py-1" data-track="A">
+                        <button class="btn-small mute-btn h-6" data-track="Drums">MUTE</button>
+                        <button class="btn-small rand-btn h-6" data-track="Drums">RANDOM</button>
+                        <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="Drums">
                             <option value="forward">MODE: FWD</option>
                             <option value="reverse">MODE: REV</option>
                             <option value="pingpong">MODE: PING</option>
                             <option value="random">MODE: RAND</option>
                         </select>
                     </div>
-                    <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK A</div>
-                </div>
-                
-                <!-- Header Row 2: Parameters -->
-                <div class="flex justify-between items-center mt-2">
-                    <div class="flex gap-2" id="waveGroupA">
-                        <button class="wave-btn active" data-track="A" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
-                        <button class="wave-btn" data-track="A" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
-                        <button class="wave-btn" data-track="A" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
-                        <button class="wave-btn" data-track="A" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
-                    </div>
+                    
                     <div class="flex gap-8">
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="noiseA" min="0" max="1" value="0" step="0.01">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE MIX</span>
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="drumNoiseDecay" min="0.01" max="0.25" value="0.05" step="0.01">
+                            <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE DECAY</span>
                         </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="cutoffA" min="50" max="2500" value="200">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">VCF CUTOFF</span>
-                        </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="decayA" min="0.05" max="0.5" value="0.15" step="0.01">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">EG DECAY</span>
-                        </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="octaveA" min="-2" max="2" value="0">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="kickPitch" min="100" max="250" value="150">
+                            <span class="text-[10px] mt-2 font-bold text-[#888]">KICK TUNE</span>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridA"></div>
-        </div>
-
-        <!-- TRACK B: VCO 2 -->
-        <div class="korg-panel">
-            <div class="korg-header">VCO 2 / VCF 2</div>
-            
-            <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3">
-                        <button class="btn-small mute-btn" data-track="B">MUTE</button>
-                        <button class="btn-small rand-btn" data-track="B">RANDOM</button>
-                        <select class="track-mode-select text-[10px] py-1" data-track="B">
-                            <option value="forward">MODE: FWD</option>
-                            <option value="reverse">MODE: REV</option>
-                            <option value="pingpong">MODE: PING</option>
-                            <option value="random">MODE: RAND</option>
-                        </select>
-                    </div>
-                    <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK B</div>
                 </div>
                 
-                <div class="flex justify-between items-center mt-2">
-                    <div class="flex gap-2" id="waveGroupB">
-                        <button class="wave-btn" data-track="B" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
-                        <button class="wave-btn active" data-track="B" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
-                        <button class="wave-btn" data-track="B" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
-                        <button class="wave-btn" data-track="B" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
-                    </div>
-                    <div class="flex gap-8">
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="noiseB" min="0" max="1" value="0" step="0.01">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE MIX</span>
-                        </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="cutoffB" min="50" max="2500" value="100">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">VCF CUTOFF</span>
-                        </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="decayB" min="0.05" max="0.5" value="0.2" step="0.01">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">EG DECAY</span>
-                        </div>
-                        <div class="flex flex-col items-center w-20">
-                            <input type="range" id="octaveB" min="-2" max="2" value="-1">
-                            <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
-                        </div>
-                    </div>
-                </div>
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridDrums"></div>
             </div>
-            
-            <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridB"></div>
         </div>
-
-        <!-- TRACK C: RHYTHM -->
-        <div class="korg-panel">
-            <div class="korg-header">RHYTHM GENERATOR</div>
-            
-            <div class="flex justify-between items-center px-2 pb-4 border-b border-[#2a2a2a] mb-4">
-                <div class="flex items-center gap-3">
-                    <button class="btn-small mute-btn" data-track="Drums">MUTE</button>
-                    <button class="btn-small rand-btn" data-track="Drums">RANDOM</button>
-                    <select class="track-mode-select text-[10px] py-1" data-track="Drums">
-                        <option value="forward">MODE: FWD</option>
-                        <option value="reverse">MODE: REV</option>
-                        <option value="pingpong">MODE: PING</option>
-                        <option value="random">MODE: RAND</option>
-                    </select>
-                </div>
-                
-                <div class="flex gap-8">
-                    <div class="flex flex-col items-center w-24">
-                        <input type="range" id="drumNoiseDecay" min="0.01" max="0.25" value="0.05" step="0.01">
-                        <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE DECAY</span>
-                    </div>
-                    <div class="flex flex-col items-center w-24">
-                        <input type="range" id="kickPitch" min="100" max="250" value="150">
-                        <span class="text-[10px] mt-2 font-bold text-[#888]">KICK TUNE</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridDrums"></div>
-        </div>
+        
+        <div class="wood-cheek wood-right"></div>
+        
     </div>
 
     <script>
@@ -469,6 +502,22 @@
             });
         });
 
+        // SYNC Button
+        document.getElementById('syncBtn').addEventListener('click', (e) => {
+            const btn = e.target;
+            btn.classList.add('active-press');
+            setTimeout(() => btn.classList.remove('active-press'), 100);
+
+            ['A', 'B', 'Drums'].forEach(trackId => {
+                if (tracks[trackId].mode === 'reverse') {
+                    tracks[trackId].step = NUM_STEPS - 1;
+                } else {
+                    tracks[trackId].step = 0;
+                }
+                tracks[trackId].dir = 1;
+            });
+        });
+
         const pitchWheel = document.getElementById('pitchWheel');
         pitchWheel.addEventListener('input', (e) => globalPitchBend = parseFloat(e.target.value));
         const snapPitchWheel = () => { pitchWheel.value = 0; globalPitchBend = 0; };
@@ -491,7 +540,7 @@
             tracks[track][param][step] = e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value) || 0;
         });
 
-        // "Volca" Style 12-key step keyboard
+        // Volca-Style 12-key Keyboard
         const keyboardContainer = document.getElementById('keyboard');
         const notes = [
             {n: 'C', c: 'w'}, {n: 'C#', c: 'b'}, {n: 'D', c: 'w'}, {n: 'D#', c: 'b'}, 
@@ -502,13 +551,10 @@
             const btn = document.createElement('button');
             const isWhite = note.c === 'w';
             
-            // Base layout for blocks
             btn.className = `flex-1 text-[8px] font-bold border border-[#111] transition-all rounded-sm shadow-sm ${isWhite ? 'bg-[#e5e3d8] text-[#111]' : 'bg-[#222] text-[#e5e3d8]'}`;
-            
             if(index === 0) {
                 btn.style.background = '#dca824'; btn.style.color = '#111'; btn.style.borderColor = '#9e7816';
             }
-            
             btn.innerText = note.n;
             btn.dataset.offset = index;
             
@@ -655,8 +701,7 @@
             initAudio();
             if (isPlaying) {
                 window.clearTimeout(timerID); isPlaying = false; 
-                playBtn.style.background = '';
-                playBtn.style.color = '';
+                playBtn.classList.remove('active-press');
                 ['A', 'B', 'Drums'].forEach(trackId => tracks[trackId].elements.forEach(el => el.classList.remove('active')));
             } else {
                 if(audioCtx.state === 'suspended') audioCtx.resume();
@@ -672,7 +717,7 @@
                 nextNoteTime = audioCtx.currentTime + 0.05;
                 scheduler(); 
                 
-                playBtn.style.background = '#d0ccbc';
+                playBtn.classList.add('active-press');
             }
         });
 
