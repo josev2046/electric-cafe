@@ -108,18 +108,32 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="panel p-4 flex flex-col gap-4">
-                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Synth</h2>
-                <div class="flex items-center justify-between gap-4" title="Sets the baseline brightness of the synthesizer tone">
-                    <label class="text-xs font-bold txt-dim w-32">Tone Brightness</label>
-                    <input type="range" id="globalCutoff" min="50" max="1500" value="200" class="flex-1">
+                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Melody Settings (Synthesizer)</h2>
+                
+                <div class="flex items-center justify-between gap-4" title="Transposes the entire melody up or down by octaves">
+                    <label class="text-xs font-bold txt-dim w-32">Octave Shift</label>
+                    <input type="range" id="octaveShift" min="-2" max="2" value="0" class="flex-1">
+                    <span id="octaveDisplay" class="font-bold w-6 text-right">0</span>
                 </div>
-                <div class="flex items-center justify-between gap-4" title="Controls how long the synth notes ring out before fading">
-                    <label class="text-xs font-bold txt-dim w-32">Note Length</label>
-                    <input type="range" id="globalDecay" min="0.05" max="0.5" value="0.15" step="0.01" class="flex-1">
+
+                <div class="mt-1 pt-2 border-t border-[#003300]" title="Changes the root musical key of the sequence">
+                    <label class="text-xs font-bold txt-dim mb-2 block">Root Key Selector</label>
+                    <div id="keyboard" class="flex w-full h-8 gap-[2px]"></div>
+                </div>
+
+                <div class="mt-1 pt-2 border-t border-[#003300] flex flex-col gap-4">
+                    <div class="flex items-center justify-between gap-4" title="Sets the baseline brightness of the synthesizer tone">
+                        <label class="text-xs font-bold txt-dim w-32">Tone Brightness</label>
+                        <input type="range" id="globalCutoff" min="50" max="1500" value="200" class="flex-1">
+                    </div>
+                    <div class="flex items-center justify-between gap-4" title="Controls how long the synth notes ring out before fading">
+                        <label class="text-xs font-bold txt-dim w-32">Note Length</label>
+                        <input type="range" id="globalDecay" min="0.05" max="0.5" value="0.15" step="0.01" class="flex-1">
+                    </div>
                 </div>
             </div>
             <div class="panel p-4 flex flex-col gap-4">
-                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Drum Settings</h2>
+                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Drum Settings (Percussion)</h2>
                 <div class="flex items-center justify-between gap-4" title="Adjusts how deep or punchy the kick drum sounds">
                     <label class="text-xs font-bold txt-dim w-32">Kick Drum Pitch</label>
                     <input type="range" id="kickPitch" min="100" max="250" value="150" class="flex-1">
@@ -135,6 +149,7 @@
     <script>
         let audioCtx, isPlaying = false, currentStep = 0, nextNoteTime = 0, timerID;
         const lookahead = 25.0, scheduleAheadTime = 0.1, baseFreq = 65.41, NUM_STEPS = 16;
+        let rootNoteOffset = 0; // Defines the base key. 0 = C.
         
         const sequence = {
             pitch:  [0, 0, 12, 0, 3, 0, 12, 0, 0, 0, 7, 0, 12, 0, 3, 0],
@@ -144,6 +159,7 @@
             hat:    [0, 40, 40, 40, 0, 40, 0, 40, 0, 40, 40, 40, 0, 40, 40, 40]
         };
 
+        // Initialize Sequencer Grid
         const gridContainer = document.getElementById('sequencerGrid');
         const stepElements = [];
 
@@ -153,7 +169,7 @@
             let stepNum = (i + 1).toString().padStart(2, '0');
             col.innerHTML = `
                 <div class="flex flex-col items-center gap-1 mb-2"><div class="led"></div><span class="text-[10px] txt-dim font-bold">STEP ${stepNum}</span></div>
-                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2" title="Melody Note (0 = Base Note, 12 = One Octave Up)"><span class="text-[9px] txt-dim">PITCH</span><input type="number" class="pitch-input" data-step="${i}" data-param="pitch" value="${sequence.pitch[i]}"></div>
+                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2" title="Melody Note Offset"><span class="text-[9px] txt-dim">PITCH</span><input type="number" class="pitch-input" data-step="${i}" data-param="pitch" value="${sequence.pitch[i]}"></div>
                 <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2 pt-1" title="How bright this specific note sounds"><span class="text-[9px] txt-dim">TONE</span><input type="range" class="vertical" orient="vertical" data-step="${i}" data-param="filter" min="0" max="100" value="${sequence.filter[i]}"></div>
                 <div class="flex flex-col items-center gap-2 w-full pt-1"><span class="text-[9px] txt-dim mb-1">DRUMS</span>
                     <label class="w-full relative" title="Toggle Kick Drum"><input type="checkbox" data-step="${i}" data-param="kick" ${sequence.kick[i] ? 'checked' : ''}><div class="drum-pad kick flex items-center justify-center text-[10px]">KICK</div></label>
@@ -170,6 +186,32 @@
             sequence[param][step] = e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value) || 0;
         });
 
+        // Initialize Keyboard UI
+        const keyboardContainer = document.getElementById('keyboard');
+        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        
+        notes.forEach((note, index) => {
+            const btn = document.createElement('button');
+            // Style differently if it's the active starting note (C)
+            const activeStyle = index === 0 ? 'bg-[#00ff41] text-black' : 'bg-black text-[#00ff41] hover:bg-[#003300]';
+            btn.className = `flex-1 text-[9px] font-bold border border-[#00ff41] transition-colors ${activeStyle}`;
+            btn.innerText = note;
+            btn.dataset.offset = index;
+            
+            btn.addEventListener('click', (e) => {
+                rootNoteOffset = parseInt(e.target.dataset.offset);
+                // Reset all keys to inactive style
+                Array.from(keyboardContainer.children).forEach(child => {
+                    child.classList.remove('bg-[#00ff41]', 'text-black');
+                    child.classList.add('bg-black', 'text-[#00ff41]');
+                });
+                // Highlight clicked key
+                e.target.classList.remove('bg-black', 'text-[#00ff41]');
+                e.target.classList.add('bg-[#00ff41]', 'text-black');
+            });
+            keyboardContainer.appendChild(btn);
+        });
+
         let noiseBuffer = null;
         function initAudio() {
             if (audioCtx) return;
@@ -184,7 +226,12 @@
             // Melody
             const osc = audioCtx.createOscillator(), filter = audioCtx.createBiquadFilter(), env = audioCtx.createGain();
             osc.type = 'sawtooth';
-            osc.frequency.value = baseFreq * Math.pow(2, sequence.pitch[step] / 12);
+            
+            // Calculate final pitch including sequence note, octave shift, and keyboard root note
+            const octaveShift = parseInt(document.getElementById('octaveShift').value);
+            const totalPitch = sequence.pitch[step] + (octaveShift * 12) + rootNoteOffset;
+            osc.frequency.value = baseFreq * Math.pow(2, totalPitch / 12);
+            
             filter.type = 'lowpass';
             const baseCutoff = parseFloat(document.getElementById('globalCutoff').value);
             filter.frequency.setValueAtTime(baseCutoff + ((sequence.filter[step] / 100) * 3000), time);
@@ -260,7 +307,12 @@
             }
         });
 
+        // UI Event Listeners
         document.getElementById('tempoSlider').addEventListener('input', (e) => document.getElementById('tempoDisplay').innerText = e.target.value);
+        document.getElementById('octaveShift').addEventListener('input', (e) => {
+            let val = parseInt(e.target.value);
+            document.getElementById('octaveDisplay').innerText = val > 0 ? '+' + val : val;
+        });
     </script>
 </body>
 </html>
