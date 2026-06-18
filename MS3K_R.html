@@ -65,19 +65,16 @@
         
         /* --- HARDWARE BADGE LOGO --- */
         .logo-badge {
-            position: absolute;
-            top: 24px;
-            right: 32px;
-            width: 140px;
+            width: 220px; /* Made significantly larger */
             background: linear-gradient(135deg, #e5e3d8 0%, #c4c2b7 100%);
             border-top: 1px solid #fff;
             border-left: 1px solid #fff;
             border-bottom: 2px solid #888;
             border-right: 2px solid #888;
-            border-radius: 3px;
-            padding: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.9);
-            z-index: 50;
+            border-radius: 4px;
+            padding: 16px; /* More breathing room */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6); /* Deeper shadow for bigger plaque */
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -89,17 +86,16 @@
             background: #999; border-radius: 50%;
             box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.8);
         }
-        .logo-badge::before { top: 4px; left: 4px; }
-        .logo-badge::after { bottom: 4px; right: 4px; }
-        .logo-badge-screw-3 { top: 4px; right: 4px; }
-        .logo-badge-screw-4 { bottom: 4px; left: 4px; }
+        .logo-badge::before { top: 6px; left: 6px; }
+        .logo-badge::after { bottom: 6px; right: 6px; }
+        .logo-badge-screw-3 { top: 6px; right: 6px; }
+        .logo-badge-screw-4 { bottom: 6px; left: 6px; }
 
         .logo-badge img {
             width: 100%;
             height: auto;
             /* Multiply blending makes the white paper perfectly transparent against the metal! */
             mix-blend-mode: multiply; 
-            /* Deepens the pen lines */
             filter: grayscale(1) contrast(1.5) brightness(1.05); 
             opacity: 0.9; 
             pointer-events: none;
@@ -263,22 +259,17 @@
         <div class="wood-cheek wood-left"></div>
 
         <div class="flex-1 flex flex-col gap-4 chassis">
-            
-            <div class="logo-badge">
-                <div class="logo-badge-screw-3"></div>
-                <div class="logo-badge-screw-4"></div>
-                <img src="image.png" alt="Creature Logo">
-            </div>
 
-            <div class="flex flex-wrap justify-between items-end mb-8 px-2 gap-y-8 relative z-20">
-                <div>
+            <div class="flex flex-wrap justify-between items-center mb-8 px-4 gap-6 relative z-20 w-full">
+                
+                <div class="flex-shrink-0 self-end mb-2">
                     <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Archivo Black', sans-serif;">
                         <span class="txt-korg-red">MS</span>-3000
                     </h1>
                     <p class="text-[11px] font-bold tracking-[0.25em] mt-2 text-[#888]">PROGRAMMABLE ANALOG SEQUENCER</p>
                 </div>
                 
-                <div class="flex flex-wrap items-end gap-6 pt-4 mr-40">
+                <div class="flex flex-wrap items-end justify-center gap-6 flex-1 px-8">
                     <div class="module-group flex flex-col gap-3 mt-2">
                         <span class="module-group-title">MASTER ROUTING</span>
                         <div class="flex items-center gap-4">
@@ -309,6 +300,15 @@
                         <button id="syncBtn" class="action-btn text-sm h-14 shadow-lg w-20" title="Snap all sequences back to step 1">SYNC</button>
                     </div>
                 </div>
+
+                <div class="flex-shrink-0 self-start">
+                    <div class="logo-badge">
+                        <div class="logo-badge-screw-3"></div>
+                        <div class="logo-badge-screw-4"></div>
+                        <img src="image.png" alt="Creature Logo">
+                    </div>
+                </div>
+
             </div>
 
             <div class="korg-panel">
