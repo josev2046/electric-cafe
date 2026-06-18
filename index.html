@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTY Groovebox Emulator</title>
+    <title>Electric Cafe Groove Emulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* --- TERMINAL AESTHETICS --- */
@@ -23,7 +23,7 @@
         .step-col { 
             display: flex; flex-direction: column; gap: 0.75rem; 
             background: #000000; border: 1px solid #003300; 
-            padding: 0.5rem; align-items: center; min-width: 60px; 
+            padding: 0.5rem; align-items: center; min-width: 75px; 
         }
         
         .step-col.active { 
@@ -72,7 +72,7 @@
         }
         
         .pitch-input { 
-            width: 45px; background: #000000; color: #00ff41; border: 1px dashed #00ff41; 
+            width: 55px; background: #000000; color: #00ff41; border: 1px dashed #00ff41; 
             text-align: center; font-weight: bold; font-size: 0.85rem; padding: 2px 0; 
         }
         .pitch-input:focus { outline: none; border: 1px solid #00ff41; background: #001a00; }
@@ -87,12 +87,12 @@
     <div class="w-full max-w-6xl flex flex-col gap-4">
         <div class="panel p-4 flex flex-wrap justify-between items-center gap-4">
             <div>
-                <h1 class="text-2xl font-bold tracking-widest">> JV_GROOVEBOX.EXE</h1>
-                <p class="txt-dim text-xs mt-1">SYS.EMU // MS2000_TTY_INTERFACE_V1.0</p>
+                <h1 class="text-2xl font-bold tracking-widest">Electric Cafe Groove Emulator</h1>
+                <p class="txt-dim text-xs mt-1">Web Audio Sequencer & Synthesizer</p>
             </div>
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3 px-4 py-2 border border-[#00ff41]">
-                    <label class="text-xs font-bold txt-dim">BPM_</label>
+                <div class="flex items-center gap-3 px-4 py-2 border border-[#00ff41]" title="Controls the speed of the track">
+                    <label class="text-xs font-bold txt-dim">Tempo (BPM)</label>
                     <input type="range" id="tempoSlider" min="80" max="180" value="120" class="w-24">
                     <span id="tempoDisplay" class="font-bold w-8 text-right">120</span>
                 </div>
@@ -108,14 +108,26 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="panel p-4 flex flex-col gap-4">
-                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">> MELODY_CFG</h2>
-                <div class="flex items-center justify-between gap-4"><label class="text-xs font-bold txt-dim w-24">BASE_FLTR</label><input type="range" id="globalCutoff" min="50" max="1500" value="200" class="flex-1"></div>
-                <div class="flex items-center justify-between gap-4"><label class="text-xs font-bold txt-dim w-24">ENV_DECAY</label><input type="range" id="globalDecay" min="0.05" max="0.5" value="0.15" step="0.01" class="flex-1"></div>
+                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Melody Settings (Synthesizer)</h2>
+                <div class="flex items-center justify-between gap-4" title="Sets the baseline brightness of the synthesizer tone">
+                    <label class="text-xs font-bold txt-dim w-32">Tone Brightness</label>
+                    <input type="range" id="globalCutoff" min="50" max="1500" value="200" class="flex-1">
+                </div>
+                <div class="flex items-center justify-between gap-4" title="Controls how long the synth notes ring out before fading">
+                    <label class="text-xs font-bold txt-dim w-32">Note Length</label>
+                    <input type="range" id="globalDecay" min="0.05" max="0.5" value="0.15" step="0.01" class="flex-1">
+                </div>
             </div>
             <div class="panel p-4 flex flex-col gap-4">
-                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">> DRUM_CFG</h2>
-                <div class="flex items-center justify-between gap-4"><label class="text-xs font-bold txt-dim w-24">KICK_DROP</label><input type="range" id="kickPitch" min="100" max="250" value="150" class="flex-1"></div>
-                <div class="flex items-center justify-between gap-4"><label class="text-xs font-bold txt-dim w-24">NOISE_DECAY</label><input type="range" id="noiseDecay" min="0.02" max="0.2" value="0.05" step="0.01" class="flex-1"></div>
+                <h2 class="text-sm font-bold border-b border-[#00ff41] pb-2">Drum Settings (Percussion)</h2>
+                <div class="flex items-center justify-between gap-4" title="Adjusts how deep or punchy the kick drum sounds">
+                    <label class="text-xs font-bold txt-dim w-32">Kick Drum Pitch</label>
+                    <input type="range" id="kickPitch" min="100" max="250" value="150" class="flex-1">
+                </div>
+                <div class="flex items-center justify-between gap-4" title="Controls how long the snare and hi-hats sizzle">
+                    <label class="text-xs font-bold txt-dim w-32">Snare/Hat Length</label>
+                    <input type="range" id="noiseDecay" min="0.02" max="0.2" value="0.05" step="0.01" class="flex-1">
+                </div>
             </div>
         </div>
     </div>
@@ -140,13 +152,13 @@
             col.className = 'step-col flex-1';
             let stepNum = (i + 1).toString().padStart(2, '0');
             col.innerHTML = `
-                <div class="flex flex-col items-center gap-1 mb-2"><div class="led"></div><span class="text-[10px] txt-dim font-bold">${stepNum}</span></div>
-                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2"><span class="text-[9px] txt-dim">PTCH</span><input type="number" class="pitch-input" data-step="${i}" data-param="pitch" value="${sequence.pitch[i]}"></div>
-                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2 pt-1"><span class="text-[9px] txt-dim">FLTR</span><input type="range" class="vertical" orient="vertical" data-step="${i}" data-param="filter" min="0" max="100" value="${sequence.filter[i]}"></div>
-                <div class="flex flex-col items-center gap-2 w-full pt-1"><span class="text-[9px] txt-dim mb-1">DRUM</span>
-                    <label class="w-full relative"><input type="checkbox" data-step="${i}" data-param="kick" ${sequence.kick[i] ? 'checked' : ''}><div class="drum-pad kick flex items-center justify-center text-[10px]">K</div></label>
-                    <label class="w-full relative"><input type="checkbox" data-step="${i}" data-param="snare" ${sequence.snare[i] ? 'checked' : ''}><div class="drum-pad snare flex items-center justify-center text-[10px]">S</div></label>
-                    <div class="w-full mt-1 flex justify-center"><input type="range" class="vertical" orient="vertical" data-step="${i}" data-param="hat" min="0" max="100" value="${sequence.hat[i]}"></div>
+                <div class="flex flex-col items-center gap-1 mb-2"><div class="led"></div><span class="text-[10px] txt-dim font-bold">STEP ${stepNum}</span></div>
+                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2" title="Melody Note (0 = Base Note, 12 = One Octave Up)"><span class="text-[9px] txt-dim">PITCH</span><input type="number" class="pitch-input" data-step="${i}" data-param="pitch" value="${sequence.pitch[i]}"></div>
+                <div class="flex flex-col items-center gap-1 w-full border-b border-[#003300] pb-2 pt-1" title="How bright this specific note sounds"><span class="text-[9px] txt-dim">TONE</span><input type="range" class="vertical" orient="vertical" data-step="${i}" data-param="filter" min="0" max="100" value="${sequence.filter[i]}"></div>
+                <div class="flex flex-col items-center gap-2 w-full pt-1"><span class="text-[9px] txt-dim mb-1">DRUMS</span>
+                    <label class="w-full relative" title="Toggle Kick Drum"><input type="checkbox" data-step="${i}" data-param="kick" ${sequence.kick[i] ? 'checked' : ''}><div class="drum-pad kick flex items-center justify-center text-[10px]">KICK</div></label>
+                    <label class="w-full relative" title="Toggle Snare Drum"><input type="checkbox" data-step="${i}" data-param="snare" ${sequence.snare[i] ? 'checked' : ''}><div class="drum-pad snare flex items-center justify-center text-[10px]">SNARE</div></label>
+                    <div class="w-full mt-1 flex flex-col items-center" title="Hi-Hat Volume"><span class="text-[8px] txt-dim mb-1">HAT VOL</span><input type="range" class="vertical" orient="vertical" data-step="${i}" data-param="hat" min="0" max="100" value="${sequence.hat[i]}"></div>
                 </div>`;
             gridContainer.appendChild(col);
             stepElements.push(col);
