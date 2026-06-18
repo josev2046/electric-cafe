@@ -70,10 +70,13 @@
             right: 30px;
             width: 140px;
             height: auto;
-            /* Boosted contrast, brightness, and drop-shadow */
-            filter: grayscale(1) invert(1) contrast(2.5) brightness(1.5) drop-shadow(0px -1px 2px rgba(0,0,0,1));
+            /* 1. Grayscale to remove colors
+               2. Massive Brightness/Contrast boost to completely destroy the paper background shadows
+               3. Invert to make the pure white background become pure black (invisible)
+               4. Drop-shadow to cut it into the metal */
+            filter: grayscale(1) brightness(1.8) contrast(5) invert(1) drop-shadow(0px -1px 1px rgba(0,0,0,1));
             mix-blend-mode: screen;
-            opacity: 0.6; /* Bumped up so you can actually see it! */
+            opacity: 0.7; 
             pointer-events: none;
             z-index: 50;
         }
