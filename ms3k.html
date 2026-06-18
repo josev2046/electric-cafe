@@ -148,6 +148,7 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-6">
+                    <label class="text-[10px] txt-dim flex items-center gap-2" title="White Noise Mix">NOISE <input type="range" id="noiseA" min="0" max="1" value="0" step="0.01" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Global brightness">BRIGHTNESS <input type="range" id="cutoffA" min="50" max="2500" value="200" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Length of note">LENGTH <input type="range" id="decayA" min="0.05" max="0.5" value="0.15" step="0.01" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Octave shift">OCTAVE <input type="range" id="octaveA" min="-2" max="2" value="0" class="w-16"></label>
@@ -169,6 +170,7 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap items-center gap-6">
+                    <label class="text-[10px] txt-dim flex items-center gap-2" title="White Noise Mix">NOISE <input type="range" id="noiseB" min="0" max="1" value="0" step="0.01" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Global brightness">BRIGHTNESS <input type="range" id="cutoffB" min="50" max="2500" value="100" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Length of note">LENGTH <input type="range" id="decayB" min="0.05" max="0.5" value="0.2" step="0.01" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="Octave shift">OCTAVE <input type="range" id="octaveB" min="-2" max="2" value="-1" class="w-16"></label>
@@ -183,7 +185,8 @@
                     <button class="mute-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="Drums">[ MUTE ]</button>
                     <span>TRACK C // PERCUSSION</span>
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex flex-wrap items-center gap-6">
+                    <label class="text-[10px] txt-dim flex items-center gap-2" title="How long the snare/hat rings">NOISE DECAY <input type="range" id="drumNoiseDecay" min="0.01" max="0.25" value="0.05" step="0.01" class="w-16"></label>
                     <label class="text-[10px] txt-dim flex items-center gap-2">KICK PITCH <input type="range" id="kickPitch" min="100" max="250" value="150" class="w-16"></label>
                 </div>
             </div>
@@ -197,7 +200,6 @@
         let rootNoteOffset = 0, playMode = 'forward', pingPongDir = 1;
         let globalPitchBend = 0;
 
-        // Data structure for multiple tracks
         const tracks = {
             A: {
                 muted: false, wave: 'sawtooth',
@@ -220,7 +222,6 @@
             }
         };
 
-        // Render functions
         function renderSynthGrid(containerId, trackData, trackId) {
             const container = document.getElementById(containerId);
             for (let i = 0; i < NUM_STEPS; i++) {
@@ -258,7 +259,6 @@
         renderSynthGrid('gridB', tracks.B, 'B');
         renderDrumGrid('gridDrums', tracks.Drums, 'Drums');
 
-        // Mute Button Logic
         document.querySelectorAll('.mute-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const trackId = e.target.dataset.track;
@@ -275,23 +275,13 @@
             });
         });
 
-        // Pitch Wheel Logic (Spring-loaded)
         const pitchWheel = document.getElementById('pitchWheel');
-        pitchWheel.addEventListener('input', (e) => {
-            globalPitchBend = parseFloat(e.target.value);
-        });
-        const snapPitchWheel = () => {
-            pitchWheel.value = 0;
-            globalPitchBend = 0;
-        };
-        // Snap back to zero when mouse/touch is released
+        pitchWheel.addEventListener('input', (e) => globalPitchBend = parseFloat(e.target.value));
+        const snapPitchWheel = () => { pitchWheel.value = 0; globalPitchBend = 0; };
         pitchWheel.addEventListener('mouseup', snapPitchWheel);
         pitchWheel.addEventListener('touchend', snapPitchWheel);
-        pitchWheel.addEventListener('mouseleave', (e) => {
-            if (e.buttons > 0) snapPitchWheel(); // Snap if dragged outside element
-        });
+        pitchWheel.addEventListener('mouseleave', (e) => { if (e.buttons > 0) snapPitchWheel(); });
 
-        // Waveform Toggles
         document.querySelectorAll('.wave-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const target = e.currentTarget, trackId = target.dataset.track, waveType = target.dataset.wave;
@@ -301,14 +291,12 @@
             });
         });
 
-        // Master Grid Event Listener
         document.body.addEventListener('input', (e) => {
             if(!e.target.dataset.track || e.target.id === 'pitchWheel') return;
             const track = e.target.dataset.track, step = parseInt(e.target.dataset.step), param = e.target.dataset.param;
             tracks[track][param][step] = e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value) || 0;
         });
 
-        // Keyboard / Root Note Setup
         const keyboardContainer = document.getElementById('keyboard');
         const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         notes.forEach((note, index) => {
@@ -329,7 +317,6 @@
             keyboardContainer.appendChild(btn);
         });
 
-        // Audio Engine
         let noiseBuffer = null;
         function initAudio() {
             if (audioCtx) return;
@@ -340,38 +327,47 @@
             for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
         }
 
-        function playSynthVoice(trackData, step, time, octaveCtrlId, decayCtrlId, cutoffCtrlId) {
-            if (trackData.muted) return; // Drop out if muted
+        function playSynthVoice(trackData, step, time, octaveCtrlId, decayCtrlId, cutoffCtrlId, noiseCtrlId) {
+            if (trackData.muted) return; 
             if (trackData.filter[step] <= 0 && trackData.pitch[step] === 0) return; 
             
-            const osc = audioCtx.createOscillator(), filter = audioCtx.createBiquadFilter(), env = audioCtx.createGain();
-            osc.type = trackData.wave;
-            
-            // Calculate final pitch including sequence, octave, root key, and live pitch bend
-            const octaveShift = parseInt(document.getElementById(octaveCtrlId).value);
-            const totalPitch = trackData.pitch[step] + (octaveShift * 12) + rootNoteOffset + globalPitchBend;
-            osc.frequency.value = baseFreq * Math.pow(2, totalPitch / 12);
-            
-            filter.type = 'lowpass';
+            const filter = audioCtx.createBiquadFilter(), env = audioCtx.createGain();
             const baseCutoff = parseFloat(document.getElementById(cutoffCtrlId).value);
+            filter.type = 'lowpass';
             filter.frequency.setValueAtTime(baseCutoff + ((trackData.filter[step] / 100) * 4000), time);
             filter.frequency.exponentialRampToValueAtTime(Math.max(50, baseCutoff), time + 0.1);
-            filter.Q.value = osc.type === 'square' ? 2 : 6; 
+            filter.Q.value = trackData.wave === 'square' ? 2 : 6; 
             
             const decay = parseFloat(document.getElementById(decayCtrlId).value);
             env.gain.setValueAtTime(0, time);
-            const peakVol = (osc.type === 'sawtooth' || osc.type === 'square') ? 0.4 : 0.6;
+            const peakVol = (trackData.wave === 'sawtooth' || trackData.wave === 'square') ? 0.4 : 0.6;
             env.gain.linearRampToValueAtTime(peakVol, time + 0.01); 
             env.gain.exponentialRampToValueAtTime(0.01, time + decay);
             
-            osc.connect(filter); filter.connect(env); env.connect(audioCtx.destination);
-            osc.start(time); osc.stop(time + decay + 0.1);
+            filter.connect(env); env.connect(audioCtx.destination);
+
+            const osc = audioCtx.createOscillator();
+            osc.type = trackData.wave;
+            const octaveShift = parseInt(document.getElementById(octaveCtrlId).value);
+            const totalPitch = trackData.pitch[step] + (octaveShift * 12) + rootNoteOffset + globalPitchBend;
+            osc.frequency.value = baseFreq * Math.pow(2, totalPitch / 12);
+            osc.connect(filter); osc.start(time); osc.stop(time + decay + 0.1);
+
+            const noiseMix = parseFloat(document.getElementById(noiseCtrlId).value);
+            if (noiseMix > 0) {
+                const noiseSrc = audioCtx.createBufferSource(), noiseGain = audioCtx.createGain();
+                noiseSrc.buffer = noiseBuffer; noiseGain.gain.value = noiseMix;
+                noiseSrc.connect(noiseGain); noiseGain.connect(filter); 
+                noiseSrc.start(time); noiseSrc.stop(time + decay + 0.1);
+            }
         }
 
         function playDrumVoices(step, time) {
             const trackData = tracks.Drums;
-            if (trackData.muted) return; // Drop out if muted
-            const nDecay = 0.05;
+            if (trackData.muted) return; 
+            
+            // Link the drum noise envelope to the new UI slider
+            const nDecay = parseFloat(document.getElementById('drumNoiseDecay').value);
 
             if (trackData.kick[step]) {
                 const kOsc = audioCtx.createOscillator(), kEnv = audioCtx.createGain();
@@ -387,7 +383,9 @@
             if (trackData.snare[step]) {
                 const nSrc = audioCtx.createBufferSource(), nFilt = audioCtx.createBiquadFilter(), nEnv = audioCtx.createGain();
                 nSrc.buffer = noiseBuffer; nFilt.type = 'bandpass'; nFilt.frequency.value = 2500;
-                nEnv.gain.setValueAtTime(0, time); nEnv.gain.linearRampToValueAtTime(0.6, time + 0.005); nEnv.gain.exponentialRampToValueAtTime(0.01, time + (nDecay * 3));
+                nEnv.gain.setValueAtTime(0, time); nEnv.gain.linearRampToValueAtTime(0.6, time + 0.005); 
+                // Multiply by 3 so the snare inherently lasts longer than a closed hat
+                nEnv.gain.exponentialRampToValueAtTime(0.01, time + (nDecay * 3)); 
                 nSrc.connect(nFilt); nFilt.connect(nEnv); nEnv.connect(audioCtx.destination);
                 nSrc.start(time); nSrc.stop(time + (nDecay * 3) + 0.1);
             }
@@ -395,15 +393,16 @@
             if (trackData.hat[step] > 0) {
                 const hSrc = audioCtx.createBufferSource(), hFilt = audioCtx.createBiquadFilter(), hEnv = audioCtx.createGain();
                 hSrc.buffer = noiseBuffer; hFilt.type = 'highpass'; hFilt.frequency.value = 7000;
-                hEnv.gain.setValueAtTime(0, time); hEnv.gain.linearRampToValueAtTime((trackData.hat[step] / 100) * 0.4, time + 0.005); hEnv.gain.exponentialRampToValueAtTime(0.01, time + nDecay);
+                hEnv.gain.setValueAtTime(0, time); hEnv.gain.linearRampToValueAtTime((trackData.hat[step] / 100) * 0.4, time + 0.005); 
+                hEnv.gain.exponentialRampToValueAtTime(0.01, time + nDecay);
                 hSrc.connect(hFilt); hFilt.connect(hEnv); hEnv.connect(audioCtx.destination);
                 hSrc.start(time); hSrc.stop(time + nDecay + 0.1);
             }
         }
 
         function dispatchStep(step, time) {
-            playSynthVoice(tracks.A, step, time, 'octaveA', 'decayA', 'cutoffA');
-            playSynthVoice(tracks.B, step, time, 'octaveB', 'decayB', 'cutoffB');
+            playSynthVoice(tracks.A, step, time, 'octaveA', 'decayA', 'cutoffA', 'noiseA');
+            playSynthVoice(tracks.B, step, time, 'octaveB', 'decayB', 'cutoffB', 'noiseB');
             playDrumVoices(step, time);
         }
 
