@@ -93,7 +93,7 @@
         .wave-btn svg { stroke-width: 1.5; }
         .wave-btn.active { background: #00ff41; color: #000000; box-shadow: 0 0 5px #00ff41; }
 
-        .mute-btn { cursor: pointer; transition: all 0.1s; }
+        .mute-btn, .rand-btn { cursor: pointer; transition: all 0.1s; }
 
         .txt-dim { color: #008f11; }
         select { -webkit-appearance: none; -moz-appearance: none; appearance: none; }
@@ -108,9 +108,9 @@
                 <p class="txt-dim text-xs mt-1">Master Clock & Transport Controls</p>
             </div>
             <div class="flex flex-wrap items-center gap-4">
-                <div class="flex items-center gap-2 px-3 py-2 border border-[#00ff41]">
-                    <label class="text-xs font-bold txt-dim">MODE</label>
-                    <select id="playMode" class="bg-black text-[#00ff41] outline-none font-bold cursor-pointer uppercase text-xs">
+                <div class="flex items-center gap-2 px-3 py-2 border border-[#00ff41]" title="Sets the mode for ALL tracks">
+                    <label class="text-xs font-bold txt-dim">MASTER MODE</label>
+                    <select id="masterPlayMode" class="bg-black text-[#00ff41] outline-none font-bold cursor-pointer uppercase text-xs">
                         <option value="forward">Forward</option>
                         <option value="reverse">Reverse</option>
                         <option value="pingpong">Ping-Pong</option>
@@ -137,10 +137,17 @@
 
         <div class="panel">
             <div class="track-header">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
                     <button class="mute-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="A">[ MUTE ]</button>
-                    <span>TRACK A // SYNTH 1</span>
-                    <div class="flex gap-1" id="waveGroupA">
+                    <button class="rand-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="A">[ RAND ]</button>
+                    <select class="track-mode-select bg-black text-[#00ff41] border border-[#00ff41] px-2 py-1 text-[10px] font-bold outline-none cursor-pointer" data-track="A">
+                        <option value="forward">MODE: FWD</option>
+                        <option value="reverse">MODE: REV</option>
+                        <option value="pingpong">MODE: PING</option>
+                        <option value="random">MODE: RAND</option>
+                    </select>
+                    <span class="ml-2">TRACK A // SYNTH 1</span>
+                    <div class="flex gap-1 ml-2" id="waveGroupA">
                         <button class="wave-btn active" data-track="A" data-wave="sawtooth" title="Sawtooth"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
                         <button class="wave-btn" data-track="A" data-wave="square" title="Square"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
                         <button class="wave-btn" data-track="A" data-wave="triangle" title="Triangle"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
@@ -159,10 +166,17 @@
 
         <div class="panel">
             <div class="track-header">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
                     <button class="mute-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="B">[ MUTE ]</button>
-                    <span>TRACK B // SYNTH 2</span>
-                    <div class="flex gap-1" id="waveGroupB">
+                    <button class="rand-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="B">[ RAND ]</button>
+                    <select class="track-mode-select bg-black text-[#00ff41] border border-[#00ff41] px-2 py-1 text-[10px] font-bold outline-none cursor-pointer" data-track="B">
+                        <option value="forward">MODE: FWD</option>
+                        <option value="reverse">MODE: REV</option>
+                        <option value="pingpong">MODE: PING</option>
+                        <option value="random">MODE: RAND</option>
+                    </select>
+                    <span class="ml-2">TRACK B // SYNTH 2</span>
+                    <div class="flex gap-1 ml-2" id="waveGroupB">
                         <button class="wave-btn" data-track="B" data-wave="sawtooth" title="Sawtooth"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
                         <button class="wave-btn active" data-track="B" data-wave="square" title="Square"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
                         <button class="wave-btn" data-track="B" data-wave="triangle" title="Triangle"><svg width="14" height="14" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
@@ -181,9 +195,16 @@
 
         <div class="panel">
             <div class="track-header">
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2">
                     <button class="mute-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="Drums">[ MUTE ]</button>
-                    <span>TRACK C // PERCUSSION</span>
+                    <button class="rand-btn border border-[#00ff41] bg-black text-[#00ff41] px-3 py-1 text-[10px] font-bold hover:bg-[#003300]" data-track="Drums">[ RAND ]</button>
+                    <select class="track-mode-select bg-black text-[#00ff41] border border-[#00ff41] px-2 py-1 text-[10px] font-bold outline-none cursor-pointer" data-track="Drums">
+                        <option value="forward">MODE: FWD</option>
+                        <option value="reverse">MODE: REV</option>
+                        <option value="pingpong">MODE: PING</option>
+                        <option value="random">MODE: RAND</option>
+                    </select>
+                    <span class="ml-2">TRACK C // PERCUSSION</span>
                 </div>
                 <div class="flex flex-wrap items-center gap-6">
                     <label class="text-[10px] txt-dim flex items-center gap-2" title="How long the snare/hat rings">NOISE DECAY <input type="range" id="drumNoiseDecay" min="0.01" max="0.25" value="0.05" step="0.01" class="w-16"></label>
@@ -195,26 +216,26 @@
     </div>
 
     <script>
-        let audioCtx, isPlaying = false, currentStep = 0, nextNoteTime = 0, timerID;
+        let audioCtx, isPlaying = false, nextNoteTime = 0, timerID;
         const lookahead = 25.0, scheduleAheadTime = 0.1, baseFreq = 65.41, NUM_STEPS = 16;
-        let rootNoteOffset = 0, playMode = 'forward', pingPongDir = 1;
-        let globalPitchBend = 0;
+        let rootNoteOffset = 0, globalPitchBend = 0;
 
+        // Tracks now store their own playhead (step), direction (dir), and play mode (mode)
         const tracks = {
             A: {
-                muted: false, wave: 'sawtooth',
+                muted: false, wave: 'sawtooth', step: 0, dir: 1, mode: 'forward',
                 pitch:  [12, 0, 12, 0, 15, 0, 12, 0, 19, 0, 15, 0, 12, 0, 15, 0],
                 filter: [80, 0, 40, 0, 80, 0, 40, 0, 100, 0, 80, 0, 40, 0, 80, 0],
                 elements: []
             },
             B: {
-                muted: false, wave: 'square',
+                muted: false, wave: 'square', step: 0, dir: 1, mode: 'forward',
                 pitch:  [0, 0, 0, 0, 3, 3, 3, 3, 7, 7, 7, 7, 5, 5, 5, 5],
                 filter: [40, 40, 60, 40, 40, 40, 60, 40, 50, 50, 80, 50, 40, 40, 60, 40],
                 elements: []
             },
             Drums: {
-                muted: false,
+                muted: false, step: 0, dir: 1, mode: 'forward',
                 kick:   [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
                 snare:  [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
                 hat:    [0, 60, 40, 60, 0, 60, 40, 60, 0, 60, 40, 60, 0, 60, 40, 60],
@@ -259,6 +280,7 @@
         renderSynthGrid('gridB', tracks.B, 'B');
         renderDrumGrid('gridDrums', tracks.Drums, 'Drums');
 
+        // Mute Buttons
         document.querySelectorAll('.mute-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const trackId = e.target.dataset.track;
@@ -272,6 +294,49 @@
                     e.target.classList.add('bg-black', 'text-[#00ff41]');
                     e.target.innerText = '[ MUTE ]';
                 }
+            });
+        });
+
+        // Data Randomizer Buttons
+        document.querySelectorAll('.rand-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const trackId = e.target.dataset.track;
+                const trackData = tracks[trackId];
+                
+                for (let i = 0; i < NUM_STEPS; i++) {
+                    if (trackId === 'A' || trackId === 'B') {
+                        trackData.pitch[i] = Math.random() > 0.4 ? Math.floor(Math.random() * 24) : 0;
+                        trackData.filter[i] = Math.floor(Math.random() * 100);
+                        const col = trackData.elements[i];
+                        col.querySelector('[data-param="pitch"]').value = trackData.pitch[i];
+                        col.querySelector('[data-param="filter"]').value = trackData.filter[i];
+                    } else if (trackId === 'Drums') {
+                        trackData.kick[i] = Math.random() > 0.70;
+                        trackData.snare[i] = Math.random() > 0.85;
+                        trackData.hat[i] = Math.random() > 0.3 ? Math.floor(Math.random() * 100) : 0;
+                        const col = trackData.elements[i];
+                        col.querySelector('[data-param="kick"]').checked = trackData.kick[i];
+                        col.querySelector('[data-param="snare"]').checked = trackData.snare[i];
+                        col.querySelector('[data-param="hat"]').value = trackData.hat[i];
+                    }
+                }
+            });
+        });
+
+        // Individual Track Mode Selectors
+        document.querySelectorAll('.track-mode-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const trackId = e.target.dataset.track;
+                tracks[trackId].mode = e.target.value;
+            });
+        });
+
+        // Master Mode Selector (overrides all tracks)
+        document.getElementById('masterPlayMode').addEventListener('change', (e) => {
+            const newMode = e.target.value;
+            ['A', 'B', 'Drums'].forEach(trackId => {
+                tracks[trackId].mode = newMode;
+                document.querySelector(`.track-mode-select[data-track="${trackId}"]`).value = newMode;
             });
         });
 
@@ -292,7 +357,7 @@
         });
 
         document.body.addEventListener('input', (e) => {
-            if(!e.target.dataset.track || e.target.id === 'pitchWheel') return;
+            if(!e.target.dataset.track || e.target.id === 'pitchWheel' || e.target.classList.contains('track-mode-select')) return;
             const track = e.target.dataset.track, step = parseInt(e.target.dataset.step), param = e.target.dataset.param;
             tracks[track][param][step] = e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value) || 0;
         });
@@ -366,7 +431,6 @@
             const trackData = tracks.Drums;
             if (trackData.muted) return; 
             
-            // Link the drum noise envelope to the new UI slider
             const nDecay = parseFloat(document.getElementById('drumNoiseDecay').value);
 
             if (trackData.kick[step]) {
@@ -384,7 +448,6 @@
                 const nSrc = audioCtx.createBufferSource(), nFilt = audioCtx.createBiquadFilter(), nEnv = audioCtx.createGain();
                 nSrc.buffer = noiseBuffer; nFilt.type = 'bandpass'; nFilt.frequency.value = 2500;
                 nEnv.gain.setValueAtTime(0, time); nEnv.gain.linearRampToValueAtTime(0.6, time + 0.005); 
-                // Multiply by 3 so the snare inherently lasts longer than a closed hat
                 nEnv.gain.exponentialRampToValueAtTime(0.01, time + (nDecay * 3)); 
                 nSrc.connect(nFilt); nFilt.connect(nEnv); nEnv.connect(audioCtx.destination);
                 nSrc.start(time); nSrc.stop(time + (nDecay * 3) + 0.1);
@@ -400,42 +463,48 @@
             }
         }
 
-        function dispatchStep(step, time) {
-            playSynthVoice(tracks.A, step, time, 'octaveA', 'decayA', 'cutoffA', 'noiseA');
-            playSynthVoice(tracks.B, step, time, 'octaveB', 'decayB', 'cutoffB', 'noiseB');
-            playDrumVoices(step, time);
-        }
-
-        function getNextStep() {
-            switch(playMode) {
-                case 'reverse': return (currentStep - 1 + NUM_STEPS) % NUM_STEPS;
+        // Calculate the next step for a specific track based on its individual mode
+        function getNextStepForTrack(trackId) {
+            const t = tracks[trackId];
+            switch(t.mode) {
+                case 'reverse': return (t.step - 1 + NUM_STEPS) % NUM_STEPS;
                 case 'pingpong':
-                    if (pingPongDir === 1) {
-                        if (currentStep >= NUM_STEPS - 1) { pingPongDir = -1; return currentStep - 1; }
-                        return currentStep + 1;
+                    if (t.dir === 1) {
+                        if (t.step >= NUM_STEPS - 1) { t.dir = -1; return t.step - 1; }
+                        return t.step + 1;
                     } else {
-                        if (currentStep <= 0) { pingPongDir = 1; return currentStep + 1; }
-                        return currentStep - 1;
+                        if (t.step <= 0) { t.dir = 1; return t.step + 1; }
+                        return t.step - 1;
                     }
                 case 'random': return Math.floor(Math.random() * NUM_STEPS);
-                case 'forward': default: return (currentStep + 1) % NUM_STEPS;
+                case 'forward': default: return (t.step + 1) % NUM_STEPS;
             }
         }
 
         function scheduler() {
             while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
-                const stepToPlay = currentStep; 
-                dispatchStep(stepToPlay, nextNoteTime);
+                
+                // Play sounds for current independent steps
+                playSynthVoice(tracks.A, tracks.A.step, nextNoteTime, 'octaveA', 'decayA', 'cutoffA', 'noiseA');
+                playSynthVoice(tracks.B, tracks.B.step, nextNoteTime, 'octaveB', 'decayB', 'cutoffB', 'noiseB');
+                playDrumVoices(tracks.Drums.step, nextNoteTime);
+                
                 nextNoteTime += 0.25 * (60.0 / parseInt(document.getElementById('tempoSlider').value));
                 
+                // Capture the current steps locally so the visualizer syncs perfectly with audio
+                const stepsToAnimate = { A: tracks.A.step, B: tracks.B.step, Drums: tracks.Drums.step };
+                
                 requestAnimationFrame(() => { 
-                    ['A', 'B', 'Drums'].forEach(track => {
-                        tracks[track].elements.forEach(el => el.classList.remove('active'));
-                        tracks[track].elements[stepToPlay].classList.add('active');
+                    ['A', 'B', 'Drums'].forEach(trackId => {
+                        tracks[trackId].elements.forEach(el => el.classList.remove('active'));
+                        tracks[trackId].elements[stepsToAnimate[trackId]].classList.add('active');
                     });
                 });
                 
-                currentStep = getNextStep();
+                // Advance each track's step independently
+                ['A', 'B', 'Drums'].forEach(trackId => {
+                    tracks[trackId].step = getNextStepForTrack(trackId);
+                });
             }
             timerID = window.setTimeout(scheduler, lookahead);
         }
@@ -447,14 +516,20 @@
                 window.clearTimeout(timerID); isPlaying = false; 
                 playBtn.innerText = '[ PLAY ]';
                 playBtn.classList.remove('bg-[#00ff41]', 'text-black');
-                ['A', 'B', 'Drums'].forEach(track => tracks[track].elements.forEach(el => el.classList.remove('active')));
+                ['A', 'B', 'Drums'].forEach(trackId => tracks[trackId].elements.forEach(el => el.classList.remove('active')));
             } else {
                 if(audioCtx.state === 'suspended') audioCtx.resume();
                 isPlaying = true; 
-                if (playMode === 'reverse') currentStep = NUM_STEPS - 1;
-                else if (playMode === 'random') currentStep = Math.floor(Math.random() * NUM_STEPS);
-                else currentStep = 0;
-                pingPongDir = 1; nextNoteTime = audioCtx.currentTime + 0.05;
+                
+                // Reset all playheads based on their individual modes
+                ['A', 'B', 'Drums'].forEach(trackId => {
+                    if (tracks[trackId].mode === 'reverse') tracks[trackId].step = NUM_STEPS - 1;
+                    else if (tracks[trackId].mode === 'random') tracks[trackId].step = Math.floor(Math.random() * NUM_STEPS);
+                    else tracks[trackId].step = 0;
+                    tracks[trackId].dir = 1;
+                });
+                
+                nextNoteTime = audioCtx.currentTime + 0.05;
                 scheduler(); 
                 playBtn.innerText = '[ STOP ]';
                 playBtn.classList.add('bg-[#00ff41]', 'text-black');
@@ -462,7 +537,6 @@
         });
 
         document.getElementById('tempoSlider').addEventListener('input', (e) => document.getElementById('tempoDisplay').innerText = e.target.value);
-        document.getElementById('playMode').addEventListener('change', (e) => playMode = e.target.value);
     </script>
 </body>
 </html>
