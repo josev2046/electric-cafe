@@ -41,3 +41,31 @@ The application functions both as a standalone virtual instrument and a central 
                        │     Hardware Output     │
                        │  (Local Web Audio Node) │
                        └─────────────────────────┘
+```
+
+---
+
+## High-Level Operation
+
+### 1. Standalone Synthesis
+*   **Clock Configuration:** Set the global tempo slider (80–180 BPM) and select a playback vector (Forward, Reverse, Ping-Pong, Random).
+*   **Step Sequencing:** Input raw numerical offsets for pitch intervals on the grid, map step-specific filter parameters via the vertical faders, and engage the `[ S ]` or `[ A ]` modifiers to dial in rhythmic variation.
+*   **Key Offsets:** Transpose the entire sequence in real time using the integrated 12-key chromatic pitch interface.
+
+### 2. Live Deployment (Offline & Remote Environments)
+*   **Offline Execution:** The application evaluates audio entirely on the client-side device using the browser's built-in processing loops. It does not require active server communication to generate sound or run the logic arrays.
+*   **Studio Integration:** The system can be mirrored or side-loaded onto portable devices (such as an iPad using specialised Web MIDI utilities) to serve as a tactile control desk. By disabling internal audio tracking (`Local Off`), the sequenced grid values output raw triggers directly over USB to drive external hardware modules like the Doepfer Dark Energy II.
+
+---
+
+## License & Copyright
+
+**Copyright (c) 2046 Jose Velazquez**
+
+This software is released under the MIT License.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
