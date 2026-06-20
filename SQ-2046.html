@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQ-2046 Analog Sequencer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- KORG MS-SERIES AESTHETICS --- */
+        /* --- Vibe coded synthetic joy while recovering from surgery... The Cat is (c) 2026 of Diego & Lola V. Use the code as you please but do not nick the logo, folks --- */
+        /* --- MIT License Copyright (c) 2026 Jose Velazquez, MA --- */
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@500;700;900&display=swap');
+
+        body { 
+            background-color: #1e1e1e; 
+            color: #e5e3d8; 
+            font-family: 'Inter', sans-serif; 
+            text-transform: uppercase;
+            padding: 2rem 1rem;
+        }
+
+        /* --- WOODEN END CHEEKS --- */
+        .synth-wrapper {
+            box-shadow: 0 30px 60px -10px rgba(0,0,0,0.9), 0 15px 20px -5px rgba(0,0,0,0.8);
+            border-radius: 10px;
+        }
+
+        .wood-cheek {
+            width: 44px;
+            background: linear-gradient(90deg, #2b1104 0%, #4a210d 15%, #5e2c13 40%, #4a210d 65%, #6e3518 85%, #2b1104 100%);
+            position: relative;
+            z-index: 20;
+            border-top: 1px solid #824322;
+            border-bottom: 2px solid #1a0801;
+        }
+        .wood-left {
+            border-radius: 10px 0 0 10px;
+            border-right: 6px solid #080808;
+            box-shadow: inset 4px 0 6px rgba(255,255,255,0.05), inset -4px 0 10px rgba(0,0,0,0.8);
+        }
+        .wood-right {
+            border-radius: 0 10px 10px 0;
+            border-left: 6px solid #080808;
+            box-shadow: inset -4px 0 6px rgba(0,0,0,0.8), inset 2px 0 6px rgba(255,255,255,0.05);
+        }
+
+        .wood-cheek::before, .wood-cheek::after {
+            content: ''; position: absolute; width: 12px; height: 12px;
+            background: linear-gradient(45deg, #111, #444);
+            border-radius: 50%; left: 16px; 
+            box-shadow: inset 0 -2px 3px #000, 0 1px 1px rgba(255,255,255,0.1);
+            border: 1px solid #000;
+        }
+        .wood-cheek::before { top: 40px; }
+        .wood-cheek::after { bottom: 40px; }
+        
+        /* --- MAIN CHASSIS --- */
+        .chassis {
+            background: #111; 
+            border-top: 8px solid #080808;
+            border-bottom: 8px solid #080808;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.05), inset 0 -2px 10px rgba(0,0,0,1);
+            padding: 24px;
+            position: relative;
+        }
+        
+        /* --- HARDWARE BADGE LOGO --- */
+        .logo-badge {
+            width: 160px;
+            background: linear-gradient(135deg, #e5e3d8 0%, #c4c2b7 100%);
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            border-bottom: 2px solid #888;
+            border-right: 2px solid #888;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.8);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px; 
+        }
+        
+        .logo-badge::before, .logo-badge::after, .logo-badge-screw-3, .logo-badge-screw-4 {
+            content: ''; position: absolute; width: 6px; height: 6px;
+            background: #999; border-radius: 50%;
+            box-shadow: inset 0 -1px 2px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.8);
+        }
+        .logo-badge::before { top: 6px; left: 6px; }
+        .logo-badge::after { bottom: 6px; right: 6px; }
+        .logo-badge-screw-3 { top: 6px; right: 6px; }
+        .logo-badge-screw-4 { bottom: 6px; left: 6px; }
+
+        .logo-badge img {
+            width: 100%;
+            height: auto;
+            mix-blend-mode: multiply; 
+            filter: grayscale(1) contrast(1.5) brightness(1.05); 
+            opacity: 0.9; 
+            pointer-events: none;
+        }
+
+        .korg-panel { 
+            border: 2px solid #e5e3d8; 
+            border-radius: 2px;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 16px 12px 12px 12px;
+            background: #151515;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+        
+        .korg-header {
+            background: #e5e3d8;
+            color: #111;
+            font-weight: 900;
+            padding: 2px 12px;
+            position: absolute;
+            top: -12px;
+            left: 16px;
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            border-radius: 2px;
+        }
+
+        /* Sequencer Step Columns */
+        .step-col { 
+            display: flex; flex-direction: column; gap: 0.5rem; 
+            border-right: 1px solid #2a2a2a; 
+            padding: 0.75rem 0.5rem; align-items: center; min-width: 65px; flex: 1;
+            transition: background 0.1s;
+        }
+        .step-col:last-child { border-right: none; }
+        .step-col.active { background: #1e1e1e; }
+        
+        /* Analog LEDs */
+        .led { 
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #3a0505; 
+            border: 2px solid #000; margin-bottom: 6px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0px rgba(255,255,255,0.1);
+        }
+        .step-col.active .led { 
+            background: #ff2a2a; 
+            box-shadow: 0 0 12px #ff2a2a, inset 0 2px 4px rgba(255,255,255,0.6); 
+            border-color: #222;
+        }
+        
+        /* Hardware Faders */
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
+        input[type=range]:focus { outline: none; }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 6px; cursor: pointer; 
+            background: #000; border: 1px solid #222; border-radius: 3px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.9);
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            height: 22px; width: 14px; background: #1a1a1a; cursor: pointer; -webkit-appearance: none; 
+            margin-top: -9px; border-radius: 2px;
+            border: 1px solid #000;
+            border-top: 3px solid #e5e3d8; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.8);
+        }
+        
+        #pitchWheel::-webkit-slider-thumb { 
+            width: 24px; height: 40px; margin-top: -18px; 
+            background: #111; border: 1px solid #333; border-bottom: 4px solid #000;
+            border-top: 4px solid #000; border-radius: 4px;
+        }
+
+        input[type=range].vertical { 
+            width: 24px; height: 80px; writing-mode: bt-lr; -webkit-appearance: slider-vertical; 
+        }
+        
+        /* Drum Pads */
+        input[type="checkbox"] { display: none; }
+        .drum-pad { 
+            width: 100%; height: 28px; background: #222; 
+            border: 2px solid #111; border-bottom-width: 4px; border-radius: 3px;
+            cursor: pointer; transition: 0.05s; color: #666; font-size: 11px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+        }
+        input[type="checkbox"]:checked + .drum-pad { 
+            background: #ff2a2a; color: #fff; 
+            border-bottom-width: 2px; border-top-width: 4px; 
+            border-color: #8a130e;
+        }
+        
+        /* Digital Readout Inputs */
+        .pitch-input { 
+            width: 48px; background: #080808; color: #ff2a2a; border: 2px inset #222; 
+            text-align: center; font-weight: bold; font-size: 0.85rem; padding: 4px 0; 
+            border-radius: 2px; font-family: monospace; 
+        }
+        .pitch-input:focus { outline: none; border-color: #ff2a2a; }
+
+        /* Buttons & Waveforms */
+        .wave-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 32px; background: #1a1a1a; color: #e5e3d8;
+            border: 2px solid #111; border-bottom-width: 4px;
+            cursor: pointer; transition: all 0.05s; border-radius: 3px;
+        }
+        .wave-btn svg { stroke-width: 2; }
+        .wave-btn.active { 
+            background: #e5e3d8; color: #111; 
+            border-bottom-width: 2px; border-top-width: 4px; border-color: #999;
+        }
+
+        .action-btn {
+            background: #e5e3d8; color: #111; font-weight: 900;
+            border: 2px solid #fff; border-bottom: 4px solid #aaa;
+            border-radius: 3px; cursor: pointer; transition: all 0.05s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .action-btn:active, .action-btn.active-press {
+            border-bottom: 2px solid #aaa; border-top: 4px solid #fff; transform: translateY(2px);
+        }
+
+        /* Special Red Play Button */
+        .btn-red {
+            background: #e0261c; color: #fff;
+            border-color: #ff5555; border-bottom-color: #8a130e; border-right-color: #8a130e;
+        }
+        .btn-red:active, .btn-red.active-press {
+            border-bottom-color: #ff5555; border-top-color: #8a130e; background: #c01b13;
+        }
+
+        .btn-small {
+            background: #2a2a2a; color: #e5e3d8; font-weight: 900;
+            border: 2px solid #111; border-bottom: 3px solid #000;
+            border-radius: 3px; cursor: pointer; transition: all 0.05s;
+            font-size: 10px; padding: 4px 12px; letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-small:active { border-bottom: 1px solid #000; border-top: 3px solid #111; transform: translateY(1px); }
+
+        .txt-korg-yellow { color: #dca824; }
+        .txt-korg-red { color: #ff2a2a; }
+        
+        select { 
+            -webkit-appearance: none; -moz-appearance: none; appearance: none; 
+            background: #080808; color: #e5e3d8; border: 2px inset #222;
+            padding: 6px 12px; border-radius: 2px; font-weight: bold; cursor: pointer;
+        }
+        
+        .module-group {
+            border: 1px solid #333; padding: 12px 16px; border-radius: 2px;
+            position: relative; background: #181818;
+        }
+        .module-group-title {
+            position: absolute; top: -8px; left: 8px; background: #111; padding: 0 6px;
+            font-size: 10px; font-weight: 700; color: #888; letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start">
+
+    <div class="w-full max-w-[84rem] flex synth-wrapper">
+        
+        <div class="wood-cheek wood-left"></div>
+
+        <div class="flex-1 flex flex-col gap-4 chassis">
+            
+            <div class="flex flex-wrap justify-between items-end mb-8 px-4 pb-8 border-b-2 border-[#151515] gap-y-8 relative z-20 w-full">
+                
+                <div class="flex flex-col items-start flex-shrink-0">
+                    <div class="logo-badge">
+                        <div class="logo-badge-screw-3"></div>
+                        <div class="logo-badge-screw-4"></div>
+                        <img src="image.png" alt="Creature Logo">
+                    </div>
+                    <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Archivo Black', sans-serif;">
+                        <span class="txt-korg-red">SQ</span>-2046
+                    </h1>
+                    <p class="text-[11px] font-bold tracking-[0.25em] mt-1 text-[#888]">PROGRAMMABLE ANALOG SEQUENCER</p>
+                </div>
+                
+                <div class="flex flex-wrap items-stretch justify-end gap-4 flex-1 mt-4">
+                    
+                    <div class="module-group flex flex-col justify-center gap-3">
+                        <span class="module-group-title">MASTER ROUTING</span>
+                        <div class="flex items-center gap-4 mt-2">
+                            <select id="masterPlayMode" class="text-[11px] h-8 w-32">
+                                <option value="forward">SEQ: FORWARD</option>
+                                <option value="reverse">SEQ: REVERSE</option>
+                                <option value="pingpong">SEQ: PING-PONG</option>
+                                <option value="random">SEQ: RANDOM</option>
+                            </select>
+                            <div id="keyboard" class="flex w-56 h-8 gap-1"></div>
+                        </div>
+                    </div>
+
+                    <div class="module-group flex items-center justify-center gap-4">
+                        <span class="module-group-title">CLOCK & BEND</span>
+                        <div class="flex flex-col items-center w-12 mt-2">
+                            <input type="range" id="pitchWheel" min="-2" max="2" value="0" step="0.01">
+                            <span class="text-[9px] mt-3 font-bold text-[#888]">BEND</span>
+                        </div>
+                        <div class="flex flex-col items-center w-24 mt-2">
+                            <input type="range" id="tempoSlider" min="80" max="180" value="120">
+                            <span class="text-[9px] mt-3 font-bold text-[#888]">TEMPO: <span id="tempoDisplay" class="text-white">120</span></span>
+                        </div>
+                    </div>
+
+                    <!-- MASTER EFFECTS (DELAY) -->
+                    <div class="module-group flex items-center justify-center gap-4">
+                        <span class="module-group-title">MASTER EFFECTS</span>
+                        <div class="flex flex-col items-center w-16 mt-2">
+                            <select id="delayTime" class="text-[10px] h-6 py-0 px-1 w-full bg-[#080808] text-[#888] border border-[#222] rounded cursor-pointer">
+                                <option value="1">1/4</option>
+                                <option value="0.5">1/8</option>
+                                <option value="0.75" selected>1/8 D</option>
+                                <option value="0.25">1/16</option>
+                            </select>
+                            <span class="text-[8px] mt-2 font-bold text-[#888]">DELAY TIME</span>
+                        </div>
+                        <div class="flex flex-col items-center w-12 mt-2">
+                            <input type="range" id="delayFeedback" min="0" max="0.9" value="0.4" step="0.01">
+                            <span class="text-[8px] mt-3 font-bold text-[#888]">F.BACK</span>
+                        </div>
+                        <div class="flex flex-col items-center w-12 mt-2">
+                            <input type="range" id="delayMix" min="0" max="1" value="0.3" step="0.01">
+                            <span class="text-[8px] mt-3 font-bold text-[#888]">MIX</span>
+                        </div>
+                    </div>
+
+                    <div class="module-group flex items-center justify-center gap-3 bg-[#131313] border-[#222]">
+                        <span class="module-group-title">TRANSPORT</span>
+                        <button id="syncBtn" class="action-btn text-xs h-12 px-4 shadow-md" title="Snap all sequences back to step 1">SYNC</button>
+                        <button id="playBtn" class="action-btn btn-red text-lg h-12 px-6 shadow-md w-36 tracking-wider">PLAY/STOP</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="korg-panel">
+                <div class="korg-header">VCO 1 / VCF 1</div>
+                
+                <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <button class="btn-small mute-btn h-6" data-track="A">MUTE</button>
+                            <button class="btn-small rand-btn h-6" data-track="A">RANDOM</button>
+                            <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="A">
+                                <option value="forward">MODE: FWD</option>
+                                <option value="reverse">MODE: REV</option>
+                                <option value="pingpong">MODE: PING</option>
+                                <option value="random">MODE: RAND</option>
+                            </select>
+                        </div>
+                        <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK A</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex gap-2" id="waveGroupA">
+                            <button class="wave-btn active" data-track="A" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="A" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
+                        </div>
+                        <div class="flex gap-5">
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="noiseA" min="0" max="1" value="0" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="cutoffA" min="50" max="2500" value="200">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">CUTOFF</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="decayA" min="0.05" max="0.5" value="0.15" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">DECAY</span>
+                            </div>
+                            <!-- NEW ACID CONTROLS -->
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="accentA" min="0" max="1" value="0.6" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">ACCENT</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="glideA" min="0" max="0.2" value="0.05" step="0.001">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">GLIDE</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="octaveA" min="-2" max="2" value="0">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridA"></div>
+            </div>
+
+            <div class="korg-panel">
+                <div class="korg-header">VCO 2 / VCF 2</div>
+                
+                <div class="flex flex-col gap-3 px-2 pb-4 border-b border-[#2a2a2a] mb-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <button class="btn-small mute-btn h-6" data-track="B">MUTE</button>
+                            <button class="btn-small rand-btn h-6" data-track="B">RANDOM</button>
+                            <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="B">
+                                <option value="forward">MODE: FWD</option>
+                                <option value="reverse">MODE: REV</option>
+                                <option value="pingpong">MODE: PING</option>
+                                <option value="random">MODE: RAND</option>
+                            </select>
+                        </div>
+                        <div class="font-black text-xl tracking-widest txt-korg-yellow">TRACK B</div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="flex gap-2" id="waveGroupB">
+                            <button class="wave-btn" data-track="B" data-wave="sawtooth"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M2 10 L10 2 L10 10 Z"/></svg></button>
+                            <button class="wave-btn active" data-track="B" data-wave="square"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L1 3 L6 3 L6 10 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="B" data-wave="triangle"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 10 L6 2 L11 10"/></svg></button>
+                            <button class="wave-btn" data-track="B" data-wave="sine"><svg width="18" height="18" viewBox="0 0 12 12" stroke="currentColor" fill="none"><path d="M1 6 Q 3.5 1 6 6 T 11 6"/></svg></button>
+                        </div>
+                        <div class="flex gap-5">
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="noiseB" min="0" max="1" value="0" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="cutoffB" min="50" max="2500" value="100">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">CUTOFF</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="decayB" min="0.05" max="0.5" value="0.2" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">DECAY</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="accentB" min="0" max="1" value="0.6" step="0.01">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">ACCENT</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="glideB" min="0" max="0.2" value="0.05" step="0.001">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">GLIDE</span>
+                            </div>
+                            <div class="flex flex-col items-center w-16">
+                                <input type="range" id="octaveB" min="-2" max="2" value="-1">
+                                <span class="text-[10px] mt-2 font-bold text-[#888]">OCTAVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridB"></div>
+            </div>
+
+            <div class="korg-panel">
+                <div class="korg-header">RHYTHM GENERATOR</div>
+                
+                <div class="flex justify-between items-center px-2 pb-4 border-b border-[#2a2a2a] mb-4">
+                    <div class="flex items-center gap-3">
+                        <button class="btn-small mute-btn h-6" data-track="Drums">MUTE</button>
+                        <button class="btn-small rand-btn h-6" data-track="Drums">RANDOM</button>
+                        <select class="track-mode-select text-[10px] h-6 py-0 px-2" data-track="Drums">
+                            <option value="forward">MODE: FWD</option>
+                            <option value="reverse">MODE: REV</option>
+                            <option value="pingpong">MODE: PING</option>
+                            <option value="random">MODE: RAND</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex gap-8">
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="drumNoiseDecay" min="0.01" max="0.25" value="0.05" step="0.01">
+                            <span class="text-[10px] mt-2 font-bold text-[#888]">NOISE DECAY</span>
+                        </div>
+                        <div class="flex flex-col items-center w-24">
+                            <input type="range" id="kickPitch" min="100" max="250" value="150">
+                            <span class="text-[10px] mt-2 font-bold text-[#888]">KICK TUNE</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex overflow-x-auto w-full px-2 pb-2" id="gridDrums"></div>
+            </div>
+        </div>
+        
+        <div class="wood-cheek wood-right"></div>
+        
+    </div>
+
+    <script>
+        let audioCtx, isPlaying = false, nextNoteTime = 0, timerID;
+        const lookahead = 25.0, scheduleAheadTime = 0.1, baseFreq = 65.41, NUM_STEPS = 16;
+        let rootNoteOffset = 0, globalPitchBend = 0;
+
+        // Master FX Bus
+        let masterBus, delayNode, delayFeedback, delayMix, delayFilter;
+        let synthEngines = { A: null, B: null };
+        let noiseBuffer = null;
+
+        // Note: I have added some default Slides and Accents to demonstrate the new acid engine!
+        const tracks = {
+            A: { muted: false, wave: 'sawtooth', step: 0, dir: 1, mode: 'forward', prevSlide: false,
+                 pitch: [12, 0, 12, 0, 15, 0, 12, 0, 19, 0, 15, 0, 12, 0, 15, 0], 
+                 filter: [80, 0, 40, 0, 80, 0, 40, 0, 100, 0, 80, 0, 40, 0, 80, 0], 
+                 slide: [false, true, false, false, false, true, false, false, false, false, true, false, false, false, true, false],
+                 accent: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+                 elements: [] },
+            B: { muted: false, wave: 'square', step: 0, dir: 1, mode: 'forward', prevSlide: false,
+                 pitch: [0, 0, 0, 0, 3, 3, 3, 3, 7, 7, 7, 7, 5, 5, 5, 5], 
+                 filter: [40, 40, 60, 40, 40, 40, 60, 40, 50, 50, 80, 50, 40, 40, 60, 40], 
+                 slide: [false, false, false, true, false, false, false, true, false, false, false, true, false, false, false, false],
+                 accent: [false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false],
+                 elements: [] },
+            Drums: { muted: false, step: 0, dir: 1, mode: 'forward', kick: [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false], snare: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false], hat: [0, 60, 40, 60, 0, 60, 40, 60, 0, 60, 40, 60, 0, 60, 40, 60], elements: [] }
+        };
+
+        function renderSynthGrid(containerId, trackData, trackId) {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < NUM_STEPS; i++) {
+                const col = document.createElement('div');
+                col.className = 'step-col';
+                col.innerHTML = `
+                    <div class="led"></div>
+                    <span class="text-[10px] font-bold text-[#666] mt-[-2px] mb-3">${(i+1).toString().padStart(2, '0')}</span>
+                    <input type="number" class="pitch-input" data-track="${trackId}" data-step="${i}" data-param="pitch" value="${trackData.pitch[i]}">
+                    
+                    <!-- ACID TOGGLES (Slide & Accent) -->
+                    <div class="flex gap-1 mt-1 w-full justify-center">
+                        <label class="cursor-pointer text-[8px] font-bold" title="SLIDE / TIE">
+                            <input type="checkbox" class="hidden peer" data-track="${trackId}" data-step="${i}" data-param="slide" ${trackData.slide[i] ? 'checked' : ''}>
+                            <div class="px-1 bg-[#222] border border-[#111] text-[#555] peer-checked:bg-[#dca824] peer-checked:text-[#111] rounded-sm transition-colors">S</div>
+                        </label>
+                        <label class="cursor-pointer text-[8px] font-bold" title="ACCENT">
+                            <input type="checkbox" class="hidden peer" data-track="${trackId}" data-step="${i}" data-param="accent" ${trackData.accent[i] ? 'checked' : ''}>
+                            <div class="px-1 bg-[#222] border border-[#111] text-[#555] peer-checked:bg-[#fff] peer-checked:text-[#111] rounded-sm transition-colors">A</div>
+                        </label>
+                    </div>
+
+                    <div class="mt-3 w-full flex justify-center h-[55px]">
+                        <input type="range" class="vertical" orient="vertical" data-track="${trackId}" data-step="${i}" data-param="filter" min="0" max="100" value="${trackData.filter[i]}">
+                    </div>
+                `;
+                container.appendChild(col);
+                trackData.elements.push(col);
+            }
+        }
+
+        function renderDrumGrid(containerId, trackData, trackId) {
+            const container = document.getElementById(containerId);
+            for (let i = 0; i < NUM_STEPS; i++) {
+                const col = document.createElement('div');
+                col.className = 'step-col';
+                col.innerHTML = `
+                    <div class="led"></div>
+                    <span class="text-[10px] font-bold text-[#666] mt-[-2px] mb-3">${(i+1).toString().padStart(2, '0')}</span>
+                    <label class="w-full relative mb-1"><input type="checkbox" data-track="${trackId}" data-step="${i}" data-param="kick" ${trackData.kick[i] ? 'checked' : ''}><div class="drum-pad">BD</div></label>
+                    <label class="w-full relative mb-3"><input type="checkbox" data-track="${trackId}" data-step="${i}" data-param="snare" ${trackData.snare[i] ? 'checked' : ''}><div class="drum-pad">SD</div></label>
+                    <div class="mt-2 w-full flex justify-center h-[60px]">
+                        <input type="range" class="vertical" orient="vertical" data-track="${trackId}" data-step="${i}" data-param="hat" min="0" max="100" value="${trackData.hat[i]}">
+                    </div>
+                `;
+                container.appendChild(col);
+                trackData.elements.push(col);
+            }
+        }
+
+        renderSynthGrid('gridA', tracks.A, 'A');
+        renderSynthGrid('gridB', tracks.B, 'B');
+        renderDrumGrid('gridDrums', tracks.Drums, 'Drums');
+
+        // Mute Buttons
+        document.querySelectorAll('.mute-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const trackId = e.target.dataset.track;
+                tracks[trackId].muted = !tracks[trackId].muted;
+                if (tracks[trackId].muted) {
+                    e.target.style.background = '#e0261c';
+                    e.target.style.color = '#fff';
+                    e.target.style.borderColor = '#8a130e';
+                } else {
+                    e.target.style.background = '';
+                    e.target.style.color = '';
+                    e.target.style.borderColor = '';
+                }
+            });
+        });
+
+        // Rand Buttons
+        document.querySelectorAll('.rand-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const trackId = e.target.dataset.track;
+                const trackData = tracks[trackId];
+                
+                for (let i = 0; i < NUM_STEPS; i++) {
+                    if (trackId === 'A' || trackId === 'B') {
+                        trackData.pitch[i] = Math.random() > 0.4 ? Math.floor(Math.random() * 24) : 0;
+                        trackData.filter[i] = Math.floor(Math.random() * 100);
+                        trackData.slide[i] = Math.random() > 0.8;
+                        trackData.accent[i] = Math.random() > 0.7;
+                        
+                        const col = trackData.elements[i];
+                        col.querySelector('[data-param="pitch"]').value = trackData.pitch[i];
+                        col.querySelector('[data-param="filter"]').value = trackData.filter[i];
+                        col.querySelector('[data-param="slide"]').checked = trackData.slide[i];
+                        col.querySelector('[data-param="accent"]').checked = trackData.accent[i];
+                    } else if (trackId === 'Drums') {
+                        trackData.kick[i] = Math.random() > 0.70;
+                        trackData.snare[i] = Math.random() > 0.85;
+                        trackData.hat[i] = Math.random() > 0.3 ? Math.floor(Math.random() * 100) : 0;
+                        const col = trackData.elements[i];
+                        col.querySelector('[data-param="kick"]').checked = trackData.kick[i];
+                        col.querySelector('[data-param="snare"]').checked = trackData.snare[i];
+                        col.querySelector('[data-param="hat"]').value = trackData.hat[i];
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll('.track-mode-select').forEach(select => {
+            select.addEventListener('change', (e) => tracks[e.target.dataset.track].mode = e.target.value);
+        });
+
+        document.getElementById('masterPlayMode').addEventListener('change', (e) => {
+            const newMode = e.target.value;
+            ['A', 'B', 'Drums'].forEach(trackId => {
+                tracks[trackId].mode = newMode;
+                document.querySelector(`.track-mode-select[data-track="${trackId}"]`).value = newMode;
+            });
+        });
+
+        document.getElementById('syncBtn').addEventListener('click', (e) => {
+            const btn = e.target;
+            btn.classList.add('active-press');
+            setTimeout(() => btn.classList.remove('active-press'), 100);
+
+            ['A', 'B', 'Drums'].forEach(trackId => {
+                tracks[trackId].step = tracks[trackId].mode === 'reverse' ? NUM_STEPS - 1 : 0;
+                tracks[trackId].dir = 1;
+            });
+        });
+
+        const pitchWheel = document.getElementById('pitchWheel');
+        pitchWheel.addEventListener('input', (e) => globalPitchBend = parseFloat(e.target.value));
+        const snapPitchWheel = () => { pitchWheel.value = 0; globalPitchBend = 0; };
+        pitchWheel.addEventListener('mouseup', snapPitchWheel);
+        pitchWheel.addEventListener('touchend', snapPitchWheel);
+        pitchWheel.addEventListener('mouseleave', (e) => { if (e.buttons > 0) snapPitchWheel(); });
+
+        document.querySelectorAll('.wave-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const target = e.currentTarget, trackId = target.dataset.track, waveType = target.dataset.wave;
+                tracks[trackId].wave = waveType;
+                document.querySelectorAll(`#waveGroup${trackId} .wave-btn`).forEach(b => b.classList.remove('active'));
+                target.classList.add('active');
+            });
+        });
+
+        document.body.addEventListener('input', (e) => {
+            if(!e.target.dataset.track || e.target.id === 'pitchWheel' || e.target.classList.contains('track-mode-select')) return;
+            const track = e.target.dataset.track, step = parseInt(e.target.dataset.step), param = e.target.dataset.param;
+            tracks[track][param][step] = e.target.type === 'checkbox' ? e.target.checked : parseFloat(e.target.value) || 0;
+        });
+
+        // Delay Parameter Updates
+        function updateDelayParams() {
+            if (!audioCtx || !delayNode) return;
+            const bpm = parseFloat(document.getElementById('tempoSlider').value);
+            const division = parseFloat(document.getElementById('delayTime').value);
+            const timeSecs = (60.0 / bpm) * division;
+            delayNode.delayTime.setTargetAtTime(timeSecs, audioCtx.currentTime, 0.1);
+            delayFeedback.gain.setTargetAtTime(parseFloat(document.getElementById('delayFeedback').value), audioCtx.currentTime, 0.1);
+            delayMix.gain.setTargetAtTime(parseFloat(document.getElementById('delayMix').value), audioCtx.currentTime, 0.1);
+        }
+
+        document.getElementById('delayTime').addEventListener('change', updateDelayParams);
+        document.getElementById('delayFeedback').addEventListener('input', updateDelayParams);
+        document.getElementById('delayMix').addEventListener('input', updateDelayParams);
+        document.getElementById('tempoSlider').addEventListener('input', (e) => {
+            document.getElementById('tempoDisplay').innerText = e.target.value;
+            if(audioCtx) updateDelayParams();
+        });
+
+        // Volca-Style 12-key Keyboard
+        const keyboardContainer = document.getElementById('keyboard');
+        const notes = [
+            {n: 'C', c: 'w'}, {n: 'C#', c: 'b'}, {n: 'D', c: 'w'}, {n: 'D#', c: 'b'}, 
+            {n: 'E', c: 'w'}, {n: 'F', c: 'w'}, {n: 'F#', c: 'b'}, {n: 'G', c: 'w'}, 
+            {n: 'G#', c: 'b'}, {n: 'A', c: 'w'}, {n: 'A#', c: 'b'}, {n: 'B', c: 'w'}
+        ];
+        notes.forEach((note, index) => {
+            const btn = document.createElement('button');
+            const isWhite = note.c === 'w';
+            
+            btn.className = `flex-1 text-[8px] font-bold border border-[#111] transition-all rounded-sm shadow-sm ${isWhite ? 'bg-[#e5e3d8] text-[#111]' : 'bg-[#222] text-[#e5e3d8]'}`;
+            if(index === 0) {
+                btn.style.background = '#dca824'; btn.style.color = '#111'; btn.style.borderColor = '#9e7816';
+            }
+            btn.innerText = note.n;
+            btn.dataset.offset = index;
+            
+            btn.addEventListener('click', (e) => {
+                rootNoteOffset = parseInt(e.target.dataset.offset);
+                Array.from(keyboardContainer.children).forEach((child, i) => {
+                    const originalIsWhite = notes[i].c === 'w';
+                    child.style.background = originalIsWhite ? '#e5e3d8' : '#222';
+                    child.style.color = originalIsWhite ? '#111' : '#e5e3d8';
+                    child.style.borderColor = '#111';
+                });
+                e.target.style.background = '#dca824';
+                e.target.style.color = '#111';
+                e.target.style.borderColor = '#9e7816';
+            });
+            keyboardContainer.appendChild(btn);
+        });
+
+        function initAudio() {
+            if (audioCtx) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // 1. Setup Master & Delay Routing
+            masterBus = audioCtx.createGain();
+            masterBus.connect(audioCtx.destination);
+            
+            delayNode = audioCtx.createDelay(2.0);
+            delayFeedback = audioCtx.createGain();
+            delayMix = audioCtx.createGain();
+            delayFilter = audioCtx.createBiquadFilter();
+            
+            delayFilter.type = 'lowpass';
+            delayFilter.frequency.value = 2000; // Warm analog bucket-brigade style echo
+            
+            masterBus.connect(delayNode);
+            delayNode.connect(delayFilter);
+            delayFilter.connect(delayFeedback);
+            delayFeedback.connect(delayNode);
+            
+            delayNode.connect(delayMix);
+            delayMix.connect(audioCtx.destination);
+            
+            updateDelayParams();
+
+            // 2. Init global noise buffer
+            const bufferSize = audioCtx.sampleRate * 2;
+            noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+            // 3. Persistent Synth Engines for Acid Slides
+            ['A', 'B'].forEach(id => {
+                const env = audioCtx.createGain(); env.gain.value = 0;
+                const filter = audioCtx.createBiquadFilter();
+                const osc = audioCtx.createOscillator();
+                
+                const noiseSrc = audioCtx.createBufferSource();
+                noiseSrc.buffer = noiseBuffer;
+                noiseSrc.loop = true;
+                const noiseGain = audioCtx.createGain(); noiseGain.gain.value = 0;
+                
+                osc.connect(filter); 
+                noiseSrc.connect(noiseGain); noiseGain.connect(filter);
+                filter.connect(env); 
+                env.connect(masterBus); 
+                
+                osc.start();
+                noiseSrc.start();
+                
+                synthEngines[id] = { osc, filter, env, noiseGain };
+            });
+        }
+
+        // New Persistent "Acid Engine" Synth Function
+        function playSynthVoice(trackId, trackData, step, time, octaveCtrlId, decayCtrlId, cutoffCtrlId, noiseCtrlId, accentCtrlId, glideCtrlId) {
+            if (trackData.muted) return; 
+            
+            const engine = synthEngines[trackId];
+            const octaveShift = parseInt(document.getElementById(octaveCtrlId).value);
+            const decay = parseFloat(document.getElementById(decayCtrlId).value);
+            const baseCutoff = parseFloat(document.getElementById(cutoffCtrlId).value);
+            const glideTime = parseFloat(document.getElementById(glideCtrlId).value);
+            const accentDepth = parseFloat(document.getElementById(accentCtrlId).value);
+            const noiseMix = parseFloat(document.getElementById(noiseCtrlId).value);
+            
+            const isRest = trackData.filter[step] <= 0 && trackData.pitch[step] === 0;
+            const isTied = trackData.prevSlide; // Boolean check if tied FROM the previous step
+            
+            engine.osc.type = trackData.wave;
+            engine.noiseGain.gain.setValueAtTime(noiseMix, time);
+            
+            // Break ties if there's a rest
+            if (isRest) {
+                engine.env.gain.cancelScheduledValues(time);
+                engine.env.gain.setTargetAtTime(0, time, 0.01);
+                trackData.prevSlide = false;
+                return;
+            }
+            
+            const totalPitch = trackData.pitch[step] + (octaveShift * 12) + rootNoteOffset + globalPitchBend;
+            const targetFreq = baseFreq * Math.pow(2, totalPitch / 12);
+            
+            let peakVol = (trackData.wave === 'sawtooth' || trackData.wave === 'square') ? 0.3 : 0.5;
+            let targetCutoff = baseCutoff + ((trackData.filter[step] / 100) * 4000);
+            let actualDecay = decay;
+            
+            // --- ACID ACCENT LOGIC ---
+            if (trackData.accent[step]) {
+                peakVol *= (1 + (accentDepth * 0.5)); 
+                targetCutoff += (accentDepth * 4000); 
+                actualDecay *= (1 - (accentDepth * 0.5)); // Snappier decay
+            }
+            
+            engine.filter.Q.value = trackData.wave === 'square' ? 3 : 8; // TB-303 Resonance
+            
+            // --- ACID SLIDE (LEGATO) LOGIC ---
+            if (isTied) {
+                // Glide Pitch & Filter (Do not re-attack envelope)
+                engine.osc.frequency.setTargetAtTime(targetFreq, time, glideTime);
+                engine.filter.frequency.setTargetAtTime(targetCutoff, time, glideTime);
+            } else {
+                // Hard reset Pitch & Filter, Re-trigger Attack
+                engine.osc.frequency.setValueAtTime(targetFreq, time);
+                engine.filter.frequency.cancelScheduledValues(time);
+                engine.filter.frequency.setValueAtTime(targetCutoff, time);
+                
+                engine.env.gain.cancelScheduledValues(time);
+                engine.env.gain.setValueAtTime(0, time);
+                engine.env.gain.linearRampToValueAtTime(peakVol, time + 0.01);
+            }
+            
+            // Determine Decay Phase
+            const stepDuration = 0.25 * (60.0 / parseInt(document.getElementById('tempoSlider').value));
+            
+            if (trackData.slide[step]) {
+                // Hold envelope high so it smoothly glides into the next step
+                engine.env.gain.exponentialRampToValueAtTime(peakVol * 0.5, time + stepDuration);
+                engine.filter.frequency.exponentialRampToValueAtTime(Math.max(50, baseCutoff + 500), time + stepDuration);
+            } else {
+                // Let envelope die normally
+                engine.env.gain.exponentialRampToValueAtTime(0.001, time + actualDecay);
+                engine.filter.frequency.exponentialRampToValueAtTime(Math.max(50, baseCutoff), time + actualDecay);
+            }
+            
+            trackData.prevSlide = trackData.slide[step]; // Save state for the next note
+        }
+
+        function playDrumVoices(step, time) {
+            const trackData = tracks.Drums;
+            if (trackData.muted) return; 
+            
+            const nDecay = parseFloat(document.getElementById('drumNoiseDecay').value);
+
+            if (trackData.kick[step]) {
+                const kOsc = audioCtx.createOscillator(), kEnv = audioCtx.createGain();
+                kOsc.frequency.setValueAtTime(parseFloat(document.getElementById('kickPitch').value), time);
+                kOsc.frequency.exponentialRampToValueAtTime(40, time + 0.1);
+                kEnv.gain.setValueAtTime(0, time);
+                kEnv.gain.linearRampToValueAtTime(0.8, time + 0.005);
+                kEnv.gain.exponentialRampToValueAtTime(0.01, time + 0.25);
+                kOsc.connect(kEnv); kEnv.connect(masterBus); // Sent to delay bus
+                kOsc.start(time); kOsc.stop(time + 0.3);
+            }
+
+            if (trackData.snare[step]) {
+                const nSrc = audioCtx.createBufferSource(), nFilt = audioCtx.createBiquadFilter(), nEnv = audioCtx.createGain();
+                nSrc.buffer = noiseBuffer; nFilt.type = 'bandpass'; nFilt.frequency.value = 2500;
+                nEnv.gain.setValueAtTime(0, time); nEnv.gain.linearRampToValueAtTime(0.6, time + 0.005); 
+                nEnv.gain.exponentialRampToValueAtTime(0.01, time + (nDecay * 3)); 
+                nSrc.connect(nFilt); nFilt.connect(nEnv); nEnv.connect(masterBus);
+                nSrc.start(time); nSrc.stop(time + (nDecay * 3) + 0.1);
+            }
+
+            if (trackData.hat[step] > 0) {
+                const hSrc = audioCtx.createBufferSource(), hFilt = audioCtx.createBiquadFilter(), hEnv = audioCtx.createGain();
+                hSrc.buffer = noiseBuffer; hFilt.type = 'highpass'; hFilt.frequency.value = 7000;
+                hEnv.gain.setValueAtTime(0, time); hEnv.gain.linearRampToValueAtTime((trackData.hat[step] / 100) * 0.4, time + 0.005); 
+                hEnv.gain.exponentialRampToValueAtTime(0.01, time + nDecay);
+                hSrc.connect(hFilt); hFilt.connect(hEnv); hEnv.connect(masterBus);
+                hSrc.start(time); hSrc.stop(time + nDecay + 0.1);
+            }
+        }
+
+        function scheduler() {
+            while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+                
+                playSynthVoice('A', tracks.A, tracks.A.step, nextNoteTime, 'octaveA', 'decayA', 'cutoffA', 'noiseA', 'accentA', 'glideA');
+                playSynthVoice('B', tracks.B, tracks.B.step, nextNoteTime, 'octaveB', 'decayB', 'cutoffB', 'noiseB', 'accentB', 'glideB');
+                playDrumVoices(tracks.Drums.step, nextNoteTime);
+                
+                nextNoteTime += 0.25 * (60.0 / parseInt(document.getElementById('tempoSlider').value));
+                
+                const stepsToAnimate = { A: tracks.A.step, B: tracks.B.step, Drums: tracks.Drums.step };
+                
+                requestAnimationFrame(() => { 
+                    ['A', 'B', 'Drums'].forEach(trackId => {
+                        tracks[trackId].elements.forEach(el => el.classList.remove('active'));
+                        tracks[trackId].elements[stepsToAnimate[trackId]].classList.add('active');
+                    });
+                });
+                
+                ['A', 'B', 'Drums'].forEach(trackId => {
+                    tracks[trackId].step = getNextStepForTrack(trackId);
+                });
+            }
+            timerID = window.setTimeout(scheduler, lookahead);
+        }
+
+        const playBtn = document.getElementById('playBtn');
+        playBtn.addEventListener('click', () => {
+            initAudio();
+            if (isPlaying) {
+                window.clearTimeout(timerID); isPlaying = false; 
+                playBtn.classList.remove('active-press');
+                ['A', 'B', 'Drums'].forEach(trackId => tracks[trackId].elements.forEach(el => el.classList.remove('active')));
+                
+                // Fade out audio slightly to prevent clicks when stopping
+                if (masterBus) masterBus.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+                ['A', 'B'].forEach(id => tracks[id].prevSlide = false); // Break any active ties
+            } else {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                if (masterBus) masterBus.gain.setTargetAtTime(1, audioCtx.currentTime, 0.01);
+                
+                isPlaying = true; 
+                
+                ['A', 'B', 'Drums'].forEach(trackId => {
+                    if (tracks[trackId].mode === 'reverse') tracks[trackId].step = NUM_STEPS - 1;
+                    else if (tracks[trackId].mode === 'random') tracks[trackId].step = Math.floor(Math.random() * NUM_STEPS);
+                    else tracks[trackId].step = 0;
+                    tracks[trackId].dir = 1;
+                });
+                
+                nextNoteTime = audioCtx.currentTime + 0.05;
+                scheduler(); 
+                
+                playBtn.classList.add('active-press');
+            }
+        });
+
+    </script>
+</body>
+</html>
