@@ -65,7 +65,7 @@ The SQ-2046 is a browser-based, three-track step sequencer and groovebox inspire
 
 ## License & Copyright
 
-**Copyright (c) 2046 Jose Velazquez**
+**Copyright (c) 2026 Jose Velazquez**
 
 This software is released under the MIT License.
 
