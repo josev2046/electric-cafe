@@ -1,6 +1,10 @@
 # SQ-2046 Programmable Analog Sequencer
 
-The SQ-2046 is a browser-based, three-track step sequencer and groovebox inspired by classic vintage hardware workflows. It combines a highly customisable scheduling engine with an authentic sound signature, serving as a powerful standalone virtual instrument.
+```markdown
+The [SQ-2046](https://josev2046.github.io/electric-cafe/SQ-2046.html) is a browser-based, three-track step sequencer and groovebox inspired by classic vintage hardware workflows. It combines a highly customisable scheduling engine with an authentic sound signature, serving as a powerful standalone virtual instrument.
+
+```
+
 
 ---
 
