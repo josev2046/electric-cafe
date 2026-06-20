@@ -1,72 +1,43 @@
-# Suicide - "Ghost rider" 
+# SQ-2046 Programmable Analog Sequencer
 
-Operational steps to perform "Ghost rider" using a serial signal path. The **Arturia MiniBrute Mk1** serves as the master clock and keyboard, the **Behringer TD-3-MO** provides the hypnotic bass, and the **Korg MS2000BR** handles the lead textures.
-
----
-
-## 1. Pre-performance setup
-
-### Audio & MIDI routing verification
-1.  **MIDI cables:**
-    * MiniBrute MIDI OUT → Korg MIDI IN
-    * Korg MIDI THRU → TD-3 MIDI IN
-2.  **Audio cables:**
-    * TD-3 LINE OUT → MiniBrute AUDIO IN (Rear)
-    * MiniBrute LINE OUT → Korg AUDIO IN 1 (Rear)
-    * Korg STEREO OUT (L/R) → Yamaha MG06X Line 3/4
-3.  **Power sequence:**
-    * 1. Yamaha Mixer | 2. MiniBrute | 3. TD-3 | 4. Korg
+The SQ-2046 is a browser-based, three-track step sequencer and groovebox inspired by classic vintage hardware workflows. It combines a highly customisable scheduling engine with an authentic sound signature, bridging the gap between web applications and studio hardware environments.
 
 ---
 
-## 2. Step-by-step configuration
+## Technical Capabilities
 
-### Step 1: Synchronise the instruments
-* **MiniBrute Mk1:** Set the rear **GATE SOURCE** switch to **HOLD**. Set the **Arpeg/Free** switch to **Arpeg** (essential for master clock). In the mixer section, set **Audio in** to **60%** and all internal oscillators to 0%.
-* **TD-3-MO:** Set clock to **MIDI** (Hold `BACK` + `WRITE/NEXT`, then press `Step 2`). Ensure it is on MIDI Channel 2.
-* **Korg MS2000BR:** Set **Global MIDI** to **Channel 1**. Set **Clock** to **External**.
+The application functions both as a standalone virtual instrument and a central routing brain for external equipment.
 
-### Step 2: Program the bass pulse (TD-3-MO)
-1.  **Clear:** Press `FUNCTION` + `PATTERN CLEAR`.
-2.  **Pitch:** Press `PITCH MODE`. Tap the **C key** 16 times.
-3.  **Time:** Press `TIME MODE`. Tap the **Note button** 16 times.
-4.  **Test:** Press `RUN`. You should hear a steady, dark "donk-donk" pulse.
-
-### Step 3: Sculpt the grime (MiniBrute Mk1)
-1.  **Cutoff:** Set to 20% (Muffled).
-2.  **Resonance:** Set to 20%.
-3.  **Brute factor:** Set to 50%. This adds the essential NYC grit without losing the bass fundamental.
-
-### Step 4: Prepare the void (Korg)
-1.  **Patch:** Select a thin organ or sine lead.
-2.  **Delay:** Set to a "slapback" (short time, 2–3 repeats).
+*   **Dual Synthesizer Voices (Tracks A & B):** Features persistent web-audio oscillator engines configured with selectable waveforms (sawtooth, square, triangle, sine) and a noise generator mix.
+*   **Acoustic Squelch Engine (303-style Architecture):** Includes programmable per-step **Slide (Legato Portamento)** and **Accent** options. When steps are tied via Slide, the engine glides the pitch smoothly without re-triggering the filter envelope. The global Accent control governs volume spikes and aggressive, snappy envelope decay adjustments.
+*   **Rhythm Generator (Track C):** A dedicated drum synthesizer path with integrated step controls for a Bass Drum, Snare Drum, and High-Hat with dynamic velocity filtering.
+*   **Master Effects Bus:** Includes a global low-pass filtered delay circuit mathematically locked to divisions of the master tempo (1/4, 1/8, 1/8 Dotted, and 1/16 notes) alongside adjustable feedback and mix controls.
 
 ---
 
-## 3. The performance routine
+## System Workflow & Architecture
 
-### 0:00–0:30 – The intro
-* Press **RUN** on the TD-3.
-* Slowly turn the MiniBrute **Cutoff** knob from 20% to 60%. Imagine the sound emerging from a dark tunnel.
-
-### 0:30–1:00 – The lead hook
-* Using the MiniBrute keys, play the eerie G–E cycle:
-    * **G** (High octave): Hold for 2 beats.
-    * **E**: Hold for 2 beats.
-* The Korg will provide the melody; the MiniBrute filter provides the grit.
-
-### 1:00–1:30 – The tension
-* Continue the G–E melody with your right hand.
-* With your left hand, slowly sweep the MiniBrute **Resonance** up to 80% and back to 20%. This makes the bass "scream" and recede.
-
-### 1:30–Finish – The climax
-* **Option A:** If using a mic, perform breathless, Alan Vega-style vocals.
-* **Option B:** Crank the **Brute factor** to 100% for 4 bars, then return to 50%.
-* **Resolution:** Abruptly turn **Cutoff** to 0% and stop the TD-3.
-
----
-
-## 4. Troubleshooting
-* **No sync:** Ensure the MiniBrute Mk1 is in **Arpeg** mode; it will not send MIDI clock in 'Free' mode.
-* **No audio:** Verify the rear **Gate source** is on **HOLD**.
-* **Audio is too distorted:** Lower the **Audio in** fader on the MiniBrute mixer; the Mk1 input is very sensitive to line-level signals.
+```text
+                       ┌─────────────────────────┐
+                       │  Master BPM Clock &     │
+                       │  Global Transport Bus   │
+                       └────────────┬────────────┘
+                                    │
+            ┌───────────────────────┼───────────────────────┐
+            ▼                       ▼                       ▼
+   ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+   │ Track A (VCO 1) │     │ Track B (VCO 2) │     │ Track C (Drums) │
+   │ Pitch/Slide/Acc │     │ Pitch/Slide/Acc │     │ BD/SD/Hat Mix   │
+   └────────┬────────┘     └────────┬────────┘     └────────┬────────┘
+            │                       │                       │
+            └───────────────────────┼───────────────────────┘
+                                    ▼
+                       ┌─────────────────────────┐
+                       │   Vintage Low-Pass      │
+                       │   BPM-Synced Delay      │
+                       └────────────┬────────────┘
+                                    ▼
+                       ┌─────────────────────────┐
+                       │     Hardware Output     │
+                       │  (Local Web Audio Node) │
+                       └─────────────────────────┘
