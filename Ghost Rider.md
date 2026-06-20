@@ -1,12 +1,10 @@
 # SQ-2046 Programmable Analog Sequencer
 
-The SQ-2046 is a browser-based, three-track step sequencer and groovebox inspired by classic vintage hardware workflows. It combines a highly customisable scheduling engine with an authentic sound signature, bridging the gap between web applications and studio hardware environments.
+The SQ-2046 is a browser-based, three-track step sequencer and groovebox inspired by classic vintage hardware workflows. It combines a highly customisable scheduling engine with an authentic sound signature, serving as a powerful standalone virtual instrument.
 
 ---
 
 ## Technical Capabilities
-
-The application functions both as a standalone virtual instrument and a central routing brain for external equipment.
 
 *   **Dual Synthesizer Voices (Tracks A & B):** Features persistent web-audio oscillator engines configured with selectable waveforms (sawtooth, square, triangle, sine) and a noise generator mix.
 *   **Acoustic Squelch Engine (303-style Architecture):** Includes programmable per-step **Slide (Legato Portamento)** and **Accent** options. When steps are tied via Slide, the engine glides the pitch smoothly without re-triggering the filter envelope. The global Accent control governs volume spikes and aggressive, snappy envelope decay adjustments.
@@ -38,7 +36,7 @@ The application functions both as a standalone virtual instrument and a central 
                        └────────────┬────────────┘
                                     ▼
                        ┌─────────────────────────┐
-                       │     Hardware Output     │
+                       │   Internal Audio Out    │
                        │  (Local Web Audio Node) │
                        └─────────────────────────┘
 ```
@@ -52,9 +50,16 @@ The application functions both as a standalone virtual instrument and a central 
 *   **Step Sequencing:** Input raw numerical offsets for pitch intervals on the grid, map step-specific filter parameters via the vertical faders, and engage the `[ S ]` or `[ A ]` modifiers to dial in rhythmic variation.
 *   **Key Offsets:** Transpose the entire sequence in real time using the integrated 12-key chromatic pitch interface.
 
-### 2. Live Deployment (Offline & Remote Environments)
-*   **Offline Execution:** The application evaluates audio entirely on the client-side device using the browser's built-in processing loops. It does not require active server communication to generate sound or run the logic arrays.
-*   **Studio Integration:** The system can be mirrored or side-loaded onto portable devices (such as an iPad using specialised Web MIDI utilities) to serve as a tactile control desk. By disabling internal audio tracking (`Local Off`), the sequenced grid values output raw triggers directly over USB to drive external hardware modules like the Doepfer Dark Energy II.
+### 2. Live Deployment (Offline Environments)
+*   **Offline Execution:** The application evaluates audio entirely on the client-side device using the browser's built-in processing loops. When assets are stored locally, it does not require active server communication to generate sound or run the logic arrays, making it robust for live performance.
+
+---
+
+## Development Roadmap
+
+*   **Web MIDI Integration:** Future updates will include external MIDI routing, allowing the SQ-2046 to act as a master brain for external hardware synths (e.g., sending slide/accent velocity data to external CV filters).
+*   **Local Off Mode:** The ability to decouple the internal Web Audio engines to function purely as a sequence controller.
+*   **External Clock Sync:** Slaving the sequencer to an external DAW transport.
 
 ---
 
