@@ -65,7 +65,7 @@ The [SQ-2046](https://josev2046.github.io/electric-cafe/SQ-2046.html) is a brows
 
 ## License & Copyright
 
-**Copyright (c) 2046 Jose Velazquez**
+**Copyright (c) 2026 Jose Velazquez**
 
 This software is released under the MIT License.
 
