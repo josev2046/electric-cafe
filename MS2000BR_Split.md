@@ -45,3 +45,67 @@ This configuration dedicates the entire right Timbre to the synth, providing all
 * **SEQ 3 DEST:** Amp (Volume).
   * **SEQ 3 Values (Steps 1–16):** `+63, 0, 0, 0, +63, 0, 0, 0, +63, 0, 0, 0, +63, 0, 0, 0`
   * *Note: This maps maximum relative volume accents to the downbeats (steps 1, 5, 9, 13), creating rhythmic gating and a heavy 4-to-the-floor pulse beneath the chaos.*
+ 
+---
+
+## Programming
+
+Before beginning, note a hardware reality of the MS2000 series: Noise is not Oscillator 2. It is a completely independent sound source with its own dedicated volume knob in the `MIXER` section. This means you do not have to sacrifice an oscillator to generate hi-hats.
+
+Here is the step-by-step guide to programming this patch from a blank slate.
+
+### 1. Initialise the Programme
+Wipe the slate clean to ensure no lingering settings interfere with your new patch.
+* Press the **[EDIT]** key to enter LCD Edit mode.
+* Press the **SELECT [16]** key (the 16th step key along the bottom). The screen will show Page 26A: UTILITY `InitProgram`.
+* Press the **[+/YES]** key twice to confirm the initialisation.
+
+### 2. Global Setup (The Split)
+* Press **SELECT [1]** to go to Page 01A: COMMON. 
+* Use the **[+/YES]** key to change `Mode:` from Single to **Split**.
+* Press the **CURSOR [>]** key to move to Page 01B. Change `Timbre Voice:` to **1+3** or **2+2**.
+* Press the **CURSOR [>]** key again to move to Page 01C. Change `Split Point:` to your preferred key by using the **[+/YES]** and **[-/NO]** keys.
+* Turn the **ARPEGGIATOR [TEMPO]** knob until the screen reads `120`.
+
+### 3. Left Split (Timbre 1): The Drum Machine
+Ensure the **TIMBRE SELECT [SELECT]** key has the **1** LED lit so you are editing the left side of the split.
+
+**The Sound:**
+* **Voice Assign:** Press **SELECT [2]** to go to Page 03A: VOICE. Use the **[-/NO]** key to set `Assign:` to **Mono**.
+* **Kick Drum (OSC 1):** Press the **OSCILLATOR 1 [WAVE]** key until the `CROSS` (Sine) LED lights up. To make it a pure Sine wave, turn the **[CONTROL 1]** knob all the way down to **0**. Use the **[TUNE]** knob to pitch it down low for a deep kick.
+* **Hats/Snare (Noise):** Turn the **MIXER [NOISE]** knob up. Turn the `OSC 1` and `OSC 2` mixer knobs down so you only hear noise while you sculpt it.
+
+**The Sequence:**
+* **Routing:** Press **SELECT [11]** to jump to the Sequencer menu. 
+* Press **CURSOR [>]** to Page 18B and ensure `Seq Type:` is **Forward**. 
+* Press **CURSOR [>]** twice to reach Page 18D and set `Key Sync:` to **OFF**.
+* **Assigning SEQ 1:** Press the **SEQ EDIT [SELECT]** key on the far left until the **SEQ 1** LED is lit. The screen will show Page 19A. Use the **[+/YES]** key to change `Knob:` to **NoiseLvl**.
+* **Entering Steps:** Using the 16 knobs along the bottom, dial in the values: `0, 63, 40, 63, 63 (Max), 63, 40, 63, 0, 63, 40, 63, 63 (Max), 63, 40, 63`. Turn on the **MOD SEQUENCE [ON/OFF]** button to hear it run.
+
+### 4. Right Split (Timbre 2): The Acid Synth
+Press the **TIMBRE SELECT [SELECT]** key so the **2** LED is lit. You are now editing the synth side.
+
+**The Sound:**
+* **Voice Assign:** Press **SELECT [2]**. Change `Assign:` to **Mono** or **Unison**.
+* **Oscillator:** Press the **OSCILLATOR 1 [WAVE]** key to select the **Saw** or **Squ** LED.
+* **Filter:** Press the **FILTER [FILTER TYPE]** key to select **24LPF**. Turn up the **[RESONANCE]** knob.
+
+**The Arpeggiator:**
+* Press **SELECT [15]**. The screen will show Page 25A. Set `Type:` to **Random**.
+* Press **CURSOR [>]** until you reach Page 25E `Target:`. Set this to **Timbre 2**.
+* Press the **ARPEGGIATOR [ON/OFF]** button so the LED is lit.
+
+**The Sequence:**
+* **Routing:** Press **SELECT [11]**. Press **CURSOR [>]** to Page 18B and ensure `Seq Type:` is **Forward**. 
+* Press **CURSOR [>]** to Page 18D and set `Key Sync:` to **OFF** (this is vital to stop the Arpeggiator from resetting the sequence).
+* **SEQ 1 (Pitch):** Press **SEQ EDIT [SELECT]** until **SEQ 1** is lit. Change `Knob:` to **Pitch**. Input your melody offsets using the 16 knobs. *(Skip step entry if relying purely on the Arpeggiator).*
+* **SEQ 2 (Cutoff):** Press **SEQ EDIT [SELECT]** until **SEQ 2** is lit. Change `Knob:` to **Cutoff**. Input your positive filter offsets using the 16 knobs.
+* **SEQ 3 (Amp):** Press **SEQ EDIT [SELECT]** until **SEQ 3** is lit. Change `Knob:` to **Amp**. Dial steps 1, 5, 9, and 13 to maximum, and the rest to 0. Turn on the **MOD SEQUENCE [ON/OFF]** button for Timbre 2.
+
+### 5. Save Your Patch (The Write Operation)
+If you turn off the synth now, you will lose everything.
+* **Turn off Memory Protect:** Press the **[GLOBAL]** key. Press **SELECT [4]** to reach Page 2A: MEMORY `Protect:`. Press the **[-/NO]** key to turn it **OFF**.
+* **Write the Patch:** Press the **[WRITE]** key. 
+* The screen will say `WR Prog: A01 OK?`. Use the **[+/YES]** and **[-/NO]** keys to choose the bank and slot where you want to save it. 
+* Press **[WRITE]** one final time. The screen will display `Completed`.
+
