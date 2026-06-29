@@ -21,7 +21,7 @@ Synthesise a kick drum from an oscillator and use the noise generator for the ha
 * **SEQ 1 Values (Steps 1–16):** `0, 60, 40, 60, 100, 60, 40, 60, 0, 60, 40, 60, 100, 60, 40, 60`
   * *Note: The values of `100` on steps 5 and 13 mimic a snare accent on beats 2 and 4. The alternating `60` and `40` values create a dynamic, 16th-note closed/open hi-hat feel.*
  
-### ALternative Left Split (Timbre 1): Robotnik #1
+### ALternative Left Split (Timbre 1): Motorik #1
 Ensure the **TIMBRE SELECT [SELECT]** key has the **1** LED lit so you are editing the left side of the split. We need the synth to stay "open" so the sequencer can do the rhythmic work, and we need the filter wide open so the noise sounds like crisp hi-hats.
 
 **The Sound:**
@@ -46,7 +46,7 @@ Because the Mod Sequencer adds *offsets* to the current knob positions, we must 
 * Turn on the **MOD SEQUENCE [ON/OFF]** button to hear it run.
 
 
-### ALternative Left Split (Timbre 1): Robotnik #2
+### ALternative Left Split (Timbre 1): Motorik #2
 
 #### 1. Voice & Amp Settings (Bypassing the Standard Envelope)
 * **Press [EDIT]** to enter LCD Edit Mode.
