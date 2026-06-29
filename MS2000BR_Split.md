@@ -20,6 +20,30 @@ Synthesise a kick drum from an oscillator and use the noise generator for the ha
 * **SEQ 1 DEST:** NoiseLvl (Noise Level).
 * **SEQ 1 Values (Steps 1–16):** `0, 60, 40, 60, 100, 60, 40, 60, 0, 60, 40, 60, 100, 60, 40, 60`
   * *Note: The values of `100` on steps 5 and 13 mimic a snare accent on beats 2 and 4. The alternating `60` and `40` values create a dynamic, 16th-note closed/open hi-hat feel.*
+ 
+### ALternative Left Split (Timbre 1): Krautrock Drums
+Ensure the **TIMBRE SELECT [SELECT]** key has the **1** LED lit so you are editing the left side of the split. We need the synth to stay "open" so the sequencer can do the rhythmic work, and we need the filter wide open so the noise sounds like crisp hi-hats.
+
+**The Sound:**
+* **Voice Assign:** Press **SELECT [2]** to go to Page 03A: VOICE. Use the **[-/NO]** key to set `Assign:` to **Mono**.
+* **Amp Envelope:** Press the **AMP [EG 2 / GATE]** key until the LED is **LIT**. This puts it in `GATE` mode, meaning the sound stays at full volume as long as you hold a key down, allowing the sequencer to carve out the rhythm.
+* **Filter:** Turn the **FILTER [CUTOFF]** knob all the way up to **127 (Max)**. This ensures your hats are bright and fizzy. (It will not affect the kick, as sine waves have no overtones to filter).
+
+**The Oscillators (Zeroing the Mix):**
+Because the Mod Sequencer adds *offsets* to the current knob positions, we must start with a silent mix.
+* **Kick Drum (OSC 1):** Press the **OSCILLATOR 1 [WAVE]** key until the `CROSS` (Sine) LED lights up. Turn the **[CONTROL 1]** knob all the way down to **0**. Use the **[TUNE]** knob to pitch it down low.
+* **Hats/Snare (Noise):** You are using the Noise generator for this.
+* **The Crucial Step:** Turn the **MIXER [OSC 1]**, **[OSC 2]**, and **[NOISE]** knobs all the way down to **0**. The synth should currently make no sound if you press a key.
+
+**The Sequence:**
+* **Routing Setup:** Press **SELECT [11]** to jump to the Sequencer menu. Press **CURSOR [>]** to Page 18B and ensure `Seq Type:` is **Forward**. Press **CURSOR [>]** twice to Page 18D and set `Key Sync:` to **Timbre**.
+* **SEQ 1 (The Kick Drum):** Press the **SEQ EDIT [SELECT]** key on the far left until the **SEQ 1** LED is lit. Give the **MIXER [OSC 1]** knob a quick wiggle. The screen will automatically assign SEQ 1 to `OSC 1 Level`.
+  * *Entering Steps:* Using the 16 knobs along the bottom, dial in a 4-to-the-floor kick pattern by turning steps 1, 5, 9, and 13 up to maximum (+63), and leaving everything else at 0.
+  * *Values:* `63, 0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0`
+* **SEQ 2 (The Hats and Snare):** Press the **SEQ EDIT [SELECT]** key until the **SEQ 2** LED is lit. Give the **MIXER [NOISE]** knob a quick wiggle. The screen will automatically assign SEQ 2 to `NoiseLvl`.
+  * *Entering Steps:* Using the 16 knobs, dial in your alternating hi-hat and snare accent pattern.
+  * *Values:* `0, 63, 40, 63, 63, 63, 40, 63, 0, 63, 40, 63, 63, 63, 40, 63`
+* Turn on the **MOD SEQUENCE [ON/OFF]** button to hear it run.
 
 ---
 
