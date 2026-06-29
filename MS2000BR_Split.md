@@ -21,7 +21,7 @@ Synthesise a kick drum from an oscillator and use the noise generator for the ha
 * **SEQ 1 Values (Steps 1–16):** `0, 60, 40, 60, 100, 60, 40, 60, 0, 60, 40, 60, 100, 60, 40, 60`
   * *Note: The values of `100` on steps 5 and 13 mimic a snare accent on beats 2 and 4. The alternating `60` and `40` values create a dynamic, 16th-note closed/open hi-hat feel.*
  
-### ALternative Left Split (Timbre 1): Krautrock Drums
+### ALternative Left Split (Timbre 1): Robotnik #1
 Ensure the **TIMBRE SELECT [SELECT]** key has the **1** LED lit so you are editing the left side of the split. We need the synth to stay "open" so the sequencer can do the rhythmic work, and we need the filter wide open so the noise sounds like crisp hi-hats.
 
 **The Sound:**
@@ -45,6 +45,57 @@ Because the Mod Sequencer adds *offsets* to the current knob positions, we must 
   * *Values:* `0, 63, 40, 63, 63, 63, 40, 63, 0, 63, 40, 63, 63, 63, 40, 63`
 * Turn on the **MOD SEQUENCE [ON/OFF]** button to hear it run.
 
+
+### ALternative Left Split (Timbre 1): Robotnik #2
+
+#### 1. Voice & Amp Settings (Bypassing the Standard Envelope)
+* **Press [EDIT]** to enter LCD Edit Mode.
+* **Press SELECT [2]** -> Go to Page `03A: VOICE Assign` -> Use [+/YES] to set to **Mono**.
+* **Press AMP [EG 2 / GATE]** on the front panel until the LED is **LIT** (Gate Mode).
+
+#### 2. LFO 1 Setup (Creating the Custom Drum Envelope)
+* **Press SELECT [8]** -> Go to Page `12A: LFO1 Wave` -> Set to **Saw**.
+* **Press CURSOR [>]** -> Go to Page `12B: LFO1 KeySync` -> Set to **Timbre**.
+* **Press CURSOR [>]** -> Go to Page `12C: LFO1 TempoSync` -> Set to **ON**.
+* **Press CURSOR [>]** -> Go to Page `12D: LFO1 Sync Note` -> Set to **1/16**.
+
+#### 3. Virtual Patch Routing (Mapping the Punch)
+* **Press VIRTUAL PATCH 1 [SELECT]** -> Go to Page `14A: PATCH1`.
+  * Move cursor to `Source` -> Set to **LFO 1**.
+  * Move cursor to `Dest` -> Set to **Amp**.
+  * Move cursor to `Intensity` -> Set to **+63**.
+* **Press VIRTUAL PATCH 2 [SELECT]** -> Go to Page `15A: PATCH2`.
+  * Move cursor to `Source` -> Set to **LFO 1**.
+  * Move cursor to `Dest` -> Set to **Pitch**.
+  * Move cursor to `Intensity` -> Set to **+24** (Adjust this later to tune the kick's "zap").
+
+#### 4. Oscillator, Filter & Mixer (Zeroing the Base Sound)
+* **OSC 1 (Kick):** Press front panel **OSCILLATOR 1 [WAVE]** to **CROSS**. Turn **[CONTROL 1]** knob to **0**.
+* **Filter:** Turn front panel **FILTER [CUTOFF]** knob up to **127**.
+* **Mixer Setup:** * **Press SELECT [7]** -> Go to Page `07A: MIXER OSC 1 Level` -> Set to **0**.
+  * **Press CURSOR [>]** -> Go to Page `07B: MIXER OSC 2 Level` -> Set to **0**.
+  * **Press CURSOR [>]** -> Go to Page `07C: MIXER Noise Level` -> Set to **0**.
+
+#### 5. Mod Sequencer Routing (The Engine)
+* **Press SELECT [11]** -> Go to Page `18A: SEQ COMMON`.
+* **Press CURSOR [>]** -> Go to Page `18B: Seq Type` -> Set to **Forward**.
+* **Press CURSOR [>]** twice -> Go to Page `18D: Key Sync` -> Set to **Timbre**.
+
+#### 6. Programming the Steps (The Groove)
+* **SEQ 1 (Kick Drum):** * Press **SEQ EDIT [SELECT]** until **SEQ 1** is lit -> Page `19A: SEQ1 Knob`.
+  * Set to **OSC 1 Level**.
+  * Twist the 16 bottom knobs to enter values: `63, 0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0, 63, 0, 0, 0`.
+* **SEQ 2 (Hi-Hats):**
+  * Press **SEQ EDIT [SELECT]** until **SEQ 2** is lit -> Page `20A: SEQ2 Knob`.
+  * Set to **NoiseLvl**.
+  * Twist the 16 bottom knobs to enter values: `0, 63, 40, 63, 0, 63, 40, 63, 0, 63, 40, 63, 0, 63, 40, 63`.
+* **SEQ 3 (Snare Accent):**
+  * First, turn the front panel **FILTER [CUTOFF]** knob down to **40**.
+  * Press **SEQ EDIT [SELECT]** until **SEQ 3** is lit -> Page `21A: SEQ3 Knob`.
+  * Set to **Cutoff**.
+  * Twist the 16 bottom knobs to enter values: `0, 0, 0, 0, 63, 0, 0, 0, 0, 0, 0, 0, 63, 0, 0, 0`.
+
+Turn on the **MOD SEQUENCE [ON/OFF]** button, press a key, and let it run!
 ---
 
 ## Right Split (Timbre 2): The Acid Synth
