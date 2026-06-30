@@ -55,3 +55,63 @@ legend right
 endlegend
 
 @enduml
+
+--
+
+Patching UML
+
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+' Increase spacing to handle the cables cleanly
+skinparam nodesep 100
+skinparam ranksep 150
+
+title My bread and butter patching for the Dark Energy II & MS2000BR
+
+component "Korg MS2000BR\n(Virtual Analog / Digital FX)" as Korg {
+    portout "Audio Output" as KorgOut
+    portout "MIDI Out" as KorgMidi
+    portin "Audio Input" as KorgIn
+}
+
+component "Doepfer Dark Energy II\n(Analog Semi-Modular)" as DE2 {
+    ' Inputs (Top/Left conceptually)
+    portin "MIDI In" as DEMidi
+    portin "Ext. Audio" as ExtAud
+    portin "VCO F (Pitch)" as VCOF
+    portin "VCO PW (Width)" as VCOPW
+    portin "VCF F (Filter)" as VCFF
+    portin "VCA A (Amp)" as VCAA
+    
+    ' Outputs (Bottom/Right conceptually)
+    portout "LFO 1" as LFO1
+    portout "Envelope" as Env
+    portout "Audio" as AudOut
+}
+
+' --- EXISTING PATCHES ---
+LFO1 -[#D4AF37,bold]right-> VCFF 
+KorgOut -[#E74C3C,bold]down-> ExtAud 
+AudOut -[#3498DB,bold]up-> KorgIn 
+
+' --- NEW POTENTIAL PATCHES ---
+Env -[#2ECC71,bold]up-> VCOPW 
+Env -[#9B59B6,bold]up-> VCOF 
+LFO1 -[#E67E22,bold]down-> VCAA 
+KorgMidi -[#black,dashed,bold]down-> DEMidi 
+
+legend bottom right
+    |= Cable / Color |= Patch Route |= Sonic Result |
+    | <color:#D4AF37>■</color> Yellow | LFO 1 ➔ VCF F | **Filter Wobble:** Rhythmic sweeping/pulsing of the filter cutoff. |
+    | <color:#E74C3C>■</color> Red | Korg Audio ➔ DE2 Ext. Audio | **Analog Warmth:** Squashes digital polyphony through the analog filter. |
+    | <color:#3498DB>■</color> Blue | DE2 Audio ➔ Korg Audio In | **Digital FX:** Processes the raw analog mono signal through Korg effects/vocoder. |
+    | <color:#2ECC71>■</color> Green | Envelope ➔ VCO PW | **Phasing Lead:** Modulates pulse width over time for a thick, evolving square wave. |
+    | <color:#9B59B6>■</color> Purple | Envelope ➔ VCO F | **Pitch Drop / Percussion:** Creates classic laser sweeps or analog kick drums. |
+    | <color:#E67E22>■</color> Orange | LFO 1 ➔ VCA A | **Tremolo / Gate:** Bypasses the filter to chop or rhythmically modulate overall volume. |
+    | <color:#000000>■</color> Black (Dashed) | Korg MIDI ➔ DE2 MIDI | **Sequencer Sync:** Triggers the analog synth using the Korg's arpeggiator/sequencer. |
+endlegend
+
+@enduml
