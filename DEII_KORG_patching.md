@@ -1,7 +1,12 @@
 <img width="992" height="1209" alt="image" src="https://github.com/user-attachments/assets/d9bc1a68-3ee0-4fd1-8b21-69a29d2b0195" />
 
-## Hardware Quick-Reference & Cheat Sheet
+## Impro to tape 30.06.26
 
+
+https://github.com/user-attachments/assets/60e55418-9ed8-4697-94d3-e3b50a01845b
+
+
+## Hardware Quick-Reference & Cheat Sheet
 ### Control Voltage (CV) Standards
 When patching the Dark Energy II (or connecting it to external gear in the future), keep these electrical standards in mind:
 * **Pitch Control:** The Dark Energy II uses the Eurorack standard of 1 Volt per Octave (1V/Oct). Every 1-volt increase from a modulation source raises the pitch by exactly one octave.
