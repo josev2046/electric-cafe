@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Behringer K2 Pristine Patch Matrix</title>
+    <style>
+        :root {
+            --ink: #000000;
+            --paper: #fdfdfd;
+            --knob-bg: #ffffff;
+            --active-color: #ff3333;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: var(--ink);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+        }
+
+        /* ---------------- TOOLBAR ---------------- */
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: #fff;
+            padding: 10px 20px;
+            border: 2px solid var(--ink);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border-radius: 4px;
+            z-index: 100;
+        }
+
+        .controls input {
+            border: 2px solid var(--ink);
+            padding: 8px 12px;
+            width: 250px;
+            font-family: monospace;
+            font-size: 14px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 0 15px;
+            border-left: 2px solid #ddd;
+            border-right: 2px solid #ddd;
+        }
+        
+        .picker-label {
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .color-swatch {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #ccc;
+            transition: transform 0.1s;
+        }
+        .color-swatch.selected {
+            border-color: #000;
+            transform: scale(1.2);
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+
+        button {
+            background: var(--ink);
+            color: var(--paper);
+            border: 2px solid var(--ink);
+            padding: 8px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: 'Helvetica Neue', sans-serif;
+            letter-spacing: 1px;
+        }
+        button:hover { background: #444; }
+
+        /* ---------------- CHASSIS ---------------- */
+        .schematic-canvas {
+            background: var(--paper);
+            border: 3px solid var(--ink);
+            width: 1460px;
+            height: 640px;
+            display: flex;
+            box-sizing: border-box;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+        }
+
+        /* ---------------- LEFT PANEL ---------------- */
+        .left-matrix {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            flex: 0 0 600px;
+            border-right: 3px solid var(--ink);
+            padding: 10px 0;
+        }
+
+        .col {
+            border-right: 2px solid var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 5px;
+        }
+        .col:last-child { border-right: none; }
+
+        .header {
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            min-height: 24px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .divider {
+            width: 100%;
+            height: 2px;
+            background: var(--ink);
+            margin: 15px 0;
+        }
+
+        .knob-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .dial {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid var(--ink);
+            background: var(--knob-bg);
+            position: relative;
+            cursor: ns-resize;
+            transform: rotate(-135deg);
+        }
+
+        .pointer {
+            width: 0px;
+            height: 16px;
+            border-left: 2px solid var(--ink);
+            background: transparent;
+            position: absolute;
+            top: 0;
+            left: 16px;
+        }
+
+        .label {
+            font-size: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        /* ---------------- RIGHT PANEL ---------------- */
+        .right-matrix {
+            flex: 1;
+            position: relative;
+        }
+
+        .flowchart-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* SVG Typography */
+        .flowchart-svg text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: bold;
+            fill: var(--ink);
+            font-size: 8px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+        .flowchart-svg .title { font-size: 9px; letter-spacing: 0.5px; }
+        .flowchart-svg .sub { font-size: 7px; fill: #444; }
+
+        /* SVG Shapes */
+        .flowchart-svg rect, .flowchart-svg circle, .flowchart-svg path, .flowchart-svg line, .flowchart-svg polygon {
+            stroke: var(--ink);
+            stroke-width: 1.5;
+            fill: none; 
+        }
+        .flowchart-svg .solid { fill: var(--ink); stroke: none; }
+
+        /* Interactive Jacks */
+        .interactive-jack {
+            pointer-events: auto;
+            cursor: crosshair;
+            stroke: var(--ink);
+            stroke-width: 2px;
+            fill: var(--paper);
+            transition: fill 0.1s;
+        }
+        .interactive-jack:hover { fill: #e0e0e0; }
+        .interactive-jack.active-source {
+            fill: var(--active-color) !important;
+            stroke-width: 3px;
+        }
+
+        /* Patch Cables */
+        .patch-cable {
+            pointer-events: auto !important;
+            cursor: pointer;
+            stroke-linecap: round;
+        }
+        .patch-cable:hover {
+            stroke-width: 6px !important;
+            opacity: 0.6;
+        }
+
+        /* HTML Overlay Knobs */
+        .overlay-knob {
+            position: absolute;
+            z-index: 10;
+            transform: translate(-50%, -50%);
+        }
+
+        /* ---------------- PRINT LAYOUT SETTINGS ---------------- */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 10mm;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            body { 
+                background: #fff; 
+                padding: 0; 
+                margin: 0; 
+                display: block; 
+            }
+            .controls { display: none !important; }
+            .schematic-canvas { 
+                box-shadow: none; 
+                position: absolute; 
+                top: 0;
+                left: 0;
+                transform: scale(0.72); 
+                transform-origin: top left;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <input type="text" placeholder="Patch Name / Notes..." />
+        
+        <div class="color-picker">
+            <span class="picker-label">CORD:</span>
+            <div class="color-swatch selected" data-color="#ff3333" style="background:#ff3333;"></div>
+            <div class="color-swatch" data-color="#3377ff" style="background:#3377ff;"></div>
+            <div class="color-swatch" data-color="#ffcc00" style="background:#ffcc00;"></div>
+            <div class="color-swatch" data-color="#22cc55" style="background:#22cc55;"></div>
+            <div class="color-swatch" data-color="#000000" style="background:#000000;"></div>
+        </div>
+
+        <button onclick="window.print()">Print Patch Sheet</button>
+        <button onclick="clearCables()" style="background:#fff; color:#000;">Clear Cords</button>
+        <button onclick="resetKnobs()" style="background:#fff; color:#000;">Reset Knobs</button>
+    </div>
+
+    <div class="schematic-canvas">
+        
+        <div class="left-matrix">
+            <div class="col">
+                <div class="header">VCO 1</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">WAVE FORM</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">PW</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">SCALE</div></div>
+                <div class="divider"></div>
+                <div class="header" style="margin-bottom:5px;">PORTAMENTO</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">TIME</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">VCO 2</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">WAVE FORM</div></div>
+                <div class="knob-node"><div class="dial" data-rot="0"><div class="pointer"></div></div><div class="label">PITCH</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">SCALE</div></div>
+                <div class="divider"></div>
+                <div class="header" style="margin-bottom:5px;">MASTER TUNE</div>
+                <div class="knob-node"><div class="dial" data-rot="0"><div class="pointer"></div></div><div class="label">TUNE</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">VCO MIXER</div>
+                <div class="knob-node"><div class="dial" data-rot="135"><div class="pointer"></div></div><div class="label">VCO 1</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">VCO 2</div></div>
+                <div class="divider"></div>
+                <div class="header">FM</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">MG</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">EG1/EXT</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">VC HPF</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">fc</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">PEAK</div></div>
+                <div class="divider"></div>
+                <div class="header">fc M</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">MG</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">EG2/EXT</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">VC LPF</div>
+                <div class="knob-node"><div class="dial" data-rot="135"><div class="pointer"></div></div><div class="label">fc</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">PEAK</div></div>
+                <div class="divider"></div>
+                <div class="header">fc M</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">MG</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">EG2/EXT</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">VCA</div>
+                <svg width="40" height="25" style="margin: 10px 0;">
+                    <polygon points="0,5 30,12.5 0,20" fill="none" stroke="#000" stroke-width="2"/>
+                    <line x1="30" y1="12.5" x2="40" y2="12.5" stroke="#000" stroke-width="2"/>
+                </svg>
+                <div class="label" style="margin-top:-5px;">EG2 & EXT</div>
+                <div class="divider" style="margin-top:28px;"></div>
+                <div class="header">MG</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">WAVE FORM</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-50"><div class="pointer"></div></div><div class="label">FREQ</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">EG 1</div>
+                <div style="height: 120px;"></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">DELAY</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">ATTACK</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">RELEASE</div></div>
+            </div>
+
+            <div class="col">
+                <div class="header">EG 2</div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">HOLD</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">ATTACK</div></div>
+                <div class="knob-node"><div class="dial" data-rot="-135"><div class="pointer"></div></div><div class="label">DECAY</div></div>
+                <div class="knob-node"><div class="dial" data-rot="135"><div class="pointer"></div></div><div class="label">SUSTAIN</div></div>
+                <div class="knob-node"><div class="dial" data-rot="0"><div class="pointer"></div></div><div class="label">RELEASE</div></div>
+            </div>
+        </div>
+
+        <div class="right-matrix">
+            <svg class="flowchart-svg" viewBox="0 0 860 640" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <g id="jack-outline">
+                        <circle cx="0" cy="0" r="10" fill="none" stroke="var(--ink)" stroke-width="1.5" />
+                    </g>
+                    <g id="gnd">
+                        <path d="M -4 0 L 4 0 M -2 2 L 2 2 M -1 4 L 1 4" stroke-width="1" fill="none"/>
+                    </g>
+                    <g id="wave-tri">
+                        <path d="M -6 3 L 0 -3 L 6 3" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g id="wave-sqr">
+                        <path d="M -6 3 L -6 -3 L 0 -3 L 0 3 L 6 3 L 6 -3" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g id="wave-env">
+                        <path d="M -6 3 L -2 -3 L 2 -1 L 6 3" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g id="wave-rev-env">
+                        <path d="M -6 -3 L -2 3 L 2 1 L 6 -3" stroke-width="1.5" fill="none"/>
+                    </g>
+                    <g id="wave-noise">
+                        <path d="M -6 0 Q -3 -4 0 0 T 6 0" stroke-width="1.5" fill="none"/>
+                    </g>
+                </defs>
+
+                <g id="patch-bay-cords"></g>
+
+                <rect x="30" y="22" width="40" height="16" fill="none" rx="2" /> <text x="50" y="30" class="title">VCO 1</text>
+                <rect x="110" y="22" width="40" height="16" fill="none" rx="2" /> <text x="130" y="30" class="title">VCO 2</text>
+                <text x="210" y="30" class="title">MIXER</text>
+                <rect x="270" y="22" width="40" height="16" fill="none" rx="2" /> <text x="290" y="30" class="title">VC HPF</text>
+                <rect x="350" y="22" width="40" height="16" fill="none" rx="2" /> <text x="370" y="30" class="title">VC LPF</text>
+                <rect x="430" y="22" width="40" height="16" fill="none" rx="2" /> <text x="450" y="30" class="title">VCA</text>
+                
+                <text x="750" y="40" class="title">VOLUME</text>
+
+                <rect x="90" y="132" width="90" height="18" fill="none" rx="2" /> <text x="135" y="141" class="title">MODULATION GEN</text>
+                <rect x="235" y="132" width="80" height="18" fill="none" rx="2" /> <text x="275" y="141" class="title">ENVELOPE 1</text>
+                <rect x="365" y="132" width="80" height="18" fill="none" rx="2" /> <text x="405" y="141" class="title">ENVELOPE 2</text>
+
+                <rect x="30" y="232" width="150" height="18" fill="none" rx="2" /> <text x="105" y="241" class="title">SAMPLE & HOLD</text>
+                <rect x="220" y="232" width="90" height="18" fill="none" rx="2" /> <text x="265" y="241" class="title">VCA</text>
+                <rect x="450" y="302" width="90" height="18" fill="none" rx="2" /> <text x="495" y="311" class="title">NOISE GENERATOR</text>
+
+                <use href="#jack-outline" x="50" y="90" /> <circle cx="50" cy="90" r="4" class="interactive-jack" /> <text x="50" y="110" class="sub">-5V~+5V</text> <text x="50" y="70" class="title">TOTAL</text>
+                <use href="#jack-outline" x="130" y="90" /> <circle cx="130" cy="90" r="4" class="interactive-jack" /> <text x="130" y="110" class="sub">-5V~+5V</text> <text x="130" y="70" class="title">FREQ</text>
+                <use href="#jack-outline" x="210" y="90" /> <circle cx="210" cy="90" r="4" class="interactive-jack" /> <text x="210" y="110" class="sub">3 VPP MAX</text> <text x="210" y="70" class="title">EXT SIGNAL IN</text>
+                <use href="#jack-outline" x="290" y="90" /> <circle cx="290" cy="90" r="4" class="interactive-jack" /> <text x="290" y="110" class="sub">-5V~+5V</text> <text x="290" y="70" class="title">CUTOFF FREQ</text>
+                <use href="#jack-outline" x="370" y="90" /> <circle cx="370" cy="90" r="4" class="interactive-jack" /> <text x="370" y="110" class="sub">-5V~+5V</text> <text x="370" y="70" class="title">CUTOFF FREQ</text>
+                <use href="#jack-outline" x="450" y="90" /> <circle cx="450" cy="90" r="4" class="interactive-jack" /> <text x="450" y="110" class="sub">0V~+5V</text> <text x="450" y="70" class="title">INITIAL GAIN</text>
+
+                <use href="#jack-outline" x="50" y="180" /> <circle cx="50" cy="180" r="4" class="interactive-jack" /> <text x="50" y="162" class="title">PWM IN</text>
+                <use href="#jack-outline" x="110" y="180" /> <circle cx="110" cy="180" r="4" class="interactive-jack" /> <text x="110" y="162" class="title">OUT</text> <use href="#wave-tri" x="110" y="205" />
+                <use href="#jack-outline" x="160" y="180" /> <circle cx="160" cy="180" r="4" class="interactive-jack" /> <text x="160" y="162" class="title">OUT</text> <use href="#wave-sqr" x="160" y="205" />
+                
+                <use href="#jack-outline" x="250" y="180" /> <circle cx="250" cy="180" r="4" class="interactive-jack" /> <text x="250" y="162" class="title">OUT</text> <use href="#wave-env" x="250" y="205" />
+                <use href="#jack-outline" x="300" y="180" /> <circle cx="300" cy="180" r="4" class="interactive-jack" /> <text x="300" y="162" class="title">REV OUT</text> <use href="#wave-rev-env" x="300" y="205" />
+                <use href="#jack-outline" x="380" y="180" /> <circle cx="380" cy="180" r="4" class="interactive-jack" /> <text x="380" y="162" class="title">OUT</text> <use href="#wave-env" x="380" y="205" />
+                <use href="#jack-outline" x="430" y="180" /> <circle cx="430" cy="180" r="4" class="interactive-jack" /> <text x="430" y="162" class="title">REV OUT</text> <use href="#wave-rev-env" x="430" y="205" />
+                
+                <use href="#jack-outline" x="500" y="180" /> <circle cx="500" cy="180" r="4" class="interactive-jack" /> <text x="500" y="162" class="title">TRIG IN</text>
+                <use href="#jack-outline" x="570" y="180" /> <circle cx="570" cy="180" r="4" class="interactive-jack" /> <text x="570" y="152" class="title">VCO 1+2</text><text x="570" y="162" class="title">CV IN (Hz/V)</text>
+                <use href="#jack-outline" x="640" y="180" /> <circle cx="640" cy="180" r="4" class="interactive-jack" /> <text x="640" y="162" class="title">CV OUT</text>
+
+                <use href="#jack-outline" x="50" y="280" /> <circle cx="50" cy="280" r="4" class="interactive-jack" /> <text x="50" y="262" class="title">IN</text>
+                <use href="#jack-outline" x="110" y="280" /> <circle cx="110" cy="280" r="4" class="interactive-jack" /> <text x="110" y="262" class="title">CLOCK</text>
+                <use href="#jack-outline" x="160" y="280" /> <circle cx="160" cy="280" r="4" class="interactive-jack" /> <text x="160" y="262" class="title">OUT</text>
+                
+                <use href="#jack-outline" x="240" y="280" /> <circle cx="240" cy="280" r="4" class="interactive-jack" /> <text x="240" y="262" class="title">IN</text>
+                <use href="#jack-outline" x="290" y="280" /> <circle cx="290" cy="280" r="4" class="interactive-jack" /> <text x="290" y="262" class="title">OUT</text>
+                <use href="#jack-outline" x="350" y="280" /> <circle cx="350" cy="280" r="4" class="interactive-jack" /> <text x="350" y="252" class="title">CONTROL</text><text x="350" y="262" class="title">INPUT</text>
+                
+                <use href="#jack-outline" x="420" y="280" /> <circle cx="420" cy="280" r="4" class="interactive-jack" /> <text x="420" y="262" class="title">EG1 TRIG IN</text>
+                <use href="#jack-outline" x="480" y="280" /> <circle cx="480" cy="280" r="4" class="interactive-jack" /> <text x="480" y="262" class="title">TRIG IN</text>
+                
+                <use href="#jack-outline" x="570" y="280" /> <circle cx="570" cy="280" r="4" class="interactive-jack" /> <text x="570" y="252" class="title">VCO 1+2</text><text x="570" y="262" class="title">CV IN (V/Oct)</text>
+                <use href="#jack-outline" x="640" y="280" /> <circle cx="640" cy="280" r="4" class="interactive-jack" /> <text x="640" y="262" class="title">TRIG OUT</text>
+
+                <use href="#jack-outline" x="470" y="350" /> <circle cx="470" cy="350" r="4" class="interactive-jack" /> <text x="470" y="332" class="title">PINK</text> <use href="#wave-noise" x="470" y="375" />
+                <use href="#jack-outline" x="520" y="350" /> <circle cx="520" cy="350" r="4" class="interactive-jack" /> <text x="520" y="332" class="title">WHITE</text> <use href="#wave-noise" x="520" y="375" />
+                
+                <use href="#jack-outline" x="590" y="350" /> <circle cx="590" cy="350" r="4" class="interactive-jack" /> <text x="590" y="332" class="title">TRIG SW OUT</text>
+                
+                <rect x="632" y="342" width="16" height="16" fill="none" stroke="var(--ink)" rx="1" /> <text x="640" y="332" class="title">TRIG SW</text>
+
+                <line x1="0" y1="410" x2="800" y2="410" class="wire" stroke-dasharray="4,4" />
+                <text x="380" y="425" class="title">EXTERNAL SIGNAL PROCESSOR</text>
+
+                <rect x="230" y="440" width="40" height="20" fill="none" rx="2" /> <text x="250" y="450" class="title">BPF</text>
+                <rect x="370" y="440" width="40" height="20" fill="none" rx="2" /> <text x="390" y="450" class="title">F-V</text>
+                <rect x="520" y="440" width="50" height="20" fill="none" rx="2" /> <text x="545" y="450" class="title">ENV FOL</text>
+
+                <use href="#jack-outline" x="50" y="480" /> <circle cx="50" cy="480" r="4" class="interactive-jack" /> <text x="50" y="460" class="title">SIGNAL IN</text>
+                <use href="#jack-outline" x="180" y="480" /> <circle cx="180" cy="480" r="4" class="interactive-jack" /> <text x="180" y="460" class="title">OUT</text>
+                <use href="#jack-outline" x="320" y="480" /> <circle cx="320" cy="480" r="4" class="interactive-jack" /> <text x="320" y="460" class="title">OUT</text>
+                <use href="#jack-outline" x="460" y="480" /> <circle cx="460" cy="480" r="4" class="interactive-jack" /> <text x="460" y="450" class="title">F-V</text><text x="460" y="460" class="title">CV OUT</text>
+                
+                <use href="#jack-outline" x="620" y="480" /> <circle cx="620" cy="480" r="4" class="interactive-jack" /> <text x="620" y="460" class="title">ENV OUT</text>
+                <use href="#jack-outline" x="700" y="480" /> <circle cx="700" cy="480" r="4" class="interactive-jack" /> <text x="700" y="460" class="title">TRIG OUT</text>
+
+                <text x="80" y="610" class="title">SIGNAL LEVEL</text>
+                <text x="210" y="610" class="title">LOW CUT FREQ</text>
+                <text x="340" y="610" class="title">HIGH CUT FREQ</text>
+                <text x="470" y="610" class="title">CV ADJUST</text>
+                <text x="600" y="610" class="title">THRESHOLD LEVEL</text>
+
+                <use href="#jack-outline" x="750" y="145" /> <circle cx="750" cy="145" r="4" class="interactive-jack" /> <text x="750" y="125" class="title">-> SIGNAL OUT</text>
+                <use href="#jack-outline" x="750" y="200" /> <circle cx="750" cy="200" r="4" class="interactive-jack" /> <text x="750" y="180" class="title">PHONES</text>
+                
+            </svg>
+
+            <div class="overlay-knob" style="left: 750px; top: 75px;">
+                <div class="dial" style="width:48px; height:48px;" data-rot="0"><div class="pointer" style="height:22px; left:23px;"></div></div>
+            </div>
+
+            <div class="overlay-knob" style="left: 80px; top: 570px;"><div class="dial" data-rot="-135"><div class="pointer"></div></div></div>
+            <div class="overlay-knob" style="left: 210px; top: 570px;"><div class="dial" data-rot="-135"><div class="pointer"></div></div></div>
+            <div class="overlay-knob" style="left: 340px; top: 570px;"><div class="dial" data-rot="135"><div class="pointer"></div></div></div>
+            <div class="overlay-knob" style="left: 470px; top: 570px;"><div class="dial" data-rot="-135"><div class="pointer"></div></div></div>
+            <div class="overlay-knob" style="left: 600px; top: 570px;"><div class="dial" data-rot="0"><div class="pointer"></div></div></div>
+        </div>
+
+    </div>
+
+    <script>
+        document.documentElement.style.setProperty('--active-color', '#ff3333');
+
+        // 1. KNOB ROTATION LOGIC
+        const dials = document.querySelectorAll('.dial');
+        let activeDial = null;
+        let startY = 0;
+        let currentAngle = 0;
+
+        dials.forEach(dial => {
+            const rot = parseFloat(dial.getAttribute('data-rot')) || -135;
+            dial.style.transform = `rotate(${rot}deg)`;
+            
+            dial.addEventListener('mousedown', (e) => {
+                activeDial = dial;
+                startY = e.clientY;
+                currentAngle = parseFloat(dial.getAttribute('data-rot')) || -135;
+                document.body.style.cursor = 'ns-resize';
+            });
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!activeDial) return;
+            const deltaY = startY - e.clientY;
+            let newAngle = currentAngle + (deltaY * 2);
+            newAngle = Math.max(-135, Math.min(135, newAngle));
+            
+            activeDial.style.transform = `rotate(${newAngle}deg)`;
+            activeDial.setAttribute('data-rot', newAngle);
+            
+            startY = e.clientY;
+            currentAngle = newAngle;
+        });
+
+        window.addEventListener('mouseup', () => {
+            activeDial = null;
+            document.body.style.cursor = 'default';
+        });
+
+        function resetKnobs() {
+            dials.forEach(dial => {
+                dial.style.transform = `rotate(-135deg)`;
+                dial.setAttribute('data-rot', -135);
+            });
+        }
+
+        // 2. INTERACTIVE CABLE ENGINE
+        const swatches = document.querySelectorAll('.color-swatch');
+        let activeColor = '#ff3333';
+        let patchStartNode = null;
+        const cordLayer = document.getElementById('patch-bay-cords');
+
+        swatches.forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                document.querySelector('.color-swatch.selected').classList.remove('selected');
+                swatch.classList.add('selected');
+                activeColor = swatch.getAttribute('data-color');
+                document.documentElement.style.setProperty('--active-color', activeColor);
+            });
+        });
+
+        const jacks = document.querySelectorAll('.interactive-jack');
+        
+        jacks.forEach(jack => {
+            jack.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                const cx = parseFloat(jack.getAttribute('cx'));
+                const cy = parseFloat(jack.getAttribute('cy'));
+
+                if (!patchStartNode) {
+                    patchStartNode = { x: cx, y: cy, element: jack };
+                    jack.classList.add('active-source');
+                } else {
+                    if (patchStartNode.element !== jack) {
+                        const cord = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        
+                        const dx = cx - patchStartNode.x;
+                        const ctrlX = patchStartNode.x + dx / 2;
+                        const ctrlY = Math.max(patchStartNode.y, cy) + Math.abs(dx) * 0.2 + 40;
+                        
+                        cord.setAttribute('d', `M ${patchStartNode.x} ${patchStartNode.y} Q ${ctrlX} ${ctrlY} ${cx} ${cy}`);
+                        cord.setAttribute('class', 'patch-cable');
+                        cord.setAttribute('style', `stroke: ${activeColor}; fill: none; stroke-width: 4px;`);
+                        
+                        cord.addEventListener('contextmenu', (evt) => {
+                            evt.preventDefault();
+                            cord.remove();
+                        });
+
+                        cordLayer.appendChild(cord);
+                    }
+                    
+                    patchStartNode.element.classList.remove('active-source');
+                    patchStartNode = null;
+                }
+            });
+        });
+
+        // Click off to cancel
+        document.querySelector('.flowchart-svg').addEventListener('click', () => {
+            if (patchStartNode) {
+                patchStartNode.element.classList.remove('active-source');
+                patchStartNode = null;
+            }
+        });
+
+        function clearCables() {
+            cordLayer.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
