@@ -718,10 +718,11 @@
                 updateKnobVisual(knobC, 2.5);
             }
             
+            // Set speed to 11 o'clock (~110 BPM)
             const speedKnob = document.getElementById('clockSpeed');
-            speedKnob.dataset.val = 75;
-            bpm = 40 + (75 / 100) * 200; 
-            updateKnobVisual(speedKnob, 75);
+            speedKnob.dataset.val = 35;
+            bpm = 40 + (35 / 100) * 200; 
+            updateKnobVisual(speedKnob, 35);
 
             const portaKnob = document.getElementById('portamento');
             portaKnob.dataset.val = 0;
@@ -743,7 +744,7 @@
             await initAudio();
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "12-cont";
-            document.getElementById('chCDest').value = "clock";
+            document.getElementById('chCDest').value = "filter"; // Set Channel C to Filter
             
             const acidA = [-1.00, 0.00, 0.25, -1.00, 0.58, 0.00, -0.17, -1.00, 0.83, 1.00, 0.00, -1.00];
             const acidC = [4.00, 1.00, 2.50, 4.50, 0.50, 2.50, 3.50, 2.00, 5.00, 0.20, 2.50, 3.00];
@@ -766,15 +767,17 @@
                 updateKnobVisual(knobC, acidC[i]);
             }
             
+            // Set speed to 12 o'clock (140 BPM)
             const speedKnob = document.getElementById('clockSpeed');
-            speedKnob.dataset.val = 60;
-            bpm = 40 + (60 / 100) * 200; 
-            updateKnobVisual(speedKnob, 60);
+            speedKnob.dataset.val = 50;
+            bpm = 40 + (50 / 100) * 200; 
+            updateKnobVisual(speedKnob, 50);
 
+            // Set portamento to 0
             const portaKnob = document.getElementById('portamento');
-            portaKnob.dataset.val = 35;
-            portamentoTime = 0.01 + (35 / 100) * 0.3; 
-            updateKnobVisual(portaKnob, 35);
+            portaKnob.dataset.val = 0;
+            portamentoTime = 0.01; 
+            updateKnobVisual(portaKnob, 0);
 
             resetStep = null; 
             document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
