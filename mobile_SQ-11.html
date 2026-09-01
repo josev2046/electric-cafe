@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korg SQ-10 Emulator</title>
+    <title>Korg SQ-11 Emulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #1a1a1a; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
@@ -24,7 +24,6 @@
         .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
         .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
         
-        /* Radial tick ring generated via conic gradient mask */
         .tick-ring {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
             background: conic-gradient(
@@ -61,6 +60,12 @@
         .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #888; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
         .crt-screen { background: #051005; border: 2px solid #222; box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1), inset 0 0 10px #000; }
         
+        /* Keyboard Styling */
+        .key-white { background: #e5e3d8; color: #111; border: 2px solid #000; border-radius: 0 0 4px 4px; }
+        .key-white.active-key { background: #ff2a2a; color: #fff; }
+        .key-black { background: #222; color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; }
+        .key-black.active-key { background: #ff2a2a; color: #fff; }
+
         .grid-scroll::-webkit-scrollbar { height: 8px; }
         .grid-scroll::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
         .grid-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -159,10 +164,19 @@
             </div>
         </div>
         
-        <!-- Footer Demos -->
-        <div class="flex justify-end gap-6 mt-6 pr-4">
-            <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
-            <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
+        <!-- Footer: Transpose Keyboard & Demos -->
+        <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#222]">
+            <div class="flex flex-col gap-1">
+                <span class="text-[10px] font-bold text-gray-400">KEYBOARD TRANSPOSE</span>
+                <div class="flex relative h-16" id="keyboardContainer">
+                    <!-- Virtual keys injected via JS -->
+                </div>
+            </div>
+
+            <div class="flex gap-6">
+                <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
+                <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
+            </div>
         </div>
     </div>
 
@@ -179,6 +193,7 @@
         let portamentoTime = 0.01;
         let resetStep = null;
         let isPreviewing = false;
+        let transposeSemitones = 0; // Global sequence transposition offset
 
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -251,7 +266,7 @@
             if (ch === 'C') {
                 document.getElementById('dispNote').innerText = `CTRL: C-MOD`;
             } else {
-                const semitoneOffset = Math.round(volt * 12);
+                const semitoneOffset = Math.round(volt * 12) + transposeSemitones;
                 const totalNote = 24 + semitoneOffset; 
                 const noteIndex = ((totalNote % 12) + 12) % 12;
                 const octave = Math.floor(totalNote / 12);
@@ -276,7 +291,7 @@
 
         function previewSynth(pitchVal, cVal) {
             if(!audioCtx) return;
-            const semitone = pitchVal * 12; 
+            const semitone = (pitchVal * 12) + transposeSemitones; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
 
@@ -395,7 +410,7 @@
 
         function triggerSynth(pitchVal, cVal, time) {
             if(!audioCtx) return;
-            const semitone = pitchVal * 12; 
+            const semitone = (pitchVal * 12) + transposeSemitones; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
 
@@ -489,6 +504,62 @@
             document.querySelectorAll('.knob[data-ch]').forEach(k => updateKnobVisual(k, 0));
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
+        }
+
+        function renderKeyboard() {
+            const container = document.getElementById('keyboardContainer');
+            container.innerHTML = '';
+            
+            const keys = [
+                { note: 'C', isBlack: false, offset: 0 },
+                { note: 'C#', isBlack: true, offset: 1 },
+                { note: 'D', isBlack: false, offset: 2 },
+                { note: 'D#', isBlack: true, offset: 3 },
+                { note: 'E', isBlack: false, offset: 4 },
+                { note: 'F', isBlack: false, offset: 5 },
+                { note: 'F#', isBlack: true, offset: 6 },
+                { note: 'G', isBlack: false, offset: 7 },
+                { note: 'G#', isBlack: true, offset: 8 },
+                { note: 'A', isBlack: false, offset: 9 },
+                { note: 'A#', isBlack: true, offset: 10 },
+                { note: 'B', isBlack: false, offset: 11 },
+                { note: 'C', isBlack: false, offset: 12 }
+            ];
+
+            let whiteIndex = 0;
+            keys.forEach(k => {
+                const btn = document.createElement('button');
+                btn.dataset.offset = k.offset;
+                
+                if (k.isBlack) {
+                    btn.className = `key-black absolute w-5 h-10 text-[8px] font-bold flex items-end justify-center pb-1 ${k.offset === transposeSemitones ? 'active-key' : ''}`;
+                    btn.style.left = `${(whiteIndex * 24) - 10}px`;
+                } else {
+                    btn.className = `key-white w-6 h-16 text-[9px] font-bold flex items-end justify-center pb-1 ${k.offset === transposeSemitones ? 'active-key' : ''}`;
+                    whiteIndex++;
+                }
+                
+                btn.innerText = k.note;
+                btn.addEventListener('pointerdown', async (e) => {
+                    await initAudio();
+                    transposeSemitones = parseInt(e.target.dataset.offset);
+                    
+                    document.querySelectorAll('#keyboardContainer button').forEach(el => el.classList.remove('active-key'));
+                    e.target.classList.add('active-key');
+                    
+                    if (!isPlaying) {
+                        const range = parseInt(document.getElementById('voltRange').value);
+                        let pVal = tracks.A[0] * (range / 5);
+                        let fVal = tracks.C[0];
+                        previewSynth(pVal, fVal);
+                    }
+                });
+
+                btn.addEventListener('pointerup', () => stopPreview());
+                btn.addEventListener('pointercancel', () => stopPreview());
+
+                container.appendChild(btn);
+            });
         }
 
         function stopSequencer() {
@@ -713,6 +784,7 @@
         });
 
         renderGrid();
+        renderKeyboard();
     </script>
 </body>
 </html>
