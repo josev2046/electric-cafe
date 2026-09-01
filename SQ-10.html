@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korg SQ-10 Emulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #1a1a1a; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
+        .chassis { background: #111; border: 4px solid #080808; padding: 24px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+        
+        .led { width: 12px; height: 12px; border-radius: 50%; background: #3a0505; border: 2px solid #000; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); margin: 0 auto; }
+        .active .led { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.4); }
+        
+        .pilot { width: 8px; height: 8px; border-radius: 50%; background: #3a0505; border: 1px solid #000; box-shadow: inset 0 1px 1px rgba(0,0,0,0.5); transition: background 0.1s; }
+        .pilot-active { background: #ff2a2a; box-shadow: 0 0 8px #ff2a2a; }
+
+        .patch-point { width: 22px; height: 22px; border-radius: 50%; background: #050505; border: 3px solid #333; box-shadow: inset 0 2px 4px rgba(0,0,0,1); margin: 0 auto; cursor: pointer; transition: all 0.2s; }
+        .patch-point:hover { border-color: #666; }
+        .patch-point.patched { background: #dca824; box-shadow: 0 0 12px #dca824, inset 0 2px 4px rgba(0,0,0,0.5); border-color: #fff; }
+        
+        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .knob { 
+            width: 40px; height: 40px; border-radius: 50%; background: #1a1a1a; 
+            border: 2px solid #000; cursor: ns-resize; position: relative;
+            box-shadow: inset 0 1px 3px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.6);
+            transform: rotate(-135deg);
+        }
+        .knob::after { content: ''; position: absolute; top: 4px; left: 17px; width: 2px; height: 12px; background: #fff; border-radius: 1px; }
+        
+        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #888; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; }
+    </style>
+</head>
+<body class="min-h-screen flex justify-center items-start">
+    <div class="chassis w-full max-w-6xl">
+        
+        <!-- Top Panel: Global Controls -->
+        <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#222] items-end justify-between">
+            <div class="flex gap-6 items-end">
+                <div class="flex flex-col gap-3">
+                    <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md">START / STOP</button>
+                    <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-5 py-2 font-bold rounded-sm shadow-md">STEP</button>
+                </div>
+                
+                <div class="knob-wrapper ml-4">
+                    <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                    <span class="text-[10px] font-bold text-gray-400">SPEED</span>
+                </div>
+                <div class="knob-wrapper">
+                    <div class="knob global-knob" id="portamento" data-val="0"></div>
+                    <span class="text-[10px] font-bold text-gray-400">PORTAMENTO</span>
+                </div>
+                
+                <div class="flex flex-col items-center ml-4 mb-1">
+                    <select id="seqMode" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                        <option value="12-step">12-STEP: STEPPED</option>
+                        <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
+                        <option value="12-one">12-STEP: ONE-TIME (1 TIMES)</option>
+                        <option value="24-step">24-STEP: STEPPED</option>
+                        <option value="24-cont">24-STEP: CONTINUOUS</option>
+                        <option value="24-one">24-STEP: ONE-TIME (1 TIMES)</option>
+                    </select>
+                    <span class="text-[10px] font-bold mt-2 text-gray-400">MODE SELECTOR</span>
+                </div>
+
+                <div class="flex flex-col items-center ml-4 mb-1">
+                    <select id="chCDest" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                        <option value="filter" selected>FILTER (CUTOFF)</option>
+                        <option value="volume">VOLUME (ACCENT)</option>
+                        <option value="clock">CLOCK (SPEED MOD)</option>
+                    </select>
+                    <span class="text-[10px] font-bold mt-2 text-gray-400">CH-C DESTINATION</span>
+                </div>
+
+                <div class="flex flex-col items-center ml-4 mb-1 text-yellow-600 font-bold text-xs" id="resetStatus">
+                    NO RESET PATCHED
+                </div>
+            </div>
+            
+            <div class="text-right">
+                <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-10</h1>
+                <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
+            </div>
+        </div>
+
+        <!-- 3x12 Sequencer Grid -->
+        <div class="flex flex-col gap-6">
+            <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
+            <div class="flex"><div class="row-label"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
+            <div class="flex"><div class="row-label"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
+            <div class="flex"><div class="row-label">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
+            <div class="flex mt-2"><div class="row-label text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
+        </div>
+    </div>
+
+    <script>
+        const NUM_STEPS = 12;
+        let currentStep = -1;
+        let isPlaying = false;
+        let nextNoteTime = 0;
+        let timerId;
+        let audioCtx;
+        
+        let bpm = 120;
+        let portamentoTime = 0.01;
+        let resetStep = null;
+
+        const tracks = { A: new Array(NUM_STEPS).fill(50), B: new Array(NUM_STEPS).fill(50), C: new Array(NUM_STEPS).fill(50) };
+
+        let synthOsc, synthVcf, synthVca;
+
+        function initAudio() {
+            if(!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                synthOsc = audioCtx.createOscillator();
+                synthVcf = audioCtx.createBiquadFilter();
+                synthVca = audioCtx.createGain();
+                
+                synthOsc.type = 'sawtooth';
+                synthVcf.type = 'lowpass';
+                synthVcf.Q.value = 12; // Boosted resonance for more pronounced sweep
+                synthVca.gain.value = 0;
+                
+                synthOsc.connect(synthVcf);
+                synthVcf.connect(synthVca);
+                synthVca.connect(audioCtx.destination);
+                synthOsc.start();
+            }
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        let activeKnob = null, startY = 0, startVal = 0;
+
+        function updateKnobVisual(knobEl, val) {
+            knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
+        }
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('knob')) {
+                activeKnob = e.target;
+                startY = e.clientY;
+                startVal = parseFloat(activeKnob.dataset.val);
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (activeKnob) {
+                let newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
+                activeKnob.dataset.val = newVal;
+                updateKnobVisual(activeKnob, newVal);
+                
+                if(activeKnob.id === 'clockSpeed') bpm = 40 + (newVal / 100) * 200;
+                else if(activeKnob.id === 'portamento') portamentoTime = 0.01 + (newVal / 100) * 0.3;
+                else tracks[activeKnob.dataset.ch][activeKnob.dataset.step] = newVal;
+            }
+        });
+
+        document.addEventListener('mouseup', () => activeKnob = null);
+
+        function triggerSynth(pitchVal, cVal, time) {
+            const semitone = Math.floor((pitchVal / 100) * 36); 
+            const freq = 65.41 * Math.pow(2, semitone / 12);
+            const dest = document.getElementById('chCDest').value;
+
+            synthOsc.frequency.setTargetAtTime(freq, time, portamentoTime);
+
+            let cutoff = 2000;
+            let peakVolume = 0.5;
+
+            // Apply Channel C routing
+            if (dest === 'filter') {
+                cutoff = 100 + (cVal / 100) * 4000;
+            } else if (dest === 'volume') {
+                peakVolume = 0.1 + (cVal / 100) * 0.8; 
+            }
+
+            synthVcf.frequency.setTargetAtTime(cutoff, time, portamentoTime);
+
+            synthVca.gain.cancelScheduledValues(time);
+            synthVca.gain.setValueAtTime(0, time);
+            synthVca.gain.linearRampToValueAtTime(peakVolume, time + 0.02);
+            synthVca.gain.exponentialRampToValueAtTime(0.001, time + (60/bpm)*0.5);
+        }
+
+        function handlePatchClick(e) {
+            const step = parseInt(e.target.dataset.step);
+            const statusText = document.getElementById('resetStatus');
+
+            if (resetStep === step) {
+                resetStep = null;
+                e.target.classList.remove('patched');
+                statusText.innerText = "NO RESET PATCHED";
+            } else {
+                document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched'));
+                resetStep = step;
+                e.target.classList.add('patched');
+                statusText.innerText = `RESET PATCHED TO STEP ${step + 1}`;
+            }
+        }
+
+        function renderGrid() {
+            ['ledRow', 'rowA', 'rowB', 'rowC', 'trigRow'].forEach(id => document.getElementById(id).innerHTML = '');
+            for(let i=0; i<NUM_STEPS; i++) {
+                document.getElementById('ledRow').innerHTML += `<div class="w-[40px] flex justify-center step-indicator" data-step="${i}"><div class="led"></div></div>`;
+                ['A', 'B', 'C'].forEach(ch => {
+                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="50" style="transform: rotate(0deg)"></div>`;
+                });
+                
+                const patchPoint = document.createElement('div');
+                patchPoint.className = 'patch-point';
+                patchPoint.dataset.step = i;
+                patchPoint.addEventListener('click', handlePatchClick);
+                
+                const patchContainer = document.createElement('div');
+                patchContainer.className = 'w-[40px] flex justify-center';
+                patchContainer.appendChild(patchPoint);
+                document.getElementById('trigRow').appendChild(patchContainer);
+            }
+            updateKnobVisual(document.getElementById('clockSpeed'), 50);
+            updateKnobVisual(document.getElementById('portamento'), 0);
+        }
+
+        function stopSequencer() {
+            isPlaying = false;
+            clearTimeout(timerId);
+            currentStep = -1;
+            document.querySelectorAll('.step-indicator').forEach(el => el.classList.remove('active'));
+            document.getElementById('pilotA').classList.remove('pilot-active');
+            document.getElementById('pilotB').classList.remove('pilot-active');
+            document.getElementById('startStop').style.backgroundColor = '';
+        }
+
+        function scheduleNextStep(manual = false) {
+            const mode = document.getElementById('seqMode').value;
+            const is24 = mode.startsWith('24');
+            const maxSteps = is24 ? 24 : 12;
+            
+            currentStep++;
+
+            if (currentStep >= maxSteps) {
+                if (mode.endsWith('one')) {
+                    stopSequencer();
+                    return;
+                }
+                currentStep = 0;
+            }
+            
+            if (resetStep !== null && (currentStep % 12) === resetStep) {
+                if (mode.endsWith('one')) {
+                    stopSequencer();
+                    return;
+                }
+                currentStep = 0;
+            }
+            
+            const uiStep = currentStep % 12;
+
+            document.querySelectorAll('.step-indicator').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.step-indicator[data-step="${uiStep}"]`).classList.add('active');
+
+            document.getElementById('pilotA').classList.remove('pilot-active');
+            document.getElementById('pilotB').classList.remove('pilot-active');
+            
+            if (is24) {
+                if (currentStep < 12) document.getElementById('pilotA').classList.add('pilot-active');
+                else document.getElementById('pilotB').classList.add('pilot-active');
+            } else {
+                document.getElementById('pilotA').classList.add('pilot-active');
+                document.getElementById('pilotB').classList.add('pilot-active');
+            }
+
+            let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+            let fVal = tracks.C[uiStep]; 
+
+            triggerSynth(pVal, fVal, manual ? audioCtx.currentTime : nextNoteTime);
+        }
+
+        function scheduler() {
+            if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) return; 
+            
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                scheduleNextStep();
+                
+                let currentStepDuration = (60.0 / bpm) * 0.25;
+                const dest = document.getElementById('chCDest').value;
+                
+                if (dest === 'clock') {
+                    const uiStep = currentStep === -1 ? 0 : currentStep % 12;
+                    const cMod = tracks.C[uiStep] / 50; 
+                    currentStepDuration = currentStepDuration * (2 - cMod); 
+                }
+                
+                nextNoteTime += currentStepDuration; 
+            }
+            timerId = setTimeout(scheduler, 25);
+        }
+
+        document.getElementById('startStop').addEventListener('click', (e) => {
+            initAudio();
+            const mode = document.getElementById('seqMode').value;
+            
+            if(isPlaying) {
+                stopSequencer();
+            } else if (!mode.endsWith('step')) { 
+                isPlaying = true;
+                e.target.style.backgroundColor = '#ff2a2a';
+                nextNoteTime = audioCtx.currentTime + 0.05;
+                scheduler();
+            }
+        });
+
+        document.getElementById('stepAdv').addEventListener('click', () => {
+            initAudio();
+            if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) {
+                scheduleNextStep(true);
+            }
+        });
+
+        renderGrid();
+    </script>
+</body>
+</html>
