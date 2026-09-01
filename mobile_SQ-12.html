@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (1970s Warm Beige, Waveform Selector & ADSR Engine)
+    SQ-12 Analog Sequencer (100% Hardware Controls & ADSR)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -21,7 +21,6 @@
             user-select: none; 
         }
         
-        /* Enclosure & Warm Oiled Walnut Side Ears */
         .synth-enclosure {
             position: relative;
             display: flex;
@@ -41,13 +40,11 @@
         .wooden-ear-left { border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-right: 2px solid #111; }
         .wooden-ear-right { border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left: 2px solid #111; }
 
-        /* Streamlined All-Beige Panel Surface */
         .chassis { 
-            background: 
-                radial-gradient(circle at 50% 20%, #f0ebd8 0%, #e2dbc8 60%, #cebba8 100%); 
+            background: radial-gradient(circle at 50% 20%, #f0ebd8 0%, #e2dbc8 60%, #cebba8 100%); 
             border-top: 3px solid #f7f4e9; 
             border-bottom: 4px solid #82796e; 
-            padding: 28px; 
+            padding: 32px 36px; 
             flex-grow: 1;
             position: relative;
             display: flex;
@@ -56,7 +53,6 @@
             box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8), inset 0 -2px 5px rgba(0,0,0,0.3);
         }
 
-        /* Rack Bolts */
         .rack-bolt {
             width: 12px; height: 12px; border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #a39c8e 0%, #3a362f 80%);
@@ -69,11 +65,10 @@
         .bolt-bl { bottom: 12px; left: 12px; }
         .bolt-br { bottom: 12px; right: 12px; }
 
-        /* Silkscreened Panel Outlines */
         .panel-outline {
             border: 1.5px solid #38342e;
             border-radius: 6px;
-            padding: 10px 14px;
+            padding: 10px 12px;
             background: rgba(0, 0, 0, 0.025);
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.7);
             display: flex;
@@ -81,7 +76,6 @@
             justify-content: center;
         }
 
-        /* Convex Glass Dome LEDs */
         .led { 
             width: 14px; height: 12px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #5a1212 0%, #200303 70%); 
@@ -98,7 +92,6 @@
             width: 9px; height: 9px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #4a0f0f 0%, #1a0202 80%); 
             border: 1px solid #111; 
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); 
             transition: all 0.1s; 
         }
         .pilot-active { 
@@ -106,7 +99,6 @@
             box-shadow: 0 0 10px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.6); 
         }
 
-        /* Gold Sockets */
         .patch-point { 
             width: 24px; height: 24px; border-radius: 50%; 
             background: radial-gradient(circle, #080808 40%, #1a1a1a 50%, #8a6f27 85%, #d4af37 100%); 
@@ -115,18 +107,11 @@
             margin: 0 auto; cursor: pointer; transition: all 0.2s; 
         }
         .patch-point:hover { filter: brightness(1.2); }
-        .patch-point.patched { 
-            background: radial-gradient(circle, #ffea78 20%, #dca824 60%, #523b00 100%); 
-            box-shadow: 0 0 14px #dca824, inset 0 2px 4px rgba(0,0,0,0.6); border-color: #fff; 
-        }
-        .patch-point.patched-b { 
-            background: radial-gradient(circle, #ff9e78 20%, #dc5a24 60%, #521800 100%); 
-            box-shadow: 0 0 14px #dc5a24, inset 0 2px 4px rgba(0,0,0,0.6); border-color: #fff; 
-        }
+        .patch-point.patched { background: radial-gradient(circle, #ffea78 20%, #dca824 60%, #523b00 100%); box-shadow: 0 0 14px #dca824; }
+        .patch-point.patched-b { background: radial-gradient(circle, #ff9e78 20%, #dc5a24 60%, #521800 100%); box-shadow: 0 0 14px #dc5a24; }
         
-        /* Vintage Bakelite Knobs */
-        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
-        .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
+        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 50px; }
+        .tick-container { position: relative; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
         
         .tick-ring {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
@@ -144,8 +129,36 @@
                 #221e1a 243deg 244.5deg, transparent 244.5deg 270deg,
                 #221e1a 270deg 271.5deg, transparent 271.5deg 360deg
             );
-            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
-            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+        }
+
+        .step4-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(
+                from -135deg,
+                #221e1a 0deg 2deg, transparent 2deg 90deg,
+                #221e1a 90deg 92deg, transparent 92deg 180deg,
+                #221e1a 180deg 182deg, transparent 182deg 270deg,
+                #221e1a 270deg 272deg, transparent 272deg 360deg
+            );
+            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+        }
+
+        .step6-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(
+                from -135deg,
+                #221e1a 0deg 2deg, transparent 2deg 54deg,
+                #221e1a 54deg 56deg, transparent 56deg 108deg,
+                #221e1a 108deg 110deg, transparent 110deg 162deg,
+                #221e1a 162deg 164deg, transparent 164deg 216deg,
+                #221e1a 216deg 218deg, transparent 218deg 270deg,
+                #221e1a 270deg 272deg, transparent 272deg 360deg
+            );
+            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
         }
 
         .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #221e1a; line-height: 1; pointer-events: none; }
@@ -153,18 +166,23 @@
         .label-left { bottom: 2px; left: 2px; }
         .label-right { bottom: 2px; right: 2px; }
 
+        .wave-saw { bottom: 2px; left: 1px; font-size: 9px; font-weight: 900; }
+        .wave-sqr { top: -2px; left: 2px; font-size: 9px; font-weight: 900; }
+        .wave-tri { top: -2px; right: 2px; font-size: 9px; font-weight: 900; }
+        .wave-sin { bottom: 2px; right: 1px; font-size: 9px; font-weight: 900; }
+
         .knob { 
-            width: 42px; height: 40px; border-radius: 50%; 
+            width: 38px; height: 36px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #2d3036 0%, #15171a 70%, #050608 100%); 
             border: 2px solid #000; cursor: ns-resize; position: relative; z-index: 2;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 4px 7px rgba(0,0,0,0.35);
             transform: rotate(-135deg); touch-action: none;
+            transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .knob::after { content: ''; position: absolute; top: 3px; left: 18px; width: 2px; height: 13px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.9); }
+        .knob::after { content: ''; position: absolute; top: 3px; left: 16px; width: 2px; height: 11px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.9); }
         
-        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #1f1a14; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
+        .row-label { width: 52px; font-weight: bold; font-size: 11px; text-align: right; color: #1f1a14; margin-right: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; line-height: 1.1; flex-shrink: 0; }
         
-        /* CRT Display Glass Screens (Green Oscilloscope & Amber Reset Display) */
         .crt-screen { 
             background: #041004; 
             border: 3px solid #38342e; 
@@ -172,44 +190,73 @@
             box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.25), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.3); 
             position: relative; overflow: hidden;
         }
-        .crt-screen::before, .amber-crt-screen::before {
-            content: " "; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
-            z-index: 5; background-size: 100% 3px, 6px 100%; pointer-events: none;
-        }
 
         .amber-crt-screen {
             background: #140a02; 
             border: 3px solid #38342e; 
             border-radius: 6px;
-            box-shadow: inset 0 0 20px rgba(255, 160, 0, 0.25), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.3); 
+            box-shadow: inset 0 0 15px rgba(255, 160, 0, 0.25), inset 0 0 10px #000, 0 2px 4px rgba(0,0,0,0.3); 
             position: relative; overflow: hidden;
         }
 
-        /* Tactile Hardware Buttons */
         .rocker-button {
             background: linear-gradient(180deg, #991b1b 0%, #5c0f0f 100%);
             border: 2px solid #280505;
             box-shadow: 0 3px 0 #1a0303, 0 4px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.3);
             transition: all 0.08s ease;
         }
-        .rocker-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a0303, 0 2px 3px rgba(0,0,0,0.3); }
+        .rocker-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a0303; }
         .rocker-button.is-active {
             background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
             border-color: #fca5a5;
-            box-shadow: 0 3px 0 #1a0303, 0 0 16px rgba(239, 68, 68, 0.7), inset 0 1px 2px rgba(255,255,255,0.7);
+            box-shadow: 0 3px 0 #1a0303, 0 0 16px rgba(239, 68, 68, 0.7);
         }
 
         .tactile-button {
             background: linear-gradient(180deg, #33363d 0%, #191a1e 100%);
             border: 2px solid #000;
             color: #f0ebd8;
-            box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
+            box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.3);
             transition: all 0.08s ease;
         }
-        .tactile-button:active { transform: translateY(1px); box-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,0.3); }
+        .tactile-button:active { transform: translateY(1px); }
 
-        /* Keyboard Styling with Vintage Red/Vermilion Accent */
+        .oct-btn, .dest-btn {
+            background: linear-gradient(180deg, #2d3036 0%, #17181c 100%);
+            border: 1.5px solid #000;
+            color: #cebba8;
+            font-weight: 900;
+            font-size: 8px;
+            padding: 3px 5px;
+            border-radius: 3px;
+            box-shadow: 0 2px 0 #000;
+            transition: all 0.08s ease;
+            cursor: pointer;
+        }
+        .oct-btn.oct-active, .dest-btn.dest-active {
+            background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%);
+            border-color: #ff8878;
+            color: #fff;
+            box-shadow: 0 2px 0 #000, 0 0 10px rgba(200, 58, 42, 0.8);
+        }
+
+        .volt-rocker {
+            width: 26px; height: 40px; border-radius: 4px;
+            background: linear-gradient(180deg, #15171a 0%, #2d3036 100%);
+            border: 2px solid #000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+            padding: 2px; cursor: pointer;
+        }
+        .volt-rocker-cap {
+            width: 18px; height: 16px; border-radius: 2px;
+            background: linear-gradient(180deg, #3d424a 0%, #1a1c20 100%);
+            border: 1px solid #000;
+            transition: all 0.1s ease;
+        }
+        .volt-5v .volt-rocker-cap { transform: translateY(0px); background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%); }
+        .volt-1v .volt-rocker-cap { transform: translateY(16px); background: linear-gradient(180deg, #3d424a 0%, #1a1c20 100%); }
+
         .key-white { background: linear-gradient(180deg, #ffffff 0%, #d8d3c5 100%); color: #111; border: 2px solid #111; border-radius: 0 0 4px 4px; box-shadow: 0 3px 4px rgba(0,0,0,0.25); }
         .key-white.active-key { background: #c83a2a; color: #fff; box-shadow: 0 0 12px #c83a2a; }
         .key-black { background: linear-gradient(180deg, #222 0%, #050505 100%); color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; box-shadow: 0 3px 4px rgba(0,0,0,0.5); }
@@ -222,154 +269,174 @@
 </head>
 <body class="min-h-screen flex justify-center items-start">
     <div class="synth-enclosure w-full max-w-6xl">
-        <!-- Left Wooden Ear -->
         <div class="wooden-ear wooden-ear-left"></div>
 
-        <!-- Main Sequencer Chassis -->
         <div class="chassis w-full">
-            <!-- Corner Bolts -->
             <div class="rack-bolt bolt-tl"></div>
             <div class="rack-bolt bolt-tr"></div>
             <div class="rack-bolt bolt-bl"></div>
             <div class="rack-bolt bolt-br"></div>
             
-            <!-- Top Header & Branding -->
+            <!-- Header with Dual Telemetry Monitored Displays -->
             <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#38342e]/30">
                 <div>
                     <h1 class="text-4xl font-black tracking-tighter text-[#1f1a14]"><span class="text-[#c83a2a]">SQ</span>-12</h1>
                     <p class="text-[10px] font-bold tracking-widest text-[#38342e] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
                 </div>
                 
-                <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
-                    <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
-                    <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10">
-                        <div id="dispStep">STEP: --</div>
-                        <div id="dispVolt">VOLT: 0.00</div>
-                        <div id="dispNote">NOTE: C2</div>
+                <div class="flex gap-3 items-center">
+                    <div class="amber-crt-screen w-32 h-16 rounded-md flex flex-col justify-center items-center px-2">
+                        <div class="text-[#ffaa00] font-mono text-[9px] text-center leading-tight z-10">
+                            <div class="text-[7px] text-[#ffaa00]/60 mb-0.5">PATCH BUS</div>
+                            <div id="resetStatus" class="font-bold tracking-wider">PATCH: NONE</div>
+                        </div>
+                    </div>
+
+                    <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
+                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
+                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10">
+                            <div id="dispStep">STEP: --</div>
+                            <div id="dispVolt">VOLT: 0.00</div>
+                            <div id="dispNote">NOTE: C2</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Top Panel: Streamlined Outlined Modules -->
-            <div class="flex flex-wrap gap-4 mb-8 w-full justify-center items-stretch">
+            <!-- Balanced Single Control Row -->
+            <div class="flex flex-wrap gap-4 mb-8 w-full justify-between items-center">
                 <!-- Transport Module -->
                 <div class="panel-outline flex flex-col gap-2">
-                    <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
+                    <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
                         START / STOP
                     </button>
-                    <div class="flex gap-1.5 w-full">
-                        <button id="stepRev" class="tactile-button px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">&lt; REV</button>
-                        <button id="stepAdv" class="tactile-button px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">FWD &gt;</button>
+                    <div class="flex gap-1 w-full">
+                        <button id="stepRev" class="tactile-button px-1.5 py-1 font-bold text-[9px] rounded-sm flex-1">&lt; REV</button>
+                        <button id="stepAdv" class="tactile-button px-1.5 py-1 font-bold text-[9px] rounded-sm flex-1">FWD &gt;</button>
                     </div>
                 </div>
                 
                 <!-- Speed & Porta Module -->
-                <div class="panel-outline flex gap-4">
+                <div class="panel-outline flex gap-3">
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-[#1f1a14]">SPEED</span>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">SPEED</span>
                     </div>
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="portamento" data-val="0"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-[#1f1a14]">PORTA</span>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">PORTA</span>
                     </div>
                 </div>
 
-                <!-- Waveform Switcher Module -->
+                <!-- Oscillator Module (Wave, Octave Bank, Pitch Tune) -->
                 <div class="panel-outline flex gap-3 items-center">
                     <div class="knob-wrapper">
                         <div class="tick-container">
-                            <div class="tick-ring"></div>
+                            <div class="step4-ring"></div>
+                            <span class="tick-label wave-saw">&#x223F;</span>
+                            <span class="tick-label wave-sqr">&#x2293;</span>
+                            <span class="tick-label wave-tri">&#x2206;</span>
+                            <span class="tick-label wave-sin">&#x223E;</span>
                             <div class="knob global-knob" id="waveKnob" data-val="0"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-[#1f1a14]">WAVE</span>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">WAVE</span>
                     </div>
-                    <div class="flex flex-col text-[9px] font-bold text-[#1f1a14] leading-tight">
-                        <span id="waveLabel">SAW</span>
+
+                    <div class="flex flex-col items-center justify-between h-full py-0.5">
+                        <div class="grid grid-cols-2 gap-1" id="octaveBtnBank">
+                            <button class="oct-btn" data-oct="0">32'</button>
+                            <button class="oct-btn oct-active" data-oct="1">16'</button>
+                            <button class="oct-btn" data-oct="2">8'</button>
+                            <button class="oct-btn" data-oct="3">4'</button>
+                        </div>
+                        <span class="text-[8px] font-bold text-[#1f1a14] mt-0.5">OCTAVE</span>
+                    </div>
+
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <span class="tick-label label-left">-12</span>
+                            <span class="tick-label label-top">0</span>
+                            <span class="tick-label label-right">+12</span>
+                            <div class="knob global-knob" id="pitchTuneKnob" data-val="50"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">PITCH</span>
                     </div>
                 </div>
 
-                <!-- ADSR Envelope Generator Module -->
-                <div class="panel-outline flex gap-3">
+                <!-- Restored ADSR Envelope Generator -->
+                <div class="panel-outline flex gap-2.5 items-center">
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="envAttack" data-val="5"></div>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">ATTACK</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">ATK</span>
                     </div>
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="envDecay" data-val="30"></div>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">DECAY</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">DEC</span>
                     </div>
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="envSustain" data-val="20"></div>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">SUSTAIN</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">SUS</span>
                     </div>
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="envRelease" data-val="25"></div>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">RELEASE</span>
-                    </div>
-                </div>
-                
-                <!-- Dropdown Selectors Module -->
-                <div class="panel-outline flex flex-wrap gap-4 items-center">
-                    <div class="flex flex-col items-center">
-                        <select id="seqMode" class="bg-[#1f1a14] text-[#f0ebd8] border-2 border-[#38342e] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
-                            <option value="12-step">12-STEP: STEPPED</option>
-                            <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
-                            <option value="12-one">12-STEP: ONE-TIME</option>
-                            <option value="24-step">24-STEP: STEPPED</option>
-                            <option value="24-cont">24-STEP: CONTINUOUS</option>
-                            <option value="24-one">24-STEP: ONE-TIME</option>
-                        </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#1f1a14]">MODE SELECTOR</span>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <select id="voltRange" class="bg-[#1f1a14] text-[#f0ebd8] border-2 border-[#38342e] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
-                            <option value="5" selected>+/- 5V</option>
-                            <option value="1">+/- 1V</option>
-                        </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#1f1a14]">VOLTAGE RANGE</span>
-                    </div>
-
-                    <div class="flex flex-col items-center">
-                        <select id="chCDest" class="bg-[#1f1a14] text-[#f0ebd8] border-2 border-[#38342e] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
-                            <option value="filter" selected>FILTER</option>
-                            <option value="volume">VOLUME</option>
-                            <option value="clock">CLOCK</option>
-                        </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#1f1a14]">CH-C DEST</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">REL</span>
                     </div>
                 </div>
 
-                <!-- Amber CRT Patch Status Display Module -->
-                <div class="amber-crt-screen w-36 h-[72px] rounded-md relative flex flex-col justify-center items-center px-2">
-                    <div class="text-[#ffaa00] font-mono text-[9px] text-center leading-tight z-10">
-                        <div class="text-[8px] text-[#ffaa00]/60 mb-1">PATCH BUS</div>
-                        <div id="resetStatus" class="font-bold tracking-wider">PATCH: NONE</div>
+                <!-- Hardware Mode, Voltage & Destination Group -->
+                <div class="panel-outline flex gap-3 items-center">
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="step6-ring"></div>
+                            <span class="tick-label" style="bottom:2px; left:-6px; font-size:6px;">12S</span>
+                            <span class="tick-label" style="top:10px; left:-10px; font-size:6px;">12C</span>
+                            <span class="tick-label" style="top:-2px; left:50%; transform:translateX(-50%); font-size:6px;">121</span>
+                            <span class="tick-label" style="top:10px; right:-10px; font-size:6px;">24S</span>
+                            <span class="tick-label" style="bottom:2px; right:-10px; font-size:6px;">24C</span>
+                            <span class="tick-label" style="bottom:-6px; left:50%; transform:translateX(-50%); font-size:6px;">241</span>
+                            <div class="knob global-knob" id="modeKnob" data-val="1"></div>
+                        </div>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">MODE</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-0.5">
+                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;5V</span>
+                        <div class="volt-rocker volt-5v" id="voltRockerBtn">
+                            <div class="volt-rocker-cap"></div>
+                        </div>
+                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;1V</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">RANGE</span>
+                    </div>
+
+                    <div class="flex flex-col gap-0.5" id="chCDestBank">
+                        <button class="dest-btn dest-active" data-dest="filter">VCF</button>
+                        <button class="dest-btn" data-dest="volume">VCA</button>
+                        <button class="dest-btn" data-dest="clock">CLK</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Centered Sequencer Grid Outlined -->
+            <!-- Centered Sequencer Grid -->
             <div class="panel-outline w-full overflow-x-auto grid-scroll py-6 mb-6">
                 <div class="flex flex-col gap-6 min-w-max mx-auto px-4">
                     <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
@@ -380,13 +447,11 @@
                 </div>
             </div>
             
-            <!-- Footer: Transpose Keyboard, Demos & Credits -->
+            <!-- Footer -->
             <div class="flex flex-wrap items-center justify-between gap-6 w-full pt-4 border-t-2 border-[#38342e]/30">
                 <div class="flex flex-col gap-1">
                     <span class="text-[10px] font-bold text-[#1f1a14]">KEYBOARD TRANSPOSE</span>
-                    <div class="flex relative h-16" id="keyboardContainer">
-                        <!-- Virtual keys injected via JS -->
-                    </div>
+                    <div class="flex relative h-16" id="keyboardContainer"></div>
                 </div>
 
                 <div class="flex flex-col items-end gap-3">
@@ -395,7 +460,6 @@
                         <button id="demo2Btn" class="tactile-button text-[10px] font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 2: ACID</button>
                     </div>
                     
-                    <!-- Line Credits & Copyright -->
                     <div class="text-[9px] text-[#38342e] font-mono font-bold tracking-widest text-right mt-1">
                         &copy; JOSE VELAZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer" class="hover:text-[#c83a2a] underline transition-colors">VOLTAGE &amp; WAVE</a>
                     </div>
@@ -403,15 +467,10 @@
             </div>
         </div>
 
-        <!-- Right Wooden Ear -->
         <div class="wooden-ear wooden-ear-right"></div>
     </div>
 
     <script>
-        /* SQ-12 Analog Sequencer Core Audio & UI Engine
-           Created & Developed by Jose Velazquez MA
-           Voltage & Wave (https://voltageandwave.co.uk/)
-        */
         const NUM_STEPS = 12;
         let currentStep = -1;
         let isPlaying = false;
@@ -426,13 +485,20 @@
         let isPreviewing = false;
         let transposeSemitones = 0;
 
-        // Waveform & ADSR Parameter Engine
+        const modeOptions = ['12-step', '12-cont', '12-one', '24-step', '24-cont', '24-one'];
+        let activeSeqMode = '12-cont';
+        let voltageRangeMultiplier = 1;
+        let activeChCDest = 'filter';
+
         const waveforms = ['sawtooth', 'square', 'triangle', 'sine'];
         let activeWaveform = 'sawtooth';
-        let attackTime = 0.01;   // Seconds
-        let decayTime = 0.15;    // Seconds
-        let sustainLevel = 0.2;  // Level (0 to 1)
-        let releaseTime = 0.2;   // Seconds
+        let octaveOffsetSemitones = 0; 
+        let finePitchTuneSemitones = 0; 
+
+        let attackTime = 0.01;   
+        let decayTime = 0.15;    
+        let sustainLevel = 0.2;  
+        let releaseTime = 0.2;   
 
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(2.5) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -480,7 +546,7 @@
             
             ctx.fillStyle = '#041004';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 1.5;
             ctx.strokeStyle = '#0f0';
             ctx.beginPath();
             
@@ -505,7 +571,7 @@
             if (ch === 'C') {
                 document.getElementById('dispNote').innerText = `CTRL: C-MOD`;
             } else {
-                const semitoneOffset = Math.round(volt * 12) + transposeSemitones;
+                const semitoneOffset = Math.round(volt * 12) + transposeSemitones + octaveOffsetSemitones + Math.round(finePitchTuneSemitones);
                 const totalNote = 24 + semitoneOffset; 
                 const noteIndex = ((totalNote % 12) + 12) % 12;
                 const octave = Math.floor(totalNote / 12);
@@ -524,18 +590,56 @@
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
             } else if (knobEl.id === 'waveKnob') {
-                const waveIndex = Math.min(3, Math.floor((val / 100) * 4));
-                knobEl.style.transform = `rotate(${-135 + waveIndex * 90}deg)`;
+                const stepIdx = Math.min(3, Math.max(0, parseInt(val)));
+                knobEl.style.transform = `rotate(${-135 + stepIdx * 90}deg)`;
+            } else if (knobEl.id === 'modeKnob') {
+                const stepIdx = Math.min(5, Math.max(0, parseInt(val)));
+                knobEl.style.transform = `rotate(${-135 + stepIdx * 54}deg)`;
             } else {
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
             }
         }
 
+        function setOctave(octIdx) {
+            octaveOffsetSemitones = (octIdx - 1) * 12;
+            document.querySelectorAll('#octaveBtnBank .oct-btn').forEach(btn => {
+                btn.classList.toggle('oct-active', parseInt(btn.dataset.oct) === octIdx);
+            });
+        }
+
+        document.querySelectorAll('#octaveBtnBank .oct-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                await initAudio();
+                setOctave(parseInt(e.target.dataset.oct));
+            });
+        });
+
+        document.getElementById('voltRockerBtn').addEventListener('click', async (e) => {
+            await initAudio();
+            const btn = e.currentTarget;
+            if (btn.classList.contains('volt-5v')) {
+                btn.classList.replace('volt-5v', 'volt-1v');
+                voltageRangeMultiplier = 0.2;
+            } else {
+                btn.classList.replace('volt-1v', 'volt-5v');
+                voltageRangeMultiplier = 1;
+            }
+        });
+
+        document.querySelectorAll('#chCDestBank .dest-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                await initAudio();
+                activeChCDest = e.target.dataset.dest;
+                document.querySelectorAll('#chCDestBank .dest-btn').forEach(b => {
+                    b.classList.toggle('dest-active', b.dataset.dest === activeChCDest);
+                });
+            });
+        });
+
         function previewSynth(pitchVal, cVal) {
             if(!audioCtx) return;
-            const semitone = (pitchVal * 12) + transposeSemitones; 
+            const semitone = (pitchVal * 12) + transposeSemitones + octaveOffsetSemitones + finePitchTuneSemitones; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
-            const dest = document.getElementById('chCDest').value;
 
             synthOsc.type = activeWaveform;
             synthOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
@@ -544,9 +648,9 @@
             let peakVolume = 0.8;
             const normalizedC = cVal / 5; 
 
-            if (dest === 'filter') {
+            if (activeChCDest === 'filter') {
                 baseCutoff = 100 + (normalizedC * 3000);
-            } else if (dest === 'volume') {
+            } else if (activeChCDest === 'volume') {
                 peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
@@ -578,18 +682,17 @@
                 if (activeKnob.hasAttribute('data-step')) {
                     const ch = activeKnob.dataset.ch;
                     const uiStep = parseInt(activeKnob.dataset.step);
-                    const is24 = document.getElementById('seqMode').value.startsWith('24');
+                    const is24 = activeSeqMode.startsWith('24');
                     const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
                     
-                    const range = parseInt(document.getElementById('voltRange').value);
                     let displayVal = parseFloat(activeKnob.dataset.val);
-                    if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
+                    if (ch === 'A' || ch === 'B') displayVal *= voltageRangeMultiplier;
                     
                     updateDisplay(stepIdx, displayVal, ch);
                     
                     if (!isPlaying) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
-                        pVal *= (range / 5);
+                        pVal *= voltageRangeMultiplier;
                         let fVal = tracks.C[uiStep];
                         previewSynth(pVal, fVal);
                     }
@@ -600,10 +703,10 @@
         document.addEventListener('pointermove', (e) => {
             if (activeKnob) {
                 let isSeqKnob = activeKnob.hasAttribute('data-ch');
-                let newVal;
 
                 if (isSeqKnob) {
                     const ch = activeKnob.dataset.ch;
+                    let newVal;
                     if (ch === 'C') {
                         newVal = Math.max(0, Math.min(5, startVal + (startY - e.clientY) * 0.025));
                     } else {
@@ -613,33 +716,41 @@
                     tracks[ch][activeKnob.dataset.step] = newVal;
                     
                     const uiStep = parseInt(activeKnob.dataset.step);
-                    const is24 = document.getElementById('seqMode').value.startsWith('24');
+                    const is24 = activeSeqMode.startsWith('24');
                     const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
                     
-                    const range = parseInt(document.getElementById('voltRange').value);
                     let displayVal = newVal;
-                    if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
+                    if (ch === 'A' || ch === 'B') displayVal *= voltageRangeMultiplier;
                     
                     updateDisplay(stepIdx, displayVal, ch);
                     
                     if (!isPlaying && isPreviewing) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
-                        pVal *= (range / 5);
+                        pVal *= voltageRangeMultiplier;
                         let fVal = tracks.C[uiStep];
                         previewSynth(pVal, fVal);
                     }
+                    activeKnob.dataset.val = newVal;
+                } else if (activeKnob.id === 'waveKnob') {
+                    const delta = (startY - e.clientY);
+                    let stepIdx = Math.min(3, Math.max(0, Math.round(startVal + delta / 30)));
+                    activeWaveform = waveforms[stepIdx];
+                    if(synthOsc) synthOsc.type = activeWaveform;
+                    activeKnob.dataset.val = stepIdx;
+                } else if (activeKnob.id === 'modeKnob') {
+                    const delta = (startY - e.clientY);
+                    let stepIdx = Math.min(5, Math.max(0, Math.round(startVal + delta / 25)));
+                    activeSeqMode = modeOptions[stepIdx];
+                    activeKnob.dataset.val = stepIdx;
                 } else {
-                    newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
+                    let newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
                     
                     if(activeKnob.id === 'clockSpeed') {
                         bpm = 40 + (newVal / 100) * 200;
                     } else if(activeKnob.id === 'portamento') {
                         portamentoTime = 0.01 + (newVal / 100) * 0.3;
-                    } else if(activeKnob.id === 'waveKnob') {
-                        const waveIdx = Math.min(3, Math.floor((newVal / 100) * 4));
-                        activeWaveform = waveforms[waveIdx];
-                        document.getElementById('waveLabel').innerText = activeWaveform.toUpperCase().substring(0, 3);
-                        if(synthOsc) synthOsc.type = activeWaveform;
+                    } else if(activeKnob.id === 'pitchTuneKnob') {
+                        finePitchTuneSemitones = -12 + (newVal / 100) * 24;
                     } else if(activeKnob.id === 'envAttack') {
                         attackTime = 0.005 + (newVal / 100) * 0.5;
                     } else if(activeKnob.id === 'envDecay') {
@@ -649,10 +760,10 @@
                     } else if(activeKnob.id === 'envRelease') {
                         releaseTime = 0.02 + (newVal / 100) * 1.5;
                     }
+                    activeKnob.dataset.val = newVal;
                 }
                 
-                activeKnob.dataset.val = newVal;
-                updateKnobVisual(activeKnob, newVal);
+                updateKnobVisual(activeKnob, activeKnob.dataset.val);
             }
         });
 
@@ -670,9 +781,8 @@
 
         function triggerSynth(pitchVal, cVal, time) {
             if(!audioCtx) return;
-            const semitone = (pitchVal * 12) + transposeSemitones; 
+            const semitone = (pitchVal * 12) + transposeSemitones + octaveOffsetSemitones + finePitchTuneSemitones; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
-            const dest = document.getElementById('chCDest').value;
 
             synthOsc.type = activeWaveform;
             synthOsc.frequency.setTargetAtTime(freq, time, portamentoTime);
@@ -681,28 +791,23 @@
             let peakVolume = 0.8;
             const normalizedC = cVal / 5; 
 
-            if (dest === 'filter') {
+            if (activeChCDest === 'filter') {
                 baseCutoff = 100 + (normalizedC * 3000);
-            } else if (dest === 'volume') {
+            } else if (activeChCDest === 'volume') {
                 peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
-            // Apply Envelope to VCF Cutoff
             synthVcf.frequency.cancelScheduledValues(time);
             synthVcf.frequency.setValueAtTime(baseCutoff, time); 
             synthVcf.frequency.linearRampToValueAtTime(baseCutoff + 5000, time + attackTime);
             synthVcf.frequency.exponentialRampToValueAtTime(Math.max(100, baseCutoff + (5000 * sustainLevel)), time + attackTime + decayTime);
 
-            // Apply Full ADSR Envelope to VCA Gain
             const stepGateTime = Math.max(0.05, ((60.0 / bpm) * 0.25) - 0.02);
             synthVca.gain.cancelScheduledValues(time);
             synthVca.gain.setValueAtTime(0, time);
             
-            // Attack
             synthVca.gain.linearRampToValueAtTime(peakVolume, time + attackTime);
-            // Decay to Sustain
             synthVca.gain.linearRampToValueAtTime(peakVolume * sustainLevel, time + attackTime + decayTime);
-            // Release after step Gate duration
             const noteEndTime = time + stepGateTime;
             synthVca.gain.setValueAtTime(peakVolume * sustainLevel, noteEndTime);
             synthVca.gain.exponentialRampToValueAtTime(0.001, noteEndTime + releaseTime);
@@ -712,7 +817,7 @@
             await initAudio();
             const step = parseInt(e.target.dataset.step);
             const statusText = document.getElementById('resetStatus');
-            const is24 = document.getElementById('seqMode').value.startsWith('24');
+            const is24 = activeSeqMode.startsWith('24');
 
             if (resetStep === step) {
                 if (is24) {
@@ -778,10 +883,14 @@
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
             updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('modeKnob'), 1);
+            updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 5);
             updateKnobVisual(document.getElementById('envDecay'), 30);
             updateKnobVisual(document.getElementById('envSustain'), 20);
             updateKnobVisual(document.getElementById('envRelease'), 25);
+            
+            setOctave(1);
         }
 
         function renderKeyboard() {
@@ -826,8 +935,7 @@
                     e.target.classList.add('active-key');
                     
                     if (!isPlaying) {
-                        const range = parseInt(document.getElementById('voltRange').value);
-                        let pVal = tracks.A[0] * (range / 5);
+                        let pVal = tracks.A[0] * voltageRangeMultiplier;
                         let fVal = tracks.C[0];
                         previewSynth(pVal, fVal);
                     }
@@ -874,20 +982,18 @@
             }
 
             let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
-            const range = parseInt(document.getElementById('voltRange').value);
-            pVal *= (range / 5);
+            pVal *= voltageRangeMultiplier;
             updateDisplay(currentStep, pVal);
         }
 
         function scheduleNextStep(manual = false, direction = 1) {
-            const mode = document.getElementById('seqMode').value;
-            const is24 = mode.startsWith('24');
+            const is24 = activeSeqMode.startsWith('24');
             const maxSteps = is24 ? 24 : 12;
             
             if (direction === 1) {
                 currentStep++;
                 if (currentStep >= maxSteps) {
-                    if (mode.endsWith('one') && !manual) {
+                    if (activeSeqMode.endsWith('one') && !manual) {
                         stopSequencer();
                         return;
                     }
@@ -898,7 +1004,7 @@
                     const hardwareMatch = (resetStep < 12) && ((currentStep % 12) === resetStep);
                     const absoluteMatch = (resetStep >= 12) && (currentStep === resetStep);
                     if (hardwareMatch || absoluteMatch) {
-                        if (mode.endsWith('one')) {
+                        if (activeSeqMode.endsWith('one')) {
                             stopSequencer();
                             return;
                         }
@@ -916,9 +1022,7 @@
 
             const uiStep = currentStep % 12;
             let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
-            
-            const range = parseInt(document.getElementById('voltRange').value);
-            pVal *= (range / 5);
+            pVal *= voltageRangeMultiplier;
             
             let fVal = tracks.C[uiStep]; 
 
@@ -926,7 +1030,7 @@
         }
 
         async function scheduler() {
-            if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) return; 
+            if(!isPlaying || activeSeqMode.endsWith('step')) return; 
             
             if(audioCtx && audioCtx.state === 'suspended') {
                 await audioCtx.resume();
@@ -936,9 +1040,8 @@
                 scheduleNextStep(false, 1);
                 
                 let currentStepDuration = (60.0 / bpm) * 0.25;
-                const dest = document.getElementById('chCDest').value;
                 
-                if (dest === 'clock') {
+                if (activeChCDest === 'clock') {
                     const uiStep = currentStep === -1 ? 0 : currentStep % 12;
                     const cMod = tracks.C[uiStep] / 2.5; 
                     currentStepDuration = currentStepDuration * Math.max(0.1, (2.1 - cMod)); 
@@ -951,13 +1054,12 @@
 
         document.getElementById('startStop').addEventListener('click', async (e) => {
             await initAudio();
-            const mode = document.getElementById('seqMode').value;
             const btn = e.currentTarget;
             const led = document.getElementById('rockerLed');
             
             if(isPlaying) {
                 stopSequencer();
-            } else if (!mode.endsWith('step')) { 
+            } else if (!activeSeqMode.endsWith('step')) { 
                 isPlaying = true;
                 btn.classList.add('is-active');
                 led.classList.replace('bg-red-400', 'bg-red-200');
@@ -979,11 +1081,21 @@
 
         document.getElementById('demo1Btn').addEventListener('click', async () => {
             await initAudio();
-            document.getElementById('voltRange').value = "5";
-            document.getElementById('seqMode').value = "24-cont";
-            document.getElementById('chCDest').value = "filter";
+            voltageRangeMultiplier = 1;
+            const voltRocker = document.getElementById('voltRockerBtn');
+            voltRocker.className = "volt-rocker volt-5v";
+
+            activeSeqMode = '24-cont';
+            updateKnobVisual(document.getElementById('modeKnob'), 4);
+
+            activeChCDest = 'filter';
+            document.querySelectorAll('#chCDestBank .dest-btn').forEach(b => {
+                b.classList.toggle('dest-active', b.dataset.dest === 'filter');
+            });
+
             activeWaveform = 'sawtooth';
-            document.getElementById('waveLabel').innerText = 'SAW';
+            setOctave(1); 
+            finePitchTuneSemitones = 0;
             
             attackTime = 0.01; decayTime = 0.15; sustainLevel = 0.2; releaseTime = 0.2;
             
@@ -1019,6 +1131,7 @@
             updateKnobVisual(portaKnob, 0);
 
             updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 5);
             updateKnobVisual(document.getElementById('envDecay'), 30);
             updateKnobVisual(document.getElementById('envSustain'), 20);
@@ -1036,11 +1149,21 @@
 
         document.getElementById('demo2Btn').addEventListener('click', async () => {
             await initAudio();
-            document.getElementById('voltRange').value = "5";
-            document.getElementById('seqMode').value = "12-cont";
-            document.getElementById('chCDest').value = "filter";
+            voltageRangeMultiplier = 1;
+            const voltRocker = document.getElementById('voltRockerBtn');
+            voltRocker.className = "volt-rocker volt-5v";
+
+            activeSeqMode = '12-cont';
+            updateKnobVisual(document.getElementById('modeKnob'), 1);
+
+            activeChCDest = 'filter';
+            document.querySelectorAll('#chCDestBank .dest-btn').forEach(b => {
+                b.classList.toggle('dest-active', b.dataset.dest === 'filter');
+            });
+
             activeWaveform = 'sawtooth';
-            document.getElementById('waveLabel').innerText = 'SAW';
+            setOctave(1); 
+            finePitchTuneSemitones = 0;
 
             attackTime = 0.005; decayTime = 0.12; sustainLevel = 0.1; releaseTime = 0.08;
             
@@ -1076,6 +1199,7 @@
             updateKnobVisual(portaKnob, 0);
 
             updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 2);
             updateKnobVisual(document.getElementById('envDecay'), 20);
             updateKnobVisual(document.getElementById('envSustain'), 10);
