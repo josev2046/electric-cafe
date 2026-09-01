@@ -91,6 +91,11 @@
             <div class="flex"><div class="row-label">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
             <div class="flex mt-2"><div class="row-label text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
         </div>
+        
+        <!-- Subtle Footer Area -->
+        <div class="flex justify-end mt-6 pr-4">
+            <button id="demoBtn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">DEMO</button>
+        </div>
     </div>
 
     <script>
@@ -105,7 +110,7 @@
         let portamentoTime = 0.01;
         let resetStep = null;
 
-        const tracks = { A: new Array(NUM_STEPS).fill(50), B: new Array(NUM_STEPS).fill(50), C: new Array(NUM_STEPS).fill(50) };
+        const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
 
         let synthOsc, synthVcf, synthVca;
 
@@ -119,7 +124,7 @@
                 
                 synthOsc.type = 'sawtooth';
                 synthVcf.type = 'lowpass';
-                synthVcf.Q.value = 12; // Boosted resonance for more pronounced sweep
+                synthVcf.Q.value = 12; 
                 synthVca.gain.value = 0;
                 
                 synthOsc.connect(synthVcf);
@@ -133,7 +138,13 @@
         let activeKnob = null, startY = 0, startVal = 0;
 
         function updateKnobVisual(knobEl, val) {
-            knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
+            if (knobEl.hasAttribute('data-ch')) {
+                // Sequencer knobs: -5 to +5 maps to -135deg to +135deg
+                knobEl.style.transform = `rotate(${val * 27}deg)`; 
+            } else {
+                // Global knobs: 0 to 100 maps to -135deg to +135deg
+                knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
+            }
         }
 
         document.addEventListener('mousedown', (e) => {
@@ -146,41 +157,53 @@
 
         document.addEventListener('mousemove', (e) => {
             if (activeKnob) {
-                let newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
+                let isSeqKnob = activeKnob.hasAttribute('data-ch');
+                let newVal;
+
+                if (isSeqKnob) {
+                    newVal = Math.max(-5, Math.min(5, startVal + (startY - e.clientY) * 0.05));
+                    tracks[activeKnob.dataset.ch][activeKnob.dataset.step] = newVal;
+                } else {
+                    newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
+                    if(activeKnob.id === 'clockSpeed') bpm = 40 + (newVal / 100) * 200;
+                    else if(activeKnob.id === 'portamento') portamentoTime = 0.01 + (newVal / 100) * 0.3;
+                }
+                
                 activeKnob.dataset.val = newVal;
                 updateKnobVisual(activeKnob, newVal);
-                
-                if(activeKnob.id === 'clockSpeed') bpm = 40 + (newVal / 100) * 200;
-                else if(activeKnob.id === 'portamento') portamentoTime = 0.01 + (newVal / 100) * 0.3;
-                else tracks[activeKnob.dataset.ch][activeKnob.dataset.step] = newVal;
             }
         });
 
         document.addEventListener('mouseup', () => activeKnob = null);
 
         function triggerSynth(pitchVal, cVal, time) {
-            const semitone = Math.floor((pitchVal / 100) * 36); 
-            const freq = 65.41 * Math.pow(2, semitone / 12);
+            const semitone = pitchVal * 12; 
+            const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
 
             synthOsc.frequency.setTargetAtTime(freq, time, portamentoTime);
 
-            let cutoff = 2000;
-            let peakVolume = 0.5;
+            let baseCutoff = 400; 
+            let peakVolume = 0.8;
 
-            // Apply Channel C routing
+            const normalizedC = (cVal + 5) / 10; 
+
             if (dest === 'filter') {
-                cutoff = 100 + (cVal / 100) * 4000;
+                baseCutoff = 100 + (normalizedC * 2000);
             } else if (dest === 'volume') {
-                peakVolume = 0.1 + (cVal / 100) * 0.8; 
+                peakVolume = 0.2 + (normalizedC * 0.8); 
             }
 
-            synthVcf.frequency.setTargetAtTime(cutoff, time, portamentoTime);
+            // MS-20 Style Filter Envelope (Sharp "Pew" Attack)
+            synthVcf.frequency.cancelScheduledValues(time);
+            synthVcf.frequency.setValueAtTime(baseCutoff + 5000, time); 
+            synthVcf.frequency.exponentialRampToValueAtTime(baseCutoff, time + 0.1); 
 
+            // Staccato Amplifier Envelope
             synthVca.gain.cancelScheduledValues(time);
             synthVca.gain.setValueAtTime(0, time);
-            synthVca.gain.linearRampToValueAtTime(peakVolume, time + 0.02);
-            synthVca.gain.exponentialRampToValueAtTime(0.001, time + (60/bpm)*0.5);
+            synthVca.gain.linearRampToValueAtTime(peakVolume, time + 0.01); 
+            synthVca.gain.exponentialRampToValueAtTime(0.001, time + 0.15); 
         }
 
         function handlePatchClick(e) {
@@ -204,7 +227,7 @@
             for(let i=0; i<NUM_STEPS; i++) {
                 document.getElementById('ledRow').innerHTML += `<div class="w-[40px] flex justify-center step-indicator" data-step="${i}"><div class="led"></div></div>`;
                 ['A', 'B', 'C'].forEach(ch => {
-                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="50" style="transform: rotate(0deg)"></div>`;
+                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="0" style="transform: rotate(0deg)"></div>`;
                 });
                 
                 const patchPoint = document.createElement('div');
@@ -246,12 +269,15 @@
                 currentStep = 0;
             }
             
-            if (resetStep !== null && (currentStep % 12) === resetStep) {
-                if (mode.endsWith('one')) {
-                    stopSequencer();
-                    return;
+            // Handles normal 0-11 physical patches, plus the hidden 16-step demo override
+            if (resetStep !== null) {
+                if ((resetStep < 12 && (currentStep % 12) === resetStep) || (resetStep === 16 && currentStep === 16)) {
+                    if (mode.endsWith('one')) {
+                        stopSequencer();
+                        return;
+                    }
+                    currentStep = 0;
                 }
-                currentStep = 0;
             }
             
             const uiStep = currentStep % 12;
@@ -287,8 +313,8 @@
                 
                 if (dest === 'clock') {
                     const uiStep = currentStep === -1 ? 0 : currentStep % 12;
-                    const cMod = tracks.C[uiStep] / 50; 
-                    currentStepDuration = currentStepDuration * (2 - cMod); 
+                    const cMod = (tracks.C[uiStep] + 5) / 5; 
+                    currentStepDuration = currentStepDuration * Math.max(0.1, (2.1 - cMod)); 
                 }
                 
                 nextNoteTime += currentStepDuration; 
@@ -315,6 +341,36 @@
             if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) {
                 scheduleNextStep(true);
             }
+        });
+
+        document.getElementById('demoBtn').addEventListener('click', () => {
+            const dafA = [-0.58, -1.00, 0.25, -1.00, 0.00, -1.00, -1.00, 0.00, -1.00, 0.00, -1.00, 0.00];
+            const dafB = [-0.17, -1.00, 0.00, -1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+
+            for(let i=0; i<12; i++) {
+                tracks.A[i] = dafA[i];
+                tracks.B[i] = dafB[i];
+                
+                let knobA = document.querySelector(`.knob[data-ch="A"][data-step="${i}"]`);
+                let knobB = document.querySelector(`.knob[data-ch="B"][data-step="${i}"]`);
+                
+                knobA.dataset.val = dafA[i];
+                knobB.dataset.val = dafB[i];
+                
+                updateKnobVisual(knobA, dafA[i]);
+                updateKnobVisual(knobB, dafB[i]);
+            }
+
+            document.getElementById('seqMode').value = "24-cont";
+            
+            const speedKnob = document.getElementById('clockSpeed');
+            speedKnob.dataset.val = 75;
+            bpm = 40 + (75 / 100) * 200; 
+            updateKnobVisual(speedKnob, 75);
+
+            resetStep = 16; 
+            document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched'));
+            document.getElementById('resetStatus').innerText = "16-STEP OVERRIDE ENGAGED";
         });
 
         renderGrid();
