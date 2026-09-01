@@ -100,7 +100,6 @@
             </div>
             
             <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
-                <!-- Data / Analysis Screen -->
                 <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
                     <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111]"></canvas>
                     <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight">
@@ -111,13 +110,13 @@
                 </div>
 
                 <div class="text-right w-full md:w-auto">
-                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-11</h1>
-                    <p class="text-[10px] tracking-widest text-gray-500 mt-1">MOBILE ANALOG SEQUENCER</p>
+                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-10</h1>
+                    <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
                 </div>
             </div>
         </div>
 
-        <!-- 3x12 Sequencer Grid -->
+        <!-- Sequencer Grid -->
         <div class="w-full overflow-x-auto grid-scroll pb-6">
             <div class="flex flex-col gap-6 min-w-max pr-4">
                 <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
@@ -128,7 +127,7 @@
             </div>
         </div>
         
-        <!-- Subtle Footer Area -->
+        <!-- Footer Demos -->
         <div class="flex justify-end gap-6 mt-6 pr-4">
             <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
             <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
@@ -149,6 +148,7 @@
         let resetStep = null;
         let isPreviewing = false;
 
+        // Tracks A & B default to 0V (Bipolar -5 to +5), Track C defaults to 0V (Unipolar 0 to +5)
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -213,22 +213,33 @@
             ctx.stroke();
         }
 
-        function updateDisplay(step, volt) {
+        function updateDisplay(step, volt, ch = 'A') {
             document.getElementById('dispStep').innerText = `STEP: ${step < 0 ? '--' : step + 1}`;
             document.getElementById('dispVolt').innerText = `VOLT: ${volt >= 0 ? '+' : ''}${volt.toFixed(2)}`;
             
-            const semitoneOffset = Math.round(volt * 12);
-            const totalNote = 24 + semitoneOffset; 
-            const noteIndex = ((totalNote % 12) + 12) % 12;
-            const octave = Math.floor(totalNote / 12);
-            document.getElementById('dispNote').innerText = `NOTE: ${noteNames[noteIndex]}${octave}`;
+            if (ch === 'C') {
+                document.getElementById('dispNote').innerText = `CTRL: C-MOD`;
+            } else {
+                const semitoneOffset = Math.round(volt * 12);
+                const totalNote = 24 + semitoneOffset; 
+                const noteIndex = ((totalNote % 12) + 12) % 12;
+                const octave = Math.floor(totalNote / 12);
+                document.getElementById('dispNote').innerText = `NOTE: ${noteNames[noteIndex]}${octave}`;
+            }
         }
 
         let activeKnob = null, startY = 0, startVal = 0;
 
         function updateKnobVisual(knobEl, val) {
             if (knobEl.hasAttribute('data-ch')) {
-                knobEl.style.transform = `rotate(${val * 27}deg)`; 
+                const ch = knobEl.dataset.ch;
+                if (ch === 'C') {
+                    // Unipolar 0 to +5V: -135deg to +135deg
+                    knobEl.style.transform = `rotate(${-135 + (val / 5) * 270}deg)`;
+                } else {
+                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg
+                    knobEl.style.transform = `rotate(${val * 27}deg)`; 
+                }
             } else {
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
             }
@@ -244,12 +255,12 @@
 
             let baseCutoff = 400; 
             let peakVolume = 0.8;
-            const normalizedC = (cVal + 5) / 10; 
+            const normalizedC = cVal / 5; // Unipolar 0 to 1 scaling
 
             if (dest === 'filter') {
-                baseCutoff = 100 + (normalizedC * 2000);
+                baseCutoff = 100 + (normalizedC * 3000);
             } else if (dest === 'volume') {
-                peakVolume = 0.2 + (normalizedC * 0.8); 
+                peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
             synthVcf.frequency.setTargetAtTime(baseCutoff, audioCtx.currentTime, 0.02); 
@@ -287,7 +298,7 @@
                     let displayVal = parseFloat(activeKnob.dataset.val);
                     if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
                     
-                    updateDisplay(stepIdx, displayVal);
+                    updateDisplay(stepIdx, displayVal, ch);
                     
                     if (!isPlaying) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
@@ -305,10 +316,17 @@
                 let newVal;
 
                 if (isSeqKnob) {
-                    newVal = Math.max(-5, Math.min(5, startVal + (startY - e.clientY) * 0.05));
-                    tracks[activeKnob.dataset.ch][activeKnob.dataset.step] = newVal;
-                    
                     const ch = activeKnob.dataset.ch;
+                    if (ch === 'C') {
+                        // Unipolar range: 0 to +5
+                        newVal = Math.max(0, Math.min(5, startVal + (startY - e.clientY) * 0.025));
+                    } else {
+                        // Bipolar range: -5 to +5
+                        newVal = Math.max(-5, Math.min(5, startVal + (startY - e.clientY) * 0.05));
+                    }
+                    
+                    tracks[ch][activeKnob.dataset.step] = newVal;
+                    
                     const uiStep = parseInt(activeKnob.dataset.step);
                     const is24 = document.getElementById('seqMode').value.startsWith('24');
                     const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
@@ -317,7 +335,7 @@
                     let displayVal = newVal;
                     if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
                     
-                    updateDisplay(stepIdx, displayVal);
+                    updateDisplay(stepIdx, displayVal, ch);
                     
                     if (!isPlaying && isPreviewing) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
@@ -358,12 +376,12 @@
 
             let baseCutoff = 400; 
             let peakVolume = 0.8;
-            const normalizedC = (cVal + 5) / 10; 
+            const normalizedC = cVal / 5; 
 
             if (dest === 'filter') {
-                baseCutoff = 100 + (normalizedC * 2000);
+                baseCutoff = 100 + (normalizedC * 3000);
             } else if (dest === 'volume') {
-                peakVolume = 0.2 + (normalizedC * 0.8); 
+                peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
             synthVcf.frequency.cancelScheduledValues(time);
@@ -414,7 +432,8 @@
             for(let i=0; i<NUM_STEPS; i++) {
                 document.getElementById('ledRow').innerHTML += `<div class="w-[40px] flex justify-center step-indicator" data-step="${i}"><div class="led"></div></div>`;
                 ['A', 'B', 'C'].forEach(ch => {
-                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="0" style="transform: rotate(0deg)"></div>`;
+                    // Set default values: 0V for A/B, 0V for C
+                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="0"></div>`;
                 });
                 
                 const patchPoint = document.createElement('div');
@@ -427,6 +446,11 @@
                 patchContainer.appendChild(patchPoint);
                 document.getElementById('trigRow').appendChild(patchContainer);
             }
+            
+            // Set initial knob visuals
+            document.querySelectorAll('.knob[data-ch]').forEach(k => {
+                updateKnobVisual(k, 0);
+            });
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
         }
@@ -526,7 +550,7 @@
                 
                 if (dest === 'clock') {
                     const uiStep = currentStep === -1 ? 0 : currentStep % 12;
-                    const cMod = (tracks.C[uiStep] + 5) / 5; 
+                    const cMod = tracks.C[uiStep] / 2.5; // Unipolar modulation factor
                     currentStepDuration = currentStepDuration * Math.max(0.1, (2.1 - cMod)); 
                 }
                 
@@ -614,7 +638,7 @@
             document.getElementById('chCDest').value = "clock";
             
             const acidA = [-1.00, 0.00, 0.25, -1.00, 0.58, 0.00, -0.17, -1.00, 0.83, 1.00, 0.00, -1.00];
-            const acidC = [3.00, -3.00, 0.00, 4.00, -2.00, 0.00, 2.00, -1.00, 5.00, -4.00, 0.00, 1.00];
+            const acidC = [4.00, 1.00, 2.50, 4.50, 0.50, 2.50, 3.50, 2.00, 5.00, 0.20, 2.50, 3.00];
 
             for(let i=0; i<12; i++) {
                 tracks.A[i] = acidA[i];
