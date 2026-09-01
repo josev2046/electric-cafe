@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Korg SQ-11 Emulator</title>
+    <title>SQ-12 Analog Sequencer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #1a1a1a; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
@@ -146,7 +146,7 @@
                 </div>
 
                 <div class="text-right w-full md:w-auto">
-                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-11</h1>
+                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-12</h1>
                     <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
                 </div>
             </div>
@@ -191,7 +191,6 @@
         let isPreviewing = false;
         let transposeSemitones = 0;
 
-        // Tracks A & B default to 0V (12 o'clock center), Track C defaults to 2.5V (12 o'clock midpoint)
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(2.5) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -277,10 +276,8 @@
             if (knobEl.hasAttribute('data-ch')) {
                 const ch = knobEl.dataset.ch;
                 if (ch === 'C') {
-                    // Unipolar 0 to +5V: -135deg to +135deg (2.5V sits straight up at 0deg)
                     knobEl.style.transform = `rotate(${-135 + (val / 5) * 270}deg)`;
                 } else {
-                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg (0V sits straight up at 0deg)
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
             } else {
@@ -475,7 +472,7 @@
                 
                 ['A', 'B', 'C'].forEach(ch => {
                     const isBipolar = (ch === 'A' || ch === 'B');
-                    const defaultVal = isBipolar ? 0 : 2.5; // 0V for A/B, 2.5V for C (12 o'clock)
+                    const defaultVal = isBipolar ? 0 : 2.5; 
                     const labelsHTML = isBipolar ? 
                         `<span class="tick-label label-left">-5</span><span class="tick-label label-top">0</span><span class="tick-label label-right">+5</span>` : 
                         `<span class="tick-label label-left">0</span><span class="tick-label label-right">+5</span>`;
@@ -501,7 +498,6 @@
                 document.getElementById('trigRow').appendChild(patchContainer);
             }
             
-            // Set initial knob visuals (A & B at 0V, C at 2.5V straight up)
             document.querySelectorAll('.knob[data-ch]').forEach(k => {
                 const ch = k.dataset.ch;
                 const val = (ch === 'C') ? 2.5 : 0;
