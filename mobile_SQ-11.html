@@ -6,8 +6,45 @@
     <title>SQ-12 Analog Sequencer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #1a1a1a; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
-        .chassis { background: #111; border: 4px solid #080808; padding: 24px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+        body { background-color: #121212; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
+        
+        /* Wooden Side Panels (Ears) Frame */
+        .synth-enclosure {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+        }
+
+        .wooden-ear {
+            width: 24px;
+            background: linear-gradient(90deg, #2d1810 0%, #4a2818 30%, #3b1e13 70%, #1f0f0a 100%);
+            border-top: 2px solid #5a3220;
+            border-bottom: 3px solid #0f0805;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 6px rgba(0,0,0,0.8);
+            flex-shrink: 0;
+        }
+
+        .wooden-ear-left {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            border-right: 2px solid #080808;
+        }
+
+        .wooden-ear-right {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+            border-left: 2px solid #080808;
+        }
+
+        .chassis { 
+            background: #111; 
+            border-top: 4px solid #080808; 
+            border-bottom: 4px solid #080808; 
+            padding: 24px; 
+            flex-grow: 1;
+        }
         
         .led { width: 12px; height: 12px; border-radius: 50%; background: #3a0505; border: 2px solid #000; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); margin: 0 auto; }
         .active .led { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.4); }
@@ -72,111 +109,127 @@
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-start">
-    <div class="chassis w-full max-w-6xl">
-        
-        <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#222] items-end justify-between">
-            <div class="flex flex-wrap gap-6 items-end">
-                <div class="flex flex-col gap-3">
-                    <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md active:scale-95 transition-transform">START / STOP</button>
-                    <div class="flex gap-1 w-full">
-                        <button id="stepRev" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">&lt; REV</button>
-                        <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">FWD &gt;</button>
+    <div class="synth-enclosure w-full max-w-6xl">
+        <div class="wooden-ear wooden-ear-left"></div>
+
+        <div class="chassis">
+            
+            <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#222] items-end justify-between">
+                <div class="flex flex-wrap gap-6 items-end">
+                    <div class="flex flex-col gap-3">
+                        <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md active:scale-95 transition-transform">START / STOP</button>
+                        <div class="flex gap-1 w-full">
+                            <button id="stepRev" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">&lt; REV</button>
+                            <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">FWD &gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <div class="knob-wrapper">
+                            <div class="tick-container">
+                                <div class="tick-ring"></div>
+                                <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400">SPEED</span>
+                        </div>
+                        <div class="knob-wrapper">
+                            <div class="tick-container">
+                                <div class="tick-ring"></div>
+                                <div class="knob global-knob" id="portamento" data-val="0"></div>
+                            </div>
+                            <span class="text-[10px] font-bold text-gray-400">PORTA</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col items-center mb-1">
+                        <select id="seqMode" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                            <option value="12-step">12-STEP: STEPPED</option>
+                            <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
+                            <option value="12-one">12-STEP: ONE-TIME</option>
+                            <option value="24-step">24-STEP: STEPPED</option>
+                            <option value="24-cont">24-STEP: CONTINUOUS</option>
+                            <option value="24-one">24-STEP: ONE-TIME</option>
+                        </select>
+                        <span class="text-[10px] font-bold mt-2 text-gray-400">MODE SELECTOR</span>
+                    </div>
+
+                    <div class="flex flex-col items-center mb-1">
+                        <select id="voltRange" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                            <option value="5" selected>+/- 5V</option>
+                            <option value="1">+/- 1V</option>
+                        </select>
+                        <span class="text-[10px] font-bold mt-2 text-gray-400">VOLTAGE RANGE</span>
+                    </div>
+
+                    <div class="flex flex-col items-center mb-1">
+                        <select id="chCDest" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                            <option value="filter" selected>FILTER</option>
+                            <option value="volume">VOLUME</option>
+                            <option value="clock">CLOCK</option>
+                        </select>
+                        <span class="text-[10px] font-bold mt-2 text-gray-400">CH-C DESTINATION</span>
+                    </div>
+
+                    <div id="resetStatus" class="flex flex-col items-center mb-1 text-yellow-600 font-bold text-xs transition-colors w-24 text-center">
+                        NO RESET PATCHED
                     </div>
                 </div>
                 
-                <div class="flex gap-4">
-                    <div class="knob-wrapper">
-                        <div class="tick-container">
-                            <div class="tick-ring"></div>
-                            <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
+                    <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
+                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111]"></canvas>
+                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight">
+                            <div id="dispStep">STEP: --</div>
+                            <div id="dispVolt">VOLT: 0.00</div>
+                            <div id="dispNote">NOTE: C2</div>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-400">SPEED</span>
                     </div>
-                    <div class="knob-wrapper">
-                        <div class="tick-container">
-                            <div class="tick-ring"></div>
-                            <div class="knob global-knob" id="portamento" data-val="0"></div>
-                        </div>
-                        <span class="text-[10px] font-bold text-gray-400">PORTA</span>
+
+                    <div class="text-right w-full md:w-auto">
+                        <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-12</h1>
+                        <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
                     </div>
                 </div>
-                
-                <div class="flex flex-col items-center mb-1">
-                    <select id="seqMode" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
-                        <option value="12-step">12-STEP: STEPPED</option>
-                        <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
-                        <option value="12-one">12-STEP: ONE-TIME</option>
-                        <option value="24-step">24-STEP: STEPPED</option>
-                        <option value="24-cont">24-STEP: CONTINUOUS</option>
-                        <option value="24-one">24-STEP: ONE-TIME</option>
-                    </select>
-                    <span class="text-[10px] font-bold mt-2 text-gray-400">MODE SELECTOR</span>
-                </div>
+            </div>
 
-                <div class="flex flex-col items-center mb-1">
-                    <select id="voltRange" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
-                        <option value="5" selected>+/- 5V</option>
-                        <option value="1">+/- 1V</option>
-                    </select>
-                    <span class="text-[10px] font-bold mt-2 text-gray-400">VOLTAGE RANGE</span>
-                </div>
-
-                <div class="flex flex-col items-center mb-1">
-                    <select id="chCDest" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
-                        <option value="filter" selected>FILTER</option>
-                        <option value="volume">VOLUME</option>
-                        <option value="clock">CLOCK</option>
-                    </select>
-                    <span class="text-[10px] font-bold mt-2 text-gray-400">CH-C DESTINATION</span>
-                </div>
-
-                <div id="resetStatus" class="flex flex-col items-center mb-1 text-yellow-600 font-bold text-xs transition-colors w-24 text-center">
-                    NO RESET PATCHED
+            <div class="w-full overflow-x-auto grid-scroll pb-6">
+                <div class="flex flex-col gap-6 min-w-max pr-4">
+                    <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
+                    <div class="flex"><div class="row-label"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
+                    <div class="flex"><div class="row-label"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
+                    <div class="flex"><div class="row-label">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
+                    <div class="flex mt-2"><div class="row-label text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
                 </div>
             </div>
             
-            <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
-                <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
-                    <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111]"></canvas>
-                    <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight">
-                        <div id="dispStep">STEP: --</div>
-                        <div id="dispVolt">VOLT: 0.00</div>
-                        <div id="dispNote">NOTE: C2</div>
-                    </div>
+            <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#222]">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-gray-400">KEYBOARD TRANSPOSE</span>
+                    <div class="flex relative h-16" id="keyboardContainer">
+                        </div>
                 </div>
 
-                <div class="text-right w-full md:w-auto">
-                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-12</h1>
-                    <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
+                <div class="flex flex-col items-end gap-3">
+                    <div class="flex gap-6">
+                        <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
+                        <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
+                    </div>
+                    
+                    <div class="text-[9px] text-[#444] font-mono tracking-widest text-right">
+                        &copy; JOSE VELAZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer" class="hover:text-[#777] underline transition-colors">VOLTAGE &amp; WAVE</a>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="w-full overflow-x-auto grid-scroll pb-6">
-            <div class="flex flex-col gap-6 min-w-max pr-4">
-                <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
-                <div class="flex"><div class="row-label"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
-                <div class="flex"><div class="row-label"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
-                <div class="flex"><div class="row-label">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
-                <div class="flex mt-2"><div class="row-label text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
-            </div>
-        </div>
-        
-        <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#222]">
-            <div class="flex flex-col gap-1">
-                <span class="text-[10px] font-bold text-gray-400">KEYBOARD TRANSPOSE</span>
-                <div class="flex relative h-16" id="keyboardContainer">
-                    </div>
-            </div>
-
-            <div class="flex gap-6">
-                <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
-                <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
-            </div>
-        </div>
+        <div class="wooden-ear wooden-ear-right"></div>
     </div>
 
     <script>
+        /* SQ-12 Analog Sequencer Core Audio & UI Engine
+           Created & Developed by Jose Velazquez MA
+           Voltage & Wave (https://voltageandwave.co.uk/)
+        */
         const NUM_STEPS = 12;
         let currentStep = -1;
         let isPlaying = false;
@@ -718,7 +771,6 @@
                 updateKnobVisual(knobC, 2.5);
             }
             
-            // Set speed to 11 o'clock (~110 BPM)
             const speedKnob = document.getElementById('clockSpeed');
             speedKnob.dataset.val = 35;
             bpm = 40 + (35 / 100) * 200; 
@@ -744,7 +796,7 @@
             await initAudio();
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "12-cont";
-            document.getElementById('chCDest').value = "filter"; // Set Channel C to Filter
+            document.getElementById('chCDest').value = "filter";
             
             const acidA = [-1.00, 0.00, 0.25, -1.00, 0.58, 0.00, -0.17, -1.00, 0.83, 1.00, 0.00, -1.00];
             const acidC = [4.00, 1.00, 2.50, 4.50, 0.50, 2.50, 3.50, 2.00, 5.00, 0.20, 2.50, 3.00];
@@ -767,13 +819,11 @@
                 updateKnobVisual(knobC, acidC[i]);
             }
             
-            // Set speed to 12 o'clock (140 BPM)
             const speedKnob = document.getElementById('clockSpeed');
             speedKnob.dataset.val = 50;
             bpm = 40 + (50 / 100) * 200; 
             updateKnobVisual(speedKnob, 50);
 
-            // Set portamento to 0
             const portaKnob = document.getElementById('portamento');
             portaKnob.dataset.val = 0;
             portamentoTime = 0.01; 
