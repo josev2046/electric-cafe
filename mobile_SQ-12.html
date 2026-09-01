@@ -47,7 +47,46 @@
             flex-grow: 1;
             box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 3px rgba(0,0,0,0.8);
         }
-        
+
+        /* Authentic Hardware Button Styling */
+        .control-bezel {
+            background: #090e18;
+            border: 2px solid #05080e;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 1px rgba(255,255,255,0.1);
+            padding: 8px 10px;
+            border-radius: 4px;
+        }
+
+        /* Illuminated Rocker Switch */
+        .rocker-button {
+            background: linear-gradient(180deg, #8b1a1a 0%, #520e0e 100%);
+            border: 2px solid #280505;
+            box-shadow: 0 4px 0 #180303, 0 5px 8px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.3);
+            transition: all 0.08s ease;
+            position: relative;
+        }
+        .rocker-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #180303, 0 2px 4px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.3);
+        }
+        .rocker-button.is-active {
+            background: linear-gradient(180deg, #d32f2f 0%, #8b1a1a 100%);
+            border-color: #ff5252;
+            box-shadow: 0 4px 0 #180303, 0 0 15px rgba(255, 42, 42, 0.6), inset 0 1px 2px rgba(255,255,255,0.6);
+        }
+
+        /* Molded Tactile Push Button */
+        .tactile-button {
+            background: linear-gradient(180deg, #3a4454 0%, #1f2733 100%);
+            border: 2px solid #101622;
+            box-shadow: 0 3px 0 #0a0e17, 0 4px 6px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.08s ease;
+        }
+        .tactile-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #0a0e17, 0 2px 3px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+
         .led { width: 12px; height: 12px; border-radius: 50%; background: #3a0505; border: 2px solid #000; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); margin: 0 auto; }
         .active .led { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.4); }
         
@@ -118,11 +157,15 @@
             
             <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#121f33] items-end justify-between">
                 <div class="flex flex-wrap gap-6 items-end">
-                    <div class="flex flex-col gap-3">
-                        <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md active:scale-95 transition-transform">START / STOP</button>
-                        <div class="flex gap-1 w-full">
-                            <button id="stepRev" class="bg-gray-800 hover:bg-gray-700 border-2 border-gray-950 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">&lt; REV</button>
-                            <button id="stepAdv" class="bg-gray-800 hover:bg-gray-700 border-2 border-gray-950 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">FWD &gt;</button>
+                    
+                    <div class="control-bezel flex flex-col gap-2">
+                        <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
+                            START / STOP
+                        </button>
+                        <div class="flex gap-1.5 w-full">
+                            <button id="stepRev" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">&lt; REV</button>
+                            <button id="stepAdv" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">FWD &gt;</button>
                         </div>
                     </div>
                     
@@ -213,7 +256,7 @@
 
                 <div class="flex flex-col items-end gap-3">
                     <div class="flex gap-6">
-                        <button id="demo1Btn" class="text-[10px] text-blue-200/50 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: EBM</button>
+                        <button id="demo1Btn" class="text-[10px] text-blue-200/50 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
                         <button id="demo2Btn" class="text-[10px] text-blue-200/50 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
                     </div>
                     
@@ -625,7 +668,12 @@
             document.querySelectorAll('.step-indicator').forEach(el => el.classList.remove('active'));
             document.getElementById('pilotA').classList.remove('pilot-active');
             document.getElementById('pilotB').classList.remove('pilot-active');
-            document.getElementById('startStop').style.backgroundColor = '';
+            
+            const startBtn = document.getElementById('startStop');
+            startBtn.classList.remove('is-active');
+            document.getElementById('rockerLed').classList.replace('bg-red-200', 'bg-red-400');
+            document.getElementById('rockerLed').classList.replace('opacity-100', 'opacity-60');
+            
             updateDisplay(-1, 0);
         }
 
@@ -725,12 +773,16 @@
         document.getElementById('startStop').addEventListener('click', async (e) => {
             await initAudio();
             const mode = document.getElementById('seqMode').value;
+            const btn = e.currentTarget;
+            const led = document.getElementById('rockerLed');
             
             if(isPlaying) {
                 stopSequencer();
             } else if (!mode.endsWith('step')) { 
                 isPlaying = true;
-                e.target.style.backgroundColor = '#ff2a2a';
+                btn.classList.add('is-active');
+                led.classList.replace('bg-red-400', 'bg-red-200');
+                led.classList.replace('opacity-60', 'opacity-100');
                 nextNoteTime = audioCtx.currentTime + 0.05;
                 scheduler();
             }
