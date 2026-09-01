@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (Redesigned Hardware UI)
+    SQ-12 Analog Sequencer (Centered Hardware UI)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -13,7 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
-            background-color: #07090e; 
+            background-color: #05070a; 
             color: #dce5f0; 
             font-family: monospace; 
             text-transform: uppercase; 
@@ -26,31 +26,34 @@
             position: relative;
             display: flex;
             align-items: stretch;
-            border-radius: 10px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.95), 0 0 50px rgba(0,0,0,0.8);
         }
 
         .wooden-ear {
-            width: 26px;
-            background: linear-gradient(90deg, #1e0e0a 0%, #3d2014 25%, #2a140c 70%, #150906 100%);
+            width: 28px;
+            background: linear-gradient(90deg, #1c0d08 0%, #3a1f13 25%, #26120b 70%, #120704 100%);
             border-top: 2px solid #5a3220;
             border-bottom: 3px solid #0a0403;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.12), inset 0 -2px 6px rgba(0,0,0,0.9);
             flex-shrink: 0;
         }
-        .wooden-ear-left { border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-right: 2px solid #05080e; }
-        .wooden-ear-right { border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left: 2px solid #05080e; }
+        .wooden-ear-left { border-top-left-radius: 12px; border-bottom-left-radius: 12px; border-right: 2px solid #05080e; }
+        .wooden-ear-right { border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-left: 2px solid #05080e; }
 
         /* Metallic Brushed Cobalt Chassis */
         .chassis { 
             background: 
-                linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.4) 100%),
-                radial-gradient(circle at 50% 30%, #1e2e4a 0%, #121e33 60%, #0a1220 100%); 
+                linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.45) 100%),
+                radial-gradient(circle at 50% 30%, #1d2c47 0%, #111c30 65%, #080f1c 100%); 
             border-top: 4px solid #080d17; 
             border-bottom: 4px solid #05080f; 
-            padding: 28px; 
+            padding: 32px 28px; 
             flex-grow: 1;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 -2px 5px rgba(0,0,0,0.9);
         }
 
@@ -62,18 +65,21 @@
             box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.8);
             position: absolute;
         }
-        .bolt-tl { top: 10px; left: 10px; }
-        .bolt-tr { top: 10px; right: 10px; }
-        .bolt-bl { bottom: 10px; left: 10px; }
-        .bolt-br { bottom: 10px; right: 10px; }
+        .bolt-tl { top: 12px; left: 12px; }
+        .bolt-tr { top: 12px; right: 12px; }
+        .bolt-bl { bottom: 12px; left: 12px; }
+        .bolt-br { bottom: 12px; right: 12px; }
 
         /* Inlaid Beveled Panel Groups */
-        .panel-section {
-            background: linear-gradient(180deg, #090e17 0%, #0d1524 100%);
-            border: 2px solid #05080f;
-            border-radius: 6px;
-            padding: 10px 14px;
-            box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1);
+        .panel-module {
+            background: linear-gradient(180deg, #080d17 0%, #0c1424 100%);
+            border: 2px solid #04070f;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.85), 0 1px 1px rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* 3D Convex Glass Dome LEDs */
@@ -212,48 +218,66 @@
         <div class="wooden-ear wooden-ear-left"></div>
 
         <!-- Main Sequencer Chassis -->
-        <div class="chassis">
+        <div class="chassis w-full">
             <!-- Corner Bolts -->
             <div class="rack-bolt bolt-tl"></div>
             <div class="rack-bolt bolt-tr"></div>
             <div class="rack-bolt bolt-bl"></div>
             <div class="rack-bolt bolt-br"></div>
             
-            <!-- Top Panel: Global Controls -->
-            <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#121f33] items-end justify-between">
-                <div class="flex flex-wrap gap-6 items-end">
-                    
-                    <!-- Hardware Bezeled Transport Controls -->
-                    <div class="panel-section flex flex-col gap-2">
-                        <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
-                            START / STOP
-                        </button>
-                        <div class="flex gap-1.5 w-full">
-                            <button id="stepRev" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">&lt; REV</button>
-                            <button id="stepAdv" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">FWD &gt;</button>
-                        </div>
+            <!-- Top Header & Branding -->
+            <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#121f33]">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-500">SQ</span>-12</h1>
+                    <p class="text-[10px] tracking-widest text-[#8fa4bf]/60 mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
+                </div>
+                
+                <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
+                    <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
+                    <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10">
+                        <div id="dispStep">STEP: --</div>
+                        <div id="dispVolt">VOLT: 0.00</div>
+                        <div id="dispNote">NOTE: C2</div>
                     </div>
-                    
-                    <div class="panel-section flex gap-4">
-                        <div class="knob-wrapper">
-                            <div class="tick-container">
-                                <div class="tick-ring"></div>
-                                <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
-                            </div>
-                            <span class="text-[10px] font-bold text-[#8fa4bf]">SPEED</span>
-                        </div>
-                        <div class="knob-wrapper">
-                            <div class="tick-container">
-                                <div class="tick-ring"></div>
-                                <div class="knob global-knob" id="portamento" data-val="0"></div>
-                            </div>
-                            <span class="text-[10px] font-bold text-[#8fa4bf]">PORTA</span>
-                        </div>
+                </div>
+            </div>
+
+            <!-- Top Panel: Centered Module Groups -->
+            <div class="flex flex-wrap gap-4 mb-8 w-full justify-center items-stretch">
+                <!-- Transport Module -->
+                <div class="panel-module flex flex-col gap-2">
+                    <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
+                        START / STOP
+                    </button>
+                    <div class="flex gap-1.5 w-full">
+                        <button id="stepRev" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">&lt; REV</button>
+                        <button id="stepAdv" class="tactile-button text-blue-100 px-2 py-1.5 font-bold text-[10px] rounded-sm flex-1">FWD &gt;</button>
                     </div>
-                    
-                    <div class="flex flex-col items-center mb-1">
-                        <select id="seqMode" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
+                </div>
+                
+                <!-- Speed & Porta Module -->
+                <div class="panel-module flex gap-4">
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-[#8fa4bf]">SPEED</span>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="portamento" data-val="0"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-[#8fa4bf]">PORTA</span>
+                    </div>
+                </div>
+                
+                <!-- Dropdown Selectors Module -->
+                <div class="panel-module flex flex-wrap gap-4 items-center">
+                    <div class="flex flex-col items-center">
+                        <select id="seqMode" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
                             <option value="12-step">12-STEP: STEPPED</option>
                             <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
                             <option value="12-one">12-STEP: ONE-TIME</option>
@@ -261,51 +285,38 @@
                             <option value="24-cont">24-STEP: CONTINUOUS</option>
                             <option value="24-one">24-STEP: ONE-TIME</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">MODE SELECTOR</span>
+                        <span class="text-[10px] font-bold mt-1 text-[#8fa4bf]">MODE SELECTOR</span>
                     </div>
 
-                    <div class="flex flex-col items-center mb-1">
-                        <select id="voltRange" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
+                    <div class="flex flex-col items-center">
+                        <select id="voltRange" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
                             <option value="5" selected>+/- 5V</option>
                             <option value="1">+/- 1V</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">VOLTAGE RANGE</span>
+                        <span class="text-[10px] font-bold mt-1 text-[#8fa4bf]">VOLTAGE RANGE</span>
                     </div>
 
-                    <div class="flex flex-col items-center mb-1">
-                        <select id="chCDest" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
+                    <div class="flex flex-col items-center">
+                        <select id="chCDest" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
                             <option value="filter" selected>FILTER</option>
                             <option value="volume">VOLUME</option>
                             <option value="clock">CLOCK</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">CH-C DESTINATION</span>
-                    </div>
-
-                    <div id="resetStatus" class="flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center">
-                        NO RESET PATCHED
+                        <span class="text-[10px] font-bold mt-1 text-[#8fa4bf]">CH-C DEST</span>
                     </div>
                 </div>
-                
-                <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
-                    <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
-                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
-                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10">
-                            <div id="dispStep">STEP: --</div>
-                            <div id="dispVolt">VOLT: 0.00</div>
-                            <div id="dispNote">NOTE: C2</div>
-                        </div>
-                    </div>
 
-                    <div class="text-right w-full md:w-auto">
-                        <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-500">SQ</span>-12</h1>
-                        <p class="text-[10px] tracking-widest text-[#8fa4bf]/60 mt-1">ANALOG SEQUENCER</p>
+                <!-- Patch Status Module -->
+                <div class="panel-module min-w-[120px]">
+                    <div id="resetStatus" class="text-yellow-500 font-bold text-xs transition-colors text-center">
+                        NO RESET PATCHED
                     </div>
                 </div>
             </div>
 
-            <!-- Sequencer Grid -->
-            <div class="w-full overflow-x-auto grid-scroll pb-6">
-                <div class="flex flex-col gap-6 min-w-max pr-4">
+            <!-- Centered Sequencer Grid -->
+            <div class="panel-module w-full overflow-x-auto grid-scroll py-6 mb-6">
+                <div class="flex flex-col gap-6 min-w-max mx-auto px-4">
                     <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
                     <div class="flex"><div class="row-label"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
                     <div class="flex"><div class="row-label"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
@@ -315,7 +326,7 @@
             </div>
             
             <!-- Footer: Transpose Keyboard, Demos & Credits -->
-            <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#121f33]">
+            <div class="flex flex-wrap items-center justify-between gap-6 w-full pt-4 border-t-2 border-[#121f33]">
                 <div class="flex flex-col gap-1">
                     <span class="text-[10px] font-bold text-[#8fa4bf]">KEYBOARD TRANSPOSE</span>
                     <div class="flex relative h-16" id="keyboardContainer">
@@ -324,13 +335,13 @@
                 </div>
 
                 <div class="flex flex-col items-end gap-3">
-                    <div class="flex gap-6">
-                        <button id="demo1Btn" class="text-[10px] text-[#8fa4bf]/60 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
-                        <button id="demo2Btn" class="text-[10px] text-[#8fa4bf]/60 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
+                    <div class="flex gap-4">
+                        <button id="demo1Btn" class="tactile-button text-[10px] text-blue-100 font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 1: DAF</button>
+                        <button id="demo2Btn" class="tactile-button text-[10px] text-blue-100 font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 2: ACID</button>
                     </div>
                     
                     <!-- Line Credits & Copyright -->
-                    <div class="text-[9px] text-[#8fa4bf]/40 font-mono tracking-widest text-right">
+                    <div class="text-[9px] text-[#8fa4bf]/40 font-mono tracking-widest text-right mt-1">
                         &copy; JOSE VELAZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-200 underline transition-colors">VOLTAGE &amp; WAVE</a>
                     </div>
                 </div>
@@ -613,24 +624,24 @@
                     e.target.classList.remove('patched');
                     e.target.classList.add('patched-b');
                     statusText.innerText = `EXT RESET\nSTEP ${resetStep + 1}`;
-                    statusText.className = "flex flex-col items-center mb-1 text-blue-400 font-bold text-xs transition-colors w-24 text-center";
+                    statusText.className = "text-blue-400 font-bold text-xs transition-colors text-center";
                 } else {
                     resetStep = null;
                     e.target.classList.remove('patched', 'patched-b');
                     statusText.innerText = "NO RESET PATCHED";
-                    statusText.className = "flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center";
+                    statusText.className = "text-yellow-500 font-bold text-xs transition-colors text-center";
                 }
             } else if (resetStep === step + 12) {
                 resetStep = null;
                 e.target.classList.remove('patched-b');
                 statusText.innerText = "NO RESET PATCHED";
-                statusText.className = "flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center";
+                statusText.className = "text-yellow-500 font-bold text-xs transition-colors text-center";
             } else {
                 document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
                 resetStep = step;
                 e.target.classList.add('patched');
                 statusText.innerText = `RESET\nSTEP ${step + 1}`;
-                statusText.className = "flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center";
+                statusText.className = "text-yellow-500 font-bold text-xs transition-colors text-center";
             }
         }
 
@@ -914,7 +925,7 @@
 
             const statusText = document.getElementById('resetStatus');
             statusText.innerText = "EXT RESET\nSTEP 17";
-            statusText.className = "flex flex-col items-center mb-1 text-blue-400 font-bold text-xs transition-colors w-24 text-center";
+            statusText.className = "text-blue-400 font-bold text-xs transition-colors text-center";
         });
 
         document.getElementById('demo2Btn').addEventListener('click', async () => {
@@ -959,7 +970,7 @@
 
             const statusText = document.getElementById('resetStatus');
             statusText.innerText = "NO RESET PATCHED";
-            statusText.className = "flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center";
+            statusText.className = "text-yellow-500 font-bold text-xs transition-colors text-center";
         });
 
         renderGrid();
