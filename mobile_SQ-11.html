@@ -193,8 +193,9 @@
         let portamentoTime = 0.01;
         let resetStep = null;
         let isPreviewing = false;
-        let transposeSemitones = 0; // Global sequence transposition offset
+        let transposeSemitones = 0;
 
+        // Tracks A & B default to 0V (12 o'clock center-detent), Track C defaults to 0V (fully counter-clockwise)
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -280,8 +281,10 @@
             if (knobEl.hasAttribute('data-ch')) {
                 const ch = knobEl.dataset.ch;
                 if (ch === 'C') {
+                    // Unipolar 0 to +5V: -135deg to +135deg
                     knobEl.style.transform = `rotate(${-135 + (val / 5) * 270}deg)`;
                 } else {
+                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg (12 o'clock)
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
             } else {
@@ -501,6 +504,7 @@
                 document.getElementById('trigRow').appendChild(patchContainer);
             }
             
+            // Set initial knob visuals (A, B, and C default to 0V / 12 o'clock center for A&B)
             document.querySelectorAll('.knob[data-ch]').forEach(k => updateKnobVisual(k, 0));
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
