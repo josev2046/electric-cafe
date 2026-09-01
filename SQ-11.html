@@ -119,8 +119,9 @@
         </div>
         
         <!-- Subtle Footer Area -->
-        <div class="flex justify-end mt-6 pr-4">
-            <button id="demoBtn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">LOAD DEMO</button>
+        <div class="flex justify-end gap-6 mt-6 pr-4">
+            <button id="demo1Btn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">DEMO 1: DAF</button>
+            <button id="demo2Btn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">DEMO 2: ACID</button>
         </div>
     </div>
 
@@ -530,7 +531,54 @@
             scheduleNextStep(true, -1);
         });
 
-        document.getElementById('demoBtn').addEventListener('click', () => {
+        document.getElementById('demo1Btn').addEventListener('click', () => {
+            document.getElementById('voltRange').value = "5";
+            document.getElementById('seqMode').value = "24-cont";
+            document.getElementById('chCDest').value = "filter";
+            
+            const dafA = [-0.58, -1.00, 0.25, -1.00, 0.00, -1.00, -1.00, 0.00, -1.00, 0.00, -1.00, 0.00];
+            const dafB = [-0.17, -1.00, 0.00, -1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+
+            for(let i=0; i<12; i++) {
+                tracks.A[i] = dafA[i];
+                tracks.B[i] = dafB[i];
+                tracks.C[i] = 0;
+                
+                let knobA = document.querySelector(`.knob[data-ch="A"][data-step="${i}"]`);
+                let knobB = document.querySelector(`.knob[data-ch="B"][data-step="${i}"]`);
+                let knobC = document.querySelector(`.knob[data-ch="C"][data-step="${i}"]`);
+                
+                knobA.dataset.val = dafA[i];
+                knobB.dataset.val = dafB[i];
+                knobC.dataset.val = 0;
+                
+                updateKnobVisual(knobA, dafA[i]);
+                updateKnobVisual(knobB, dafB[i]);
+                updateKnobVisual(knobC, 0);
+            }
+            
+            const speedKnob = document.getElementById('clockSpeed');
+            speedKnob.dataset.val = 75;
+            bpm = 40 + (75 / 100) * 200; 
+            updateKnobVisual(speedKnob, 75);
+
+            const portaKnob = document.getElementById('portamento');
+            portaKnob.dataset.val = 0;
+            portamentoTime = 0.01; 
+            updateKnobVisual(portaKnob, 0);
+
+            resetStep = 16; 
+            document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
+            
+            const targetPatch = document.querySelector('.patch-point[data-step="4"]');
+            if (targetPatch) targetPatch.classList.add('patched-b');
+
+            const statusText = document.getElementById('resetStatus');
+            statusText.innerText = "EXT RESET\nSTEP 17";
+            statusText.className = "flex flex-col items-center ml-2 mb-1 text-blue-500 font-bold text-xs transition-colors w-32 text-center";
+        });
+
+        document.getElementById('demo2Btn').addEventListener('click', () => {
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "12-cont";
             document.getElementById('chCDest').value = "clock";
