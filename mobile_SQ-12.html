@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (CRT Module Integrated into Master Row)
+    SQ-12 Analog Sequencer (Unified Master Console & Silkscreen Layout)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -65,15 +65,23 @@
         .bolt-bl { bottom: 12px; left: 12px; }
         .bolt-br { bottom: 12px; right: 12px; }
 
+        /* Full Width Continuous Panel Frame */
         .panel-outline {
             border: 1.5px solid #38342e;
             border-radius: 6px;
-            padding: 10px 12px;
             background: rgba(0, 0, 0, 0.025);
             box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.7);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px 24px;
+        }
+
+        /* Silkscreen Vertical Divider */
+        .panel-divider {
+            width: 1px;
+            height: 60px;
+            background-color: rgba(56, 52, 46, 0.2);
+            margin: 0 12px;
         }
 
         .led { 
@@ -114,52 +122,28 @@
         .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
         .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
         
-        .tick-ring {
+        .tick-ring, .step4-ring, .step6-ring {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(
-                from -135deg,
-                #221e1a 0deg 1.5deg, transparent 1.5deg 27deg,
-                #221e1a 27deg 28.5deg, transparent 28.5deg 54deg,
-                #221e1a 54deg 55.5deg, transparent 55.5deg 81deg,
-                #221e1a 81deg 82.5deg, transparent 82.5deg 108deg,
-                #221e1a 108deg 109.5deg, transparent 109.5deg 135deg,
-                #221e1a 135deg 136.5deg, transparent 136.5deg 162deg,
-                #221e1a 162deg 163.5deg, transparent 163.5deg 189deg,
-                #221e1a 189deg 190.5deg, transparent 190.5deg 216deg,
-                #221e1a 216deg 217.5deg, transparent 217.5deg 243deg,
-                #221e1a 243deg 244.5deg, transparent 244.5deg 270deg,
-                #221e1a 270deg 271.5deg, transparent 271.5deg 360deg
-            );
             -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
             mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+        }
+
+        .tick-ring {
+            background: conic-gradient(from -135deg,
+                #221e1a 0deg 1.5deg, transparent 1.5deg 27deg, #221e1a 27deg 28.5deg, transparent 28.5deg 54deg,
+                #221e1a 54deg 55.5deg, transparent 55.5deg 81deg, #221e1a 81deg 82.5deg, transparent 82.5deg 108deg,
+                #221e1a 108deg 109.5deg, transparent 109.5deg 135deg, #221e1a 135deg 136.5deg, transparent 136.5deg 162deg,
+                #221e1a 162deg 163.5deg, transparent 163.5deg 189deg, #221e1a 189deg 190.5deg, transparent 190.5deg 216deg,
+                #221e1a 216deg 217.5deg, transparent 217.5deg 243deg, #221e1a 243deg 244.5deg, transparent 244.5deg 270deg,
+                #221e1a 270deg 271.5deg, transparent 271.5deg 360deg
+            );
         }
 
         .step4-ring {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(
-                from -135deg,
-                #221e1a 0deg 2deg, transparent 2deg 90deg,
-                #221e1a 90deg 92deg, transparent 92deg 180deg,
-                #221e1a 180deg 182deg, transparent 182deg 270deg,
-                #221e1a 270deg 272deg, transparent 272deg 360deg
+            background: conic-gradient(from -135deg,
+                #221e1a 0deg 2deg, transparent 2deg 90deg, #221e1a 90deg 92deg, transparent 92deg 180deg,
+                #221e1a 180deg 182deg, transparent 182deg 270deg, #221e1a 270deg 272deg, transparent 272deg 360deg
             );
-            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
-            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
-        }
-
-        .step6-ring {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(
-                from -135deg,
-                #221e1a 0deg 2deg, transparent 2deg 54deg,
-                #221e1a 54deg 56deg, transparent 56deg 108deg,
-                #221e1a 108deg 110deg, transparent 110deg 162deg,
-                #221e1a 162deg 164deg, transparent 164deg 216deg,
-                #221e1a 216deg 218deg, transparent 218deg 270deg,
-                #221e1a 270deg 272deg, transparent 272deg 360deg
-            );
-            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
-            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
         .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #221e1a; line-height: 1; pointer-events: none; }
@@ -184,15 +168,15 @@
         
         .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #1f1a14; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
         
-        /* Combined CRT Display Monitor Screen */
+        /* Unified Wide CRT Screen in Header */
         .crt-screen { 
             background: #041004; 
-            border: 3px solid #38342e; 
-            border-radius: 6px;
-            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.25), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.3); 
+            border: 4px solid #2a2722; 
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.25), inset 0 0 12px #000, 0 3px 6px rgba(0,0,0,0.4); 
             position: relative; overflow: hidden;
+            box-sizing: border-box;
         }
-
         .crt-screen::before {
             content: " "; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
@@ -221,19 +205,19 @@
         }
         .tactile-button:active { transform: translateY(1px); }
 
-        .oct-btn, .dest-btn {
+        .oct-btn, .dest-btn, .mode-btn {
             background: linear-gradient(180deg, #2d3036 0%, #17181c 100%);
             border: 1.5px solid #000;
             color: #cebba8;
             font-weight: 900;
             font-size: 8px;
-            padding: 3px 5px;
+            padding: 4px 6px;
             border-radius: 3px;
             box-shadow: 0 2px 0 #000;
             transition: all 0.08s ease;
             cursor: pointer;
         }
-        .oct-btn.oct-active, .dest-btn.dest-active {
+        .oct-btn.oct-active, .dest-btn.dest-active, .mode-btn.mode-active {
             background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%);
             border-color: #ff8878;
             color: #fff;
@@ -241,7 +225,7 @@
         }
 
         .volt-rocker {
-            width: 26px; height: 40px; border-radius: 4px;
+            width: 26px; height: 44px; border-radius: 4px;
             background: linear-gradient(180deg, #15171a 0%, #2d3036 100%);
             border: 2px solid #000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
@@ -249,13 +233,13 @@
             padding: 2px; cursor: pointer;
         }
         .volt-rocker-cap {
-            width: 18px; height: 16px; border-radius: 2px;
+            width: 18px; height: 18px; border-radius: 2px;
             background: linear-gradient(180deg, #3d424a 0%, #1a1c20 100%);
             border: 1px solid #000;
             transition: all 0.1s ease;
         }
-        .volt-5v .volt-rocker-cap { transform: translateY(0px); background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%); }
-        .volt-1v .volt-rocker-cap { transform: translateY(16px); background: linear-gradient(180deg, #3d424a 0%, #1a1c20 100%); }
+        .volt-toggle-top .volt-rocker-cap { transform: translateY(0px); background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%); }
+        .volt-toggle-bottom .volt-rocker-cap { transform: translateY(18px); background: linear-gradient(180deg, #3d424a 0%, #1a1c20 100%); }
 
         .key-white { background: linear-gradient(180deg, #ffffff 0%, #d8d3c5 100%); color: #111; border: 2px solid #111; border-radius: 0 0 4px 4px; box-shadow: 0 3px 4px rgba(0,0,0,0.25); }
         .key-white.active-key { background: #c83a2a; color: #fff; box-shadow: 0 0 12px #c83a2a; }
@@ -277,48 +261,102 @@
             <div class="rack-bolt bolt-bl"></div>
             <div class="rack-bolt bolt-br"></div>
             
-            <!-- Cleaned Header with Title & Subtitle Only -->
+            <!-- HEADER: Logo & Restored Unified Display Module -->
             <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#38342e]/30">
                 <div>
                     <h1 class="text-4xl font-black tracking-tighter text-[#1f1a14]"><span class="text-[#c83a2a]">SQ</span>-12</h1>
                     <p class="text-[10px] font-bold tracking-widest text-[#38342e] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
                 </div>
+                
+                <div class="crt-screen w-[320px] h-[72px] flex items-center justify-between px-4 py-2">
+                    <div class="flex-shrink-0 flex items-center justify-center">
+                        <canvas id="scopeCanvas" width="110" height="50" class="border border-[#111] z-10"></canvas>
+                    </div>
+                    <div class="border-l border-[#0f0]/30 h-[50px] mx-4 z-10"></div>
+                    <div class="text-[#0f0] font-mono text-[10px] text-right leading-tight z-10 flex flex-col justify-center h-full flex-1">
+                        <div id="dispStep" class="mb-0.5">STEP: --</div>
+                        <div id="dispVolt" class="mb-0.5">VOLT: 0.00</div>
+                        <div id="dispNote" class="mb-1">NOTE: C2</div>
+                        <div id="resetStatus" class="text-[9px] text-[#ffaa00] font-bold tracking-wider mt-1 opacity-90">PATCH: NONE</div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Master Control Row with Integrated Outlined Display Module -->
-            <div class="flex flex-wrap gap-3 mb-8 w-full justify-between items-center">
-                <!-- Transport Module -->
-                <div class="panel-outline flex flex-col gap-2">
-                    <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
-                        START / STOP
-                    </button>
-                    <div class="flex gap-1 w-full">
-                        <button id="stepRev" class="tactile-button px-1.5 py-1 font-bold text-[9px] rounded-sm flex-1">&lt; REV</button>
-                        <button id="stepAdv" class="tactile-button px-1.5 py-1 font-bold text-[9px] rounded-sm flex-1">FWD &gt;</button>
-                    </div>
-                </div>
+            <!-- UNIFIED MASTER CONTROL ROW: One Continuous Panel with Silkscreen Dividers -->
+            <div class="panel-outline flex flex-wrap md:flex-nowrap justify-between items-center mb-8 gap-y-6">
                 
-                <!-- Speed & Porta Module -->
-                <div class="panel-outline flex gap-3">
-                    <div class="knob-wrapper">
-                        <div class="tick-container">
-                            <div class="tick-ring"></div>
-                            <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                <!-- 1. TRANSPORT & CLOCK -->
+                <div class="flex items-center gap-4">
+                    <div class="flex flex-col gap-2 justify-center w-[110px]">
+                        <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5 w-full">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
+                            START / STOP
+                        </button>
+                        <div class="flex gap-1.5 w-full">
+                            <button id="stepRev" class="tactile-button px-2 py-1 font-bold text-[9px] rounded-sm flex-1">&lt; REV</button>
+                            <button id="stepAdv" class="tactile-button px-2 py-1 font-bold text-[9px] rounded-sm flex-1">FWD &gt;</button>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">SPEED</span>
                     </div>
-                    <div class="knob-wrapper">
-                        <div class="tick-container">
-                            <div class="tick-ring"></div>
-                            <div class="knob global-knob" id="portamento" data-val="0"></div>
+                    <div class="flex gap-3">
+                        <div class="knob-wrapper">
+                            <div class="tick-container">
+                                <div class="tick-ring"></div>
+                                <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                            </div>
+                            <span class="text-[9px] font-bold text-[#1f1a14]">SPEED</span>
                         </div>
-                        <span class="text-[9px] font-bold text-[#1f1a14]">PORTA</span>
+                        <div class="knob-wrapper">
+                            <div class="tick-container">
+                                <div class="tick-ring"></div>
+                                <div class="knob global-knob" id="portamento" data-val="0"></div>
+                            </div>
+                            <span class="text-[9px] font-bold text-[#1f1a14]">PORTA</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Oscillator Module (Wave, Octave Bank, Pitch Tune) -->
-                <div class="panel-outline flex gap-3 items-center">
+                <div class="hidden md:block panel-divider"></div>
+
+                <!-- 2. ROUTING & MODE -->
+                <div class="flex items-center gap-5">
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-[7px] font-bold text-[#1f1a14]">12</span>
+                        <div class="volt-rocker volt-toggle-top" id="lengthRockerBtn">
+                            <div class="volt-rocker-cap"></div>
+                        </div>
+                        <span class="text-[7px] font-bold text-[#1f1a14]">24</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14] mt-0.5">STEPS</span>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="flex flex-col gap-1" id="playModeBank">
+                            <button class="mode-btn" data-play="step">STEP</button>
+                            <button class="mode-btn mode-active" data-play="cont">CONT</button>
+                            <button class="mode-btn" data-play="one">ONCE</button>
+                        </div>
+                        <span class="text-[8px] font-bold text-[#1f1a14] mt-1.5">MODE</span>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-1 ml-2">
+                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;5V</span>
+                        <div class="volt-rocker volt-toggle-top" id="voltRockerBtn">
+                            <div class="volt-rocker-cap"></div>
+                        </div>
+                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;1V</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14] mt-0.5">RANGE</span>
+                    </div>
+
+                    <div class="flex flex-col justify-center gap-1.5" id="chCDestBank">
+                        <button class="dest-btn dest-active" data-dest="filter">VCF</button>
+                        <button class="dest-btn" data-dest="volume">VCA</button>
+                        <button class="dest-btn" data-dest="clock">CLK</button>
+                    </div>
+                </div>
+
+                <div class="hidden md:block panel-divider"></div>
+
+                <!-- 3. OSCILLATOR MODULE -->
+                <div class="flex items-center gap-4">
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="step4-ring"></div>
@@ -330,17 +368,15 @@
                         </div>
                         <span class="text-[9px] font-bold text-[#1f1a14]">WAVE</span>
                     </div>
-
-                    <div class="flex flex-col items-center justify-between h-full py-0.5">
-                        <div class="grid grid-cols-2 gap-1" id="octaveBtnBank">
+                    <div class="flex flex-col items-center justify-center h-full">
+                        <div class="grid grid-cols-2 gap-1 mb-1.5" id="octaveBtnBank">
                             <button class="oct-btn" data-oct="0">32'</button>
                             <button class="oct-btn oct-active" data-oct="1">16'</button>
                             <button class="oct-btn" data-oct="2">8'</button>
                             <button class="oct-btn" data-oct="3">4'</button>
                         </div>
-                        <span class="text-[8px] font-bold text-[#1f1a14] mt-0.5">OCTAVE</span>
+                        <span class="text-[8px] font-bold text-[#1f1a14]">OCTAVE</span>
                     </div>
-
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
@@ -353,8 +389,10 @@
                     </div>
                 </div>
 
-                <!-- ADSR Envelope Generator -->
-                <div class="panel-outline flex gap-2.5 items-center">
+                <div class="hidden md:block panel-divider"></div>
+
+                <!-- 4. ADSR ENVELOPE -->
+                <div class="flex items-center gap-3">
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
@@ -385,58 +423,11 @@
                     </div>
                 </div>
 
-                <!-- Hardware Mode, Voltage & Destination Group -->
-                <div class="panel-outline flex gap-3 items-center">
-                    <div class="knob-wrapper">
-                        <div class="tick-container">
-                            <div class="step6-ring"></div>
-                            <span class="tick-label" style="bottom:2px; left:-6px; font-size:6px;">12S</span>
-                            <span class="tick-label" style="top:10px; left:-10px; font-size:6px;">12C</span>
-                            <span class="tick-label" style="top:-2px; left:50%; transform:translateX(-50%); font-size:6px;">121</span>
-                            <span class="tick-label" style="top:10px; right:-10px; font-size:6px;">24S</span>
-                            <span class="tick-label" style="bottom:2px; right:-10px; font-size:6px;">24C</span>
-                            <span class="tick-label" style="bottom:-6px; left:50%; transform:translateX(-50%); font-size:6px;">241</span>
-                            <div class="knob global-knob" id="modeKnob" data-val="1"></div>
-                        </div>
-                        <span class="text-[8px] font-bold text-[#1f1a14]">MODE</span>
-                    </div>
-
-                    <div class="flex flex-col items-center gap-0.5">
-                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;5V</span>
-                        <div class="volt-rocker volt-5v" id="voltRockerBtn">
-                            <div class="volt-rocker-cap"></div>
-                        </div>
-                        <span class="text-[7px] font-bold text-[#1f1a14]">&plusmn;1V</span>
-                        <span class="text-[8px] font-bold text-[#1f1a14]">RANGE</span>
-                    </div>
-
-                    <div class="flex flex-col gap-0.5" id="chCDestBank">
-                        <button class="dest-btn dest-active" data-dest="filter">VCF</button>
-                        <button class="dest-btn" data-dest="volume">VCA</button>
-                        <button class="dest-btn" data-dest="clock">CLK</button>
-                    </div>
-                </div>
-
-                <!-- Outlined Display Module (Unified CRT Scope & Telemetry Monitor) -->
-                <div class="panel-outline">
-                    <div class="crt-screen w-72 h-16 rounded-md relative flex items-center justify-between px-2">
-                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
-                        
-                        <div class="border-l border-[#0f0]/30 h-10 mx-1.5 z-10"></div>
-                        
-                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10 flex-1">
-                            <div id="dispStep">STEP: --</div>
-                            <div id="dispVolt">VOLT: 0.00</div>
-                            <div id="dispNote">NOTE: C2</div>
-                            <div id="resetStatus" class="text-[8px] text-[#ffaa00] font-bold tracking-wider mt-0.5">PATCH: NONE</div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Centered Sequencer Grid -->
-            <div class="panel-outline w-full overflow-x-auto grid-scroll py-6 mb-6">
-                <div class="flex flex-col gap-6 min-w-max mx-auto px-4">
+            <!-- Pixel-Aligned Sequencer Grid -->
+            <div class="panel-outline w-full overflow-x-auto grid-scroll mb-6">
+                <div class="flex flex-col gap-6 min-w-max mx-auto px-2">
                     <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
                     <div class="flex"><div class="row-label text-[#1f1a14]"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
                     <div class="flex"><div class="row-label text-[#1f1a14]"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
@@ -483,8 +474,10 @@
         let isPreviewing = false;
         let transposeSemitones = 0;
 
-        const modeOptions = ['12-step', '12-cont', '12-one', '24-step', '24-cont', '24-one'];
-        let activeSeqMode = '12-cont';
+        let currentLength = '12';
+        let currentPlayMode = 'cont'; 
+        let activeSeqMode = '12-cont'; 
+        
         let voltageRangeMultiplier = 1;
         let activeChCDest = 'filter';
 
@@ -590,9 +583,6 @@
             } else if (knobEl.id === 'waveKnob') {
                 const stepIdx = Math.min(3, Math.max(0, parseInt(val)));
                 knobEl.style.transform = `rotate(${-135 + stepIdx * 90}deg)`;
-            } else if (knobEl.id === 'modeKnob') {
-                const stepIdx = Math.min(5, Math.max(0, parseInt(val)));
-                knobEl.style.transform = `rotate(${-135 + stepIdx * 54}deg)`;
             } else {
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
             }
@@ -612,14 +602,42 @@
             });
         });
 
+        function updateActiveMode() {
+            activeSeqMode = `${currentLength}-${currentPlayMode}`;
+        }
+
+        document.getElementById('lengthRockerBtn').addEventListener('click', async (e) => {
+            await initAudio();
+            const btn = e.currentTarget;
+            if (btn.classList.contains('volt-toggle-top')) {
+                btn.classList.replace('volt-toggle-top', 'volt-toggle-bottom');
+                currentLength = '24';
+            } else {
+                btn.classList.replace('volt-toggle-bottom', 'volt-toggle-top');
+                currentLength = '12';
+            }
+            updateActiveMode();
+        });
+
+        document.querySelectorAll('#playModeBank .mode-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                await initAudio();
+                currentPlayMode = e.target.dataset.play;
+                document.querySelectorAll('#playModeBank .mode-btn').forEach(b => {
+                    b.classList.toggle('mode-active', b.dataset.play === currentPlayMode);
+                });
+                updateActiveMode();
+            });
+        });
+
         document.getElementById('voltRockerBtn').addEventListener('click', async (e) => {
             await initAudio();
             const btn = e.currentTarget;
-            if (btn.classList.contains('volt-5v')) {
-                btn.classList.replace('volt-5v', 'volt-1v');
+            if (btn.classList.contains('volt-toggle-top')) {
+                btn.classList.replace('volt-toggle-top', 'volt-toggle-bottom');
                 voltageRangeMultiplier = 0.2;
             } else {
-                btn.classList.replace('volt-1v', 'volt-5v');
+                btn.classList.replace('volt-toggle-bottom', 'volt-toggle-top');
                 voltageRangeMultiplier = 1;
             }
         });
@@ -734,11 +752,6 @@
                     let stepIdx = Math.min(3, Math.max(0, Math.round(startVal + delta / 30)));
                     activeWaveform = waveforms[stepIdx];
                     if(synthOsc) synthOsc.type = activeWaveform;
-                    activeKnob.dataset.val = stepIdx;
-                } else if (activeKnob.id === 'modeKnob') {
-                    const delta = (startY - e.clientY);
-                    let stepIdx = Math.min(5, Math.max(0, Math.round(startVal + delta / 25)));
-                    activeSeqMode = modeOptions[stepIdx];
                     activeKnob.dataset.val = stepIdx;
                 } else {
                     let newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
@@ -881,7 +894,6 @@
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
             updateKnobVisual(document.getElementById('waveKnob'), 0);
-            updateKnobVisual(document.getElementById('modeKnob'), 1);
             updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 5);
             updateKnobVisual(document.getElementById('envDecay'), 30);
@@ -1081,10 +1093,15 @@
             await initAudio();
             voltageRangeMultiplier = 1;
             const voltRocker = document.getElementById('voltRockerBtn');
-            voltRocker.className = "volt-rocker volt-5v";
+            voltRocker.className = "volt-rocker volt-toggle-top";
 
-            activeSeqMode = '24-cont';
-            updateKnobVisual(document.getElementById('modeKnob'), 4);
+            currentLength = '24';
+            currentPlayMode = 'cont';
+            updateActiveMode();
+            document.getElementById('lengthRockerBtn').className = "volt-rocker volt-toggle-bottom";
+            document.querySelectorAll('#playModeBank .mode-btn').forEach(b => {
+                b.classList.toggle('mode-active', b.dataset.play === 'cont');
+            });
 
             activeChCDest = 'filter';
             document.querySelectorAll('#chCDestBank .dest-btn').forEach(b => {
@@ -1149,10 +1166,15 @@
             await initAudio();
             voltageRangeMultiplier = 1;
             const voltRocker = document.getElementById('voltRockerBtn');
-            voltRocker.className = "volt-rocker volt-5v";
+            voltRocker.className = "volt-rocker volt-toggle-top";
 
-            activeSeqMode = '12-cont';
-            updateKnobVisual(document.getElementById('modeKnob'), 1);
+            currentLength = '12';
+            currentPlayMode = 'cont';
+            updateActiveMode();
+            document.getElementById('lengthRockerBtn').className = "volt-rocker volt-toggle-top";
+            document.querySelectorAll('#playModeBank .mode-btn').forEach(b => {
+                b.classList.toggle('mode-active', b.dataset.play === 'cont');
+            });
 
             activeChCDest = 'filter';
             document.querySelectorAll('#chCDestBank .dest-btn').forEach(b => {
