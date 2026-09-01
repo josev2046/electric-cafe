@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- 
+    SQ-12 Analog Sequencer (Redesigned Hardware UI)
+    Created & Developed by Jose Velazquez MA
+    Voltage & Wave (https://voltageandwave.co.uk/)
+    Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,99 +12,114 @@
     <title>SQ-12 Analog Sequencer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0c0e14; color: #e5e3d8; font-family: monospace; text-transform: uppercase; padding: 1rem; user-select: none; }
+        body { 
+            background-color: #07090e; 
+            color: #dce5f0; 
+            font-family: monospace; 
+            text-transform: uppercase; 
+            padding: 1rem; 
+            user-select: none; 
+        }
         
-        /* Wooden Side Panels (Ears) Frame */
+        /* Enclosure & Wooden Side Ears */
         .synth-enclosure {
             position: relative;
             display: flex;
             align-items: stretch;
-            border-radius: 8px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.95);
+            border-radius: 10px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.8);
         }
 
         .wooden-ear {
-            width: 24px;
-            background: linear-gradient(90deg, #2d1810 0%, #4a2818 30%, #3b1e13 70%, #1f0f0a 100%);
+            width: 26px;
+            background: linear-gradient(90deg, #1e0e0a 0%, #3d2014 25%, #2a140c 70%, #150906 100%);
             border-top: 2px solid #5a3220;
-            border-bottom: 3px solid #0f0805;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -2px 6px rgba(0,0,0,0.8);
+            border-bottom: 3px solid #0a0403;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.12), inset 0 -2px 6px rgba(0,0,0,0.9);
             flex-shrink: 0;
         }
+        .wooden-ear-left { border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-right: 2px solid #05080e; }
+        .wooden-ear-right { border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left: 2px solid #05080e; }
 
-        .wooden-ear-left {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            border-right: 2px solid #080d1a;
-        }
-
-        .wooden-ear-right {
-            border-top-right-radius: 8px;
-            border-bottom-right-radius: 8px;
-            border-left: 2px solid #080d1a;
-        }
-
-        /* Cobalt Chassis Styling */
+        /* Metallic Brushed Cobalt Chassis */
         .chassis { 
-            background: radial-gradient(circle at 50% 20%, #20324c 0%, #152238 60%, #0d1626 100%); 
-            border-top: 4px solid #0a111f; 
-            border-bottom: 4px solid #0a111f; 
-            padding: 24px; 
+            background: 
+                linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0.4) 100%),
+                radial-gradient(circle at 50% 30%, #1e2e4a 0%, #121e33 60%, #0a1220 100%); 
+            border-top: 4px solid #080d17; 
+            border-bottom: 4px solid #05080f; 
+            padding: 28px; 
             flex-grow: 1;
-            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* Authentic Hardware Button Styling */
-        .control-bezel {
-            background: #090e18;
-            border: 2px solid #05080e;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 1px rgba(255,255,255,0.1);
-            padding: 8px 10px;
-            border-radius: 4px;
-        }
-
-        /* Illuminated Rocker Switch */
-        .rocker-button {
-            background: linear-gradient(180deg, #8b1a1a 0%, #520e0e 100%);
-            border: 2px solid #280505;
-            box-shadow: 0 4px 0 #180303, 0 5px 8px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.3);
-            transition: all 0.08s ease;
             position: relative;
-        }
-        .rocker-button:active {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #180303, 0 2px 4px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.3);
-        }
-        .rocker-button.is-active {
-            background: linear-gradient(180deg, #d32f2f 0%, #8b1a1a 100%);
-            border-color: #ff5252;
-            box-shadow: 0 4px 0 #180303, 0 0 15px rgba(255, 42, 42, 0.6), inset 0 1px 2px rgba(255,255,255,0.6);
+            box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 -2px 5px rgba(0,0,0,0.9);
         }
 
-        /* Molded Tactile Push Button */
-        .tactile-button {
-            background: linear-gradient(180deg, #3a4454 0%, #1f2733 100%);
-            border: 2px solid #101622;
-            box-shadow: 0 3px 0 #0a0e17, 0 4px 6px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);
-            transition: all 0.08s ease;
+        /* Rack Bolts */
+        .rack-bolt {
+            width: 12px; height: 12px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #666 0%, #1a1a1a 80%);
+            border: 1px solid #000;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.8);
+            position: absolute;
         }
-        .tactile-button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #0a0e17, 0 2px 3px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.2);
+        .bolt-tl { top: 10px; left: 10px; }
+        .bolt-tr { top: 10px; right: 10px; }
+        .bolt-bl { bottom: 10px; left: 10px; }
+        .bolt-br { bottom: 10px; right: 10px; }
+
+        /* Inlaid Beveled Panel Groups */
+        .panel-section {
+            background: linear-gradient(180deg, #090e17 0%, #0d1524 100%);
+            border: 2px solid #05080f;
+            border-radius: 6px;
+            padding: 10px 14px;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1);
         }
 
-        .led { width: 12px; height: 12px; border-radius: 50%; background: #3a0505; border: 2px solid #000; box-shadow: inset 0 1px 2px rgba(0,0,0,0.5); margin: 0 auto; }
-        .active .led { background: #ff2a2a; box-shadow: 0 0 12px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.4); }
+        /* 3D Convex Glass Dome LEDs */
+        .led { 
+            width: 14px; height: 12px; border-radius: 50%; 
+            background: radial-gradient(circle at 35% 35%, #5a1212 0%, #200303 70%); 
+            border: 2px solid #050505; 
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.6); 
+            margin: 0 auto; 
+        }
+        .active .led { 
+            background: radial-gradient(circle at 35% 35%, #ff7777 0%, #ff1111 60%, #990000 100%); 
+            box-shadow: 0 0 14px #ff2a2a, 0 0 4px #ff8888, inset 0 1px 2px rgba(255,255,255,0.8); 
+        }
         
-        .pilot { width: 8px; height: 8px; border-radius: 50%; background: #3a0505; border: 1px solid #000; box-shadow: inset 0 1px 1px rgba(0,0,0,0.5); transition: background 0.1s; }
-        .pilot-active { background: #ff2a2a; box-shadow: 0 0 8px #ff2a2a; }
+        .pilot { 
+            width: 9px; height: 9px; border-radius: 50%; 
+            background: radial-gradient(circle at 35% 35%, #4a0f0f 0%, #1a0202 80%); 
+            border: 1px solid #000; 
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); 
+            transition: all 0.1s; 
+        }
+        .pilot-active { 
+            background: radial-gradient(circle at 35% 35%, #ff6666 0%, #ff0000 70%); 
+            box-shadow: 0 0 10px #ff2a2a, inset 0 1px 2px rgba(255,255,255,0.6); 
+        }
 
-        .patch-point { width: 22px; height: 22px; border-radius: 50%; background: #050505; border: 3px solid #333; box-shadow: inset 0 2px 4px rgba(0,0,0,1); margin: 0 auto; cursor: pointer; transition: all 0.2s; }
-        .patch-point:hover { border-color: #666; }
-        .patch-point.patched { background: #dca824; box-shadow: 0 0 12px #dca824, inset 0 2px 4px rgba(0,0,0,0.5); border-color: #fff; }
-        .patch-point.patched-b { background: #2488dc; box-shadow: 0 0 12px #2488dc, inset 0 2px 4px rgba(0,0,0,0.5); border-color: #fff; }
+        /* Gold-Plated Patch Sockets */
+        .patch-point { 
+            width: 24px; height: 24px; border-radius: 50%; 
+            background: radial-gradient(circle, #080808 40%, #1a1a1a 50%, #8a6f27 85%, #d4af37 100%); 
+            border: 2px solid #050505; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.6); 
+            margin: 0 auto; cursor: pointer; transition: all 0.2s; 
+        }
+        .patch-point:hover { filter: brightness(1.2); }
+        .patch-point.patched { 
+            background: radial-gradient(circle, #ffea78 20%, #dca824 60%, #523b00 100%); 
+            box-shadow: 0 0 14px #dca824, inset 0 2px 4px rgba(0,0,0,0.6); border-color: #fff; 
+        }
+        .patch-point.patched-b { 
+            background: radial-gradient(circle, #78caff 20%, #2488dc 60%, #003766 100%); 
+            box-shadow: 0 0 14px #2488dc, inset 0 2px 4px rgba(0,0,0,0.6); border-color: #fff; 
+        }
         
-        /* Knob & Tick Mark Styling */
+        /* 3D Rotary Knobs */
         .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
         .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
         
@@ -106,59 +127,104 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
             background: conic-gradient(
                 from -135deg,
-                #9bb3cb 0deg 1.5deg, transparent 1.5deg 27deg,
-                #9bb3cb 27deg 28.5deg, transparent 28.5deg 54deg,
-                #9bb3cb 54deg 55.5deg, transparent 55.5deg 81deg,
-                #9bb3cb 81deg 82.5deg, transparent 82.5deg 108deg,
-                #9bb3cb 108deg 109.5deg, transparent 109.5deg 135deg,
-                #9bb3cb 135deg 136.5deg, transparent 136.5deg 162deg,
-                #9bb3cb 162deg 163.5deg, transparent 163.5deg 189deg,
-                #9bb3cb 189deg 190.5deg, transparent 190.5deg 216deg,
-                #9bb3cb 216deg 217.5deg, transparent 217.5deg 243deg,
-                #9bb3cb 243deg 244.5deg, transparent 244.5deg 270deg,
-                #9bb3cb 270deg 271.5deg, transparent 271.5deg 360deg
+                #8fa4bf 0deg 1.5deg, transparent 1.5deg 27deg,
+                #8fa4bf 27deg 28.5deg, transparent 28.5deg 54deg,
+                #8fa4bf 54deg 55.5deg, transparent 55.5deg 81deg,
+                #8fa4bf 81deg 82.5deg, transparent 82.5deg 108deg,
+                #8fa4bf 108deg 109.5deg, transparent 109.5deg 135deg,
+                #8fa4bf 135deg 136.5deg, transparent 136.5deg 162deg,
+                #8fa4bf 162deg 163.5deg, transparent 163.5deg 189deg,
+                #8fa4bf 189deg 190.5deg, transparent 190.5deg 216deg,
+                #8fa4bf 216deg 217.5deg, transparent 217.5deg 243deg,
+                #8fa4bf 243deg 244.5deg, transparent 244.5deg 270deg,
+                #8fa4bf 270deg 271.5deg, transparent 271.5deg 360deg
             );
             -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
             mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
-        .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #b0c4de; line-height: 1; pointer-events: none; }
+        .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #8fa4bf; line-height: 1; pointer-events: none; }
         .label-top { top: -2px; left: 50%; transform: translateX(-50%); }
         .label-left { bottom: 2px; left: 2px; }
         .label-right { bottom: 2px; right: 2px; }
 
         .knob { 
-            width: 40px; height: 40px; border-radius: 50%; background: #121822; 
-            border: 2px solid #000; cursor: ns-resize; position: relative; z-index: 2;
-            box-shadow: inset 0 1px 3px rgba(255,255,255,0.15), 0 4px 6px rgba(0,0,0,0.8);
+            width: 42px; height: 40px; border-radius: 50%; 
+            background: radial-gradient(circle at 30% 30%, #2c384a 0%, #121924 70%, #090e17 100%); 
+            border: 2px solid #05080e; cursor: ns-resize; position: relative; z-index: 2;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), 0 5px 8px rgba(0,0,0,0.85);
             transform: rotate(-135deg); touch-action: none;
         }
-        .knob::after { content: ''; position: absolute; top: 4px; left: 17px; width: 2px; height: 12px; background: #fff; border-radius: 1px; }
+        .knob::after { content: ''; position: absolute; top: 3px; left: 18px; width: 2px; height: 13px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.8); }
         
-        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #a4b8d1; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
-        .crt-screen { background: #051005; border: 2px solid #0d1a29; box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1), inset 0 0 10px #000; }
+        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #8fa4bf; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
         
+        /* Scanline CRT Glass Display */
+        .crt-screen { 
+            background: #041004; 
+            border: 3px solid #091321; 
+            border-radius: 6px;
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.2), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.8); 
+            position: relative; overflow: hidden;
+        }
+        .crt-screen::before {
+            content: " "; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 5; background-size: 100% 3px, 6px 100%; pointer-events: none;
+        }
+
+        /* Tactile Hardware Buttons */
+        .rocker-button {
+            background: linear-gradient(180deg, #991b1b 0%, #5c0f0f 100%);
+            border: 2px solid #280505;
+            box-shadow: 0 4px 0 #1a0303, 0 5px 8px rgba(0,0,0,0.8), inset 0 1px 1px rgba(255,255,255,0.3);
+            transition: all 0.08s ease;
+        }
+        .rocker-button:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a0303, 0 2px 4px rgba(0,0,0,0.8); }
+        .rocker-button.is-active {
+            background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+            border-color: #fca5a5;
+            box-shadow: 0 4px 0 #1a0303, 0 0 18px rgba(239, 68, 68, 0.7), inset 0 1px 2px rgba(255,255,255,0.7);
+        }
+
+        .tactile-button {
+            background: linear-gradient(180deg, #2d3a4d 0%, #16202e 100%);
+            border: 2px solid #0a101a;
+            box-shadow: 0 3px 0 #060912, 0 4px 6px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.2);
+            transition: all 0.08s ease;
+        }
+        .tactile-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #060912, 0 2px 3px rgba(0,0,0,0.7); }
+
         /* Keyboard Styling */
-        .key-white { background: #e5e3d8; color: #111; border: 2px solid #000; border-radius: 0 0 4px 4px; }
-        .key-white.active-key { background: #ff2a2a; color: #fff; }
-        .key-black { background: #151a24; color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; }
-        .key-black.active-key { background: #ff2a2a; color: #fff; }
+        .key-white { background: linear-gradient(180deg, #ffffff 0%, #d1cfc0 100%); color: #111; border: 2px solid #000; border-radius: 0 0 4px 4px; box-shadow: 0 4px 4px rgba(0,0,0,0.5); }
+        .key-white.active-key { background: #ef4444; color: #fff; box-shadow: 0 0 12px #ef4444; }
+        .key-black { background: linear-gradient(180deg, #222 0%, #050505 100%); color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; box-shadow: 0 3px 4px rgba(0,0,0,0.8); }
+        .key-black.active-key { background: #ef4444; color: #fff; box-shadow: 0 0 12px #ef4444; }
 
         .grid-scroll::-webkit-scrollbar { height: 8px; }
-        .grid-scroll::-webkit-scrollbar-track { background: #0c1524; border-radius: 4px; }
-        .grid-scroll::-webkit-scrollbar-thumb { background: #1f344d; border-radius: 4px; }
+        .grid-scroll::-webkit-scrollbar-track { background: #070d17; border-radius: 4px; }
+        .grid-scroll::-webkit-scrollbar-thumb { background: #1b2a42; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-start">
     <div class="synth-enclosure w-full max-w-6xl">
+        <!-- Left Wooden Ear -->
         <div class="wooden-ear wooden-ear-left"></div>
 
+        <!-- Main Sequencer Chassis -->
         <div class="chassis">
+            <!-- Corner Bolts -->
+            <div class="rack-bolt bolt-tl"></div>
+            <div class="rack-bolt bolt-tr"></div>
+            <div class="rack-bolt bolt-bl"></div>
+            <div class="rack-bolt bolt-br"></div>
             
+            <!-- Top Panel: Global Controls -->
             <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#121f33] items-end justify-between">
                 <div class="flex flex-wrap gap-6 items-end">
                     
-                    <div class="control-bezel flex flex-col gap-2">
+                    <!-- Hardware Bezeled Transport Controls -->
+                    <div class="panel-section flex flex-col gap-2">
                         <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
                             START / STOP
@@ -169,25 +235,25 @@
                         </div>
                     </div>
                     
-                    <div class="flex gap-4">
+                    <div class="panel-section flex gap-4">
                         <div class="knob-wrapper">
                             <div class="tick-container">
                                 <div class="tick-ring"></div>
                                 <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
                             </div>
-                            <span class="text-[10px] font-bold text-blue-200/70">SPEED</span>
+                            <span class="text-[10px] font-bold text-[#8fa4bf]">SPEED</span>
                         </div>
                         <div class="knob-wrapper">
                             <div class="tick-container">
                                 <div class="tick-ring"></div>
                                 <div class="knob global-knob" id="portamento" data-val="0"></div>
                             </div>
-                            <span class="text-[10px] font-bold text-blue-200/70">PORTA</span>
+                            <span class="text-[10px] font-bold text-[#8fa4bf]">PORTA</span>
                         </div>
                     </div>
                     
                     <div class="flex flex-col items-center mb-1">
-                        <select id="seqMode" class="bg-[#0b121e] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm">
+                        <select id="seqMode" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
                             <option value="12-step">12-STEP: STEPPED</option>
                             <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
                             <option value="12-one">12-STEP: ONE-TIME</option>
@@ -195,24 +261,24 @@
                             <option value="24-cont">24-STEP: CONTINUOUS</option>
                             <option value="24-one">24-STEP: ONE-TIME</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-blue-200/70">MODE SELECTOR</span>
+                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">MODE SELECTOR</span>
                     </div>
 
                     <div class="flex flex-col items-center mb-1">
-                        <select id="voltRange" class="bg-[#0b121e] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm">
+                        <select id="voltRange" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
                             <option value="5" selected>+/- 5V</option>
                             <option value="1">+/- 1V</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-blue-200/70">VOLTAGE RANGE</span>
+                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">VOLTAGE RANGE</span>
                     </div>
 
                     <div class="flex flex-col items-center mb-1">
-                        <select id="chCDest" class="bg-[#0b121e] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm">
+                        <select id="chCDest" class="bg-[#080e1a] text-white border-2 border-[#1d2d47] p-2 text-xs font-bold outline-none rounded-sm shadow-inner">
                             <option value="filter" selected>FILTER</option>
                             <option value="volume">VOLUME</option>
                             <option value="clock">CLOCK</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-2 text-blue-200/70">CH-C DESTINATION</span>
+                        <span class="text-[10px] font-bold mt-2 text-[#8fa4bf]">CH-C DESTINATION</span>
                     </div>
 
                     <div id="resetStatus" class="flex flex-col items-center mb-1 text-yellow-500 font-bold text-xs transition-colors w-24 text-center">
@@ -222,8 +288,8 @@
                 
                 <div class="flex flex-wrap items-center gap-6 mt-4 md:mt-0">
                     <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
-                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111]"></canvas>
-                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight">
+                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
+                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10">
                             <div id="dispStep">STEP: --</div>
                             <div id="dispVolt">VOLT: 0.00</div>
                             <div id="dispNote">NOTE: C2</div>
@@ -232,11 +298,12 @@
 
                     <div class="text-right w-full md:w-auto">
                         <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-500">SQ</span>-12</h1>
-                        <p class="text-[10px] tracking-widest text-blue-200/50 mt-1">ANALOG SEQUENCER</p>
+                        <p class="text-[10px] tracking-widest text-[#8fa4bf]/60 mt-1">ANALOG SEQUENCER</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Sequencer Grid -->
             <div class="w-full overflow-x-auto grid-scroll pb-6">
                 <div class="flex flex-col gap-6 min-w-max pr-4">
                     <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
@@ -247,26 +314,30 @@
                 </div>
             </div>
             
+            <!-- Footer: Transpose Keyboard, Demos & Credits -->
             <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#121f33]">
                 <div class="flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-blue-200/70">KEYBOARD TRANSPOSE</span>
+                    <span class="text-[10px] font-bold text-[#8fa4bf]">KEYBOARD TRANSPOSE</span>
                     <div class="flex relative h-16" id="keyboardContainer">
-                        </div>
+                        <!-- Virtual keys injected via JS -->
+                    </div>
                 </div>
 
                 <div class="flex flex-col items-end gap-3">
                     <div class="flex gap-6">
-                        <button id="demo1Btn" class="text-[10px] text-blue-200/50 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
-                        <button id="demo2Btn" class="text-[10px] text-blue-200/50 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
+                        <button id="demo1Btn" class="text-[10px] text-[#8fa4bf]/60 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
+                        <button id="demo2Btn" class="text-[10px] text-[#8fa4bf]/60 hover:text-white font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
                     </div>
                     
-                    <div class="text-[9px] text-blue-200/40 font-mono tracking-widest text-right">
+                    <!-- Line Credits & Copyright -->
+                    <div class="text-[9px] text-[#8fa4bf]/40 font-mono tracking-widest text-right">
                         &copy; JOSE VELAZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer" class="hover:text-blue-200 underline transition-colors">VOLTAGE &amp; WAVE</a>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Right Wooden Ear -->
         <div class="wooden-ear wooden-ear-right"></div>
     </div>
 
@@ -333,7 +404,7 @@
             
             analyser.getByteTimeDomainData(dataArray);
             
-            ctx.fillStyle = '#051005';
+            ctx.fillStyle = '#041004';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#0f0';
