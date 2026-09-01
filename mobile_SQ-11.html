@@ -74,7 +74,6 @@
 <body class="min-h-screen flex justify-center items-start">
     <div class="chassis w-full max-w-6xl">
         
-        <!-- Top Panel: Global Controls -->
         <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#222] items-end justify-between">
             <div class="flex flex-wrap gap-6 items-end">
                 <div class="flex flex-col gap-3">
@@ -153,7 +152,6 @@
             </div>
         </div>
 
-        <!-- Sequencer Grid -->
         <div class="w-full overflow-x-auto grid-scroll pb-6">
             <div class="flex flex-col gap-6 min-w-max pr-4">
                 <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
@@ -164,13 +162,11 @@
             </div>
         </div>
         
-        <!-- Footer: Transpose Keyboard & Demos -->
         <div class="flex flex-wrap items-center justify-between gap-6 mt-6 pt-4 border-t-2 border-[#222]">
             <div class="flex flex-col gap-1">
                 <span class="text-[10px] font-bold text-gray-400">KEYBOARD TRANSPOSE</span>
                 <div class="flex relative h-16" id="keyboardContainer">
-                    <!-- Virtual keys injected via JS -->
-                </div>
+                    </div>
             </div>
 
             <div class="flex gap-6">
@@ -195,8 +191,8 @@
         let isPreviewing = false;
         let transposeSemitones = 0;
 
-        // Tracks A & B default to 0V (12 o'clock center-detent), Track C defaults to 0V (fully counter-clockwise)
-        const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
+        // Tracks A & B default to 0V (12 o'clock center), Track C defaults to 2.5V (12 o'clock midpoint)
+        const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(2.5) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
         async function initAudio() {
@@ -281,10 +277,10 @@
             if (knobEl.hasAttribute('data-ch')) {
                 const ch = knobEl.dataset.ch;
                 if (ch === 'C') {
-                    // Unipolar 0 to +5V: -135deg to +135deg
+                    // Unipolar 0 to +5V: -135deg to +135deg (2.5V sits straight up at 0deg)
                     knobEl.style.transform = `rotate(${-135 + (val / 5) * 270}deg)`;
                 } else {
-                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg (12 o'clock)
+                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg (0V sits straight up at 0deg)
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
             } else {
@@ -479,6 +475,7 @@
                 
                 ['A', 'B', 'C'].forEach(ch => {
                     const isBipolar = (ch === 'A' || ch === 'B');
+                    const defaultVal = isBipolar ? 0 : 2.5; // 0V for A/B, 2.5V for C (12 o'clock)
                     const labelsHTML = isBipolar ? 
                         `<span class="tick-label label-left">-5</span><span class="tick-label label-top">0</span><span class="tick-label label-right">+5</span>` : 
                         `<span class="tick-label label-left">0</span><span class="tick-label label-right">+5</span>`;
@@ -488,7 +485,7 @@
                             <div class="tick-container">
                                 <div class="tick-ring"></div>
                                 ${labelsHTML}
-                                <div class="knob" data-ch="${ch}" data-step="${i}" data-val="0"></div>
+                                <div class="knob" data-ch="${ch}" data-step="${i}" data-val="${defaultVal}"></div>
                             </div>
                         </div>`;
                 });
@@ -504,8 +501,12 @@
                 document.getElementById('trigRow').appendChild(patchContainer);
             }
             
-            // Set initial knob visuals (A, B, and C default to 0V / 12 o'clock center for A&B)
-            document.querySelectorAll('.knob[data-ch]').forEach(k => updateKnobVisual(k, 0));
+            // Set initial knob visuals (A & B at 0V, C at 2.5V straight up)
+            document.querySelectorAll('.knob[data-ch]').forEach(k => {
+                const ch = k.dataset.ch;
+                const val = (ch === 'C') ? 2.5 : 0;
+                updateKnobVisual(k, val);
+            });
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
         }
@@ -706,7 +707,7 @@
             for(let i=0; i<12; i++) {
                 tracks.A[i] = dafA[i];
                 tracks.B[i] = dafB[i];
-                tracks.C[i] = 0;
+                tracks.C[i] = 2.5;
                 
                 let knobA = document.querySelector(`.knob[data-ch="A"][data-step="${i}"]`);
                 let knobB = document.querySelector(`.knob[data-ch="B"][data-step="${i}"]`);
@@ -714,11 +715,11 @@
                 
                 knobA.dataset.val = dafA[i];
                 knobB.dataset.val = dafB[i];
-                knobC.dataset.val = 0;
+                knobC.dataset.val = 2.5;
                 
                 updateKnobVisual(knobA, dafA[i]);
                 updateKnobVisual(knobB, dafB[i]);
-                updateKnobVisual(knobC, 0);
+                updateKnobVisual(knobC, 2.5);
             }
             
             const speedKnob = document.getElementById('clockSpeed');
