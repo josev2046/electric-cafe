@@ -70,6 +70,14 @@
                 </div>
 
                 <div class="flex flex-col items-center ml-4 mb-1">
+                    <select id="voltRange" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
+                        <option value="5" selected>+/- 5V</option>
+                        <option value="1">+/- 1V</option>
+                    </select>
+                    <span class="text-[10px] font-bold mt-2 text-gray-400">VOLTAGE RANGE</span>
+                </div>
+
+                <div class="flex flex-col items-center ml-4 mb-1">
                     <select id="chCDest" class="bg-black text-white border-2 border-gray-700 p-2 text-xs font-bold outline-none rounded-sm">
                         <option value="filter" selected>FILTER (CUTOFF)</option>
                         <option value="volume">VOLUME (ACCENT)</option>
@@ -259,10 +267,15 @@
                     const is24 = document.getElementById('seqMode').value.startsWith('24');
                     const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
                     
-                    updateDisplay(stepIdx, parseFloat(activeKnob.dataset.val));
+                    const range = parseInt(document.getElementById('voltRange').value);
+                    let displayVal = parseFloat(activeKnob.dataset.val);
+                    if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
+                    
+                    updateDisplay(stepIdx, displayVal);
                     
                     if (!isPlaying) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+                        pVal *= (range / 5);
                         let fVal = tracks.C[uiStep];
                         previewSynth(pVal, fVal);
                     }
@@ -284,10 +297,15 @@
                     const is24 = document.getElementById('seqMode').value.startsWith('24');
                     const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
                     
-                    updateDisplay(stepIdx, newVal);
+                    const range = parseInt(document.getElementById('voltRange').value);
+                    let displayVal = newVal;
+                    if (ch === 'A' || ch === 'B') displayVal *= (range / 5);
+                    
+                    updateDisplay(stepIdx, displayVal);
                     
                     if (!isPlaying && isPreviewing) {
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+                        pVal *= (range / 5);
                         let fVal = tracks.C[uiStep];
                         previewSynth(pVal, fVal);
                     }
@@ -417,6 +435,8 @@
             }
 
             let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+            const range = parseInt(document.getElementById('voltRange').value);
+            pVal *= (range / 5);
             updateDisplay(currentStep, pVal);
         }
 
@@ -457,6 +477,10 @@
 
             const uiStep = currentStep % 12;
             let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+            
+            const range = parseInt(document.getElementById('voltRange').value);
+            pVal *= (range / 5);
+            
             let fVal = tracks.C[uiStep]; 
 
             triggerSynth(pVal, fVal, manual ? audioCtx.currentTime : nextNoteTime);
@@ -507,6 +531,8 @@
         });
 
         document.getElementById('demoBtn').addEventListener('click', () => {
+            document.getElementById('voltRange').value = "5";
+            
             const dafA = [-0.58, -1.00, 0.25, -1.00, 0.00, -1.00, -1.00, 0.00, -1.00, 0.00, -1.00, 0.00];
             const dafB = [-0.17, -1.00, 0.00, -1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
 
