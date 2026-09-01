@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (1970s Warm Beige & Dual CRT UI)
+    SQ-12 Analog Sequencer (1970s Warm Beige, Waveform Selector & ADSR Engine)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -281,6 +281,52 @@
                         <span class="text-[10px] font-bold text-[#1f1a14]">PORTA</span>
                     </div>
                 </div>
+
+                <!-- Waveform Switcher Module -->
+                <div class="panel-outline flex gap-3 items-center">
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="waveKnob" data-val="0"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-[#1f1a14]">WAVE</span>
+                    </div>
+                    <div class="flex flex-col text-[9px] font-bold text-[#1f1a14] leading-tight">
+                        <span id="waveLabel">SAW</span>
+                    </div>
+                </div>
+
+                <!-- ADSR Envelope Generator Module -->
+                <div class="panel-outline flex gap-3">
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="envAttack" data-val="5"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">ATTACK</span>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="envDecay" data-val="30"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">DECAY</span>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="envSustain" data-val="20"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">SUSTAIN</span>
+                    </div>
+                    <div class="knob-wrapper">
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="envRelease" data-val="25"></div>
+                        </div>
+                        <span class="text-[9px] font-bold text-[#1f1a14]">RELEASE</span>
+                    </div>
+                </div>
                 
                 <!-- Dropdown Selectors Module -->
                 <div class="panel-outline flex flex-wrap gap-4 items-center">
@@ -345,7 +391,7 @@
 
                 <div class="flex flex-col items-end gap-3">
                     <div class="flex gap-4">
-                        <button id="demo1Btn" class="tactile-button text-[10px] font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 1: EBM</button>
+                        <button id="demo1Btn" class="tactile-button text-[10px] font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 1: DAF</button>
                         <button id="demo2Btn" class="tactile-button text-[10px] font-bold tracking-widest px-3 py-2 rounded-sm cursor-pointer outline-none">DEMO 2: ACID</button>
                     </div>
                     
@@ -380,6 +426,14 @@
         let isPreviewing = false;
         let transposeSemitones = 0;
 
+        // Waveform & ADSR Parameter Engine
+        const waveforms = ['sawtooth', 'square', 'triangle', 'sine'];
+        let activeWaveform = 'sawtooth';
+        let attackTime = 0.01;   // Seconds
+        let decayTime = 0.15;    // Seconds
+        let sustainLevel = 0.2;  // Level (0 to 1)
+        let releaseTime = 0.2;   // Seconds
+
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(2.5) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -393,7 +447,7 @@
                 synthVca = audioCtx.createGain();
                 analyser = audioCtx.createAnalyser();
                 
-                synthOsc.type = 'sawtooth';
+                synthOsc.type = activeWaveform;
                 synthVcf.type = 'lowpass';
                 synthVcf.Q.value = 12; 
                 synthVca.gain.value = 0;
@@ -469,6 +523,9 @@
                 } else {
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
+            } else if (knobEl.id === 'waveKnob') {
+                const waveIndex = Math.min(3, Math.floor((val / 100) * 4));
+                knobEl.style.transform = `rotate(${-135 + waveIndex * 90}deg)`;
             } else {
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
             }
@@ -480,6 +537,7 @@
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
 
+            synthOsc.type = activeWaveform;
             synthOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
 
             let baseCutoff = 400; 
@@ -572,8 +630,25 @@
                     }
                 } else {
                     newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
-                    if(activeKnob.id === 'clockSpeed') bpm = 40 + (newVal / 100) * 200;
-                    else if(activeKnob.id === 'portamento') portamentoTime = 0.01 + (newVal / 100) * 0.3;
+                    
+                    if(activeKnob.id === 'clockSpeed') {
+                        bpm = 40 + (newVal / 100) * 200;
+                    } else if(activeKnob.id === 'portamento') {
+                        portamentoTime = 0.01 + (newVal / 100) * 0.3;
+                    } else if(activeKnob.id === 'waveKnob') {
+                        const waveIdx = Math.min(3, Math.floor((newVal / 100) * 4));
+                        activeWaveform = waveforms[waveIdx];
+                        document.getElementById('waveLabel').innerText = activeWaveform.toUpperCase().substring(0, 3);
+                        if(synthOsc) synthOsc.type = activeWaveform;
+                    } else if(activeKnob.id === 'envAttack') {
+                        attackTime = 0.005 + (newVal / 100) * 0.5;
+                    } else if(activeKnob.id === 'envDecay') {
+                        decayTime = 0.02 + (newVal / 100) * 0.8;
+                    } else if(activeKnob.id === 'envSustain') {
+                        sustainLevel = newVal / 100;
+                    } else if(activeKnob.id === 'envRelease') {
+                        releaseTime = 0.02 + (newVal / 100) * 1.5;
+                    }
                 }
                 
                 activeKnob.dataset.val = newVal;
@@ -599,6 +674,7 @@
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
 
+            synthOsc.type = activeWaveform;
             synthOsc.frequency.setTargetAtTime(freq, time, portamentoTime);
 
             let baseCutoff = 400; 
@@ -611,14 +687,25 @@
                 peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
+            // Apply Envelope to VCF Cutoff
             synthVcf.frequency.cancelScheduledValues(time);
-            synthVcf.frequency.setValueAtTime(baseCutoff + 5000, time); 
-            synthVcf.frequency.exponentialRampToValueAtTime(baseCutoff, time + 0.1); 
+            synthVcf.frequency.setValueAtTime(baseCutoff, time); 
+            synthVcf.frequency.linearRampToValueAtTime(baseCutoff + 5000, time + attackTime);
+            synthVcf.frequency.exponentialRampToValueAtTime(Math.max(100, baseCutoff + (5000 * sustainLevel)), time + attackTime + decayTime);
 
+            // Apply Full ADSR Envelope to VCA Gain
+            const stepGateTime = Math.max(0.05, ((60.0 / bpm) * 0.25) - 0.02);
             synthVca.gain.cancelScheduledValues(time);
             synthVca.gain.setValueAtTime(0, time);
-            synthVca.gain.linearRampToValueAtTime(peakVolume, time + 0.01); 
-            synthVca.gain.exponentialRampToValueAtTime(0.001, time + 0.15); 
+            
+            // Attack
+            synthVca.gain.linearRampToValueAtTime(peakVolume, time + attackTime);
+            // Decay to Sustain
+            synthVca.gain.linearRampToValueAtTime(peakVolume * sustainLevel, time + attackTime + decayTime);
+            // Release after step Gate duration
+            const noteEndTime = time + stepGateTime;
+            synthVca.gain.setValueAtTime(peakVolume * sustainLevel, noteEndTime);
+            synthVca.gain.exponentialRampToValueAtTime(0.001, noteEndTime + releaseTime);
         }
 
         async function handlePatchClick(e) {
@@ -690,6 +777,11 @@
             });
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
+            updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('envAttack'), 5);
+            updateKnobVisual(document.getElementById('envDecay'), 30);
+            updateKnobVisual(document.getElementById('envSustain'), 20);
+            updateKnobVisual(document.getElementById('envRelease'), 25);
         }
 
         function renderKeyboard() {
@@ -890,6 +982,10 @@
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "24-cont";
             document.getElementById('chCDest').value = "filter";
+            activeWaveform = 'sawtooth';
+            document.getElementById('waveLabel').innerText = 'SAW';
+            
+            attackTime = 0.01; decayTime = 0.15; sustainLevel = 0.2; releaseTime = 0.2;
             
             const dafA = [-0.58, -1.00, 0.25, -1.00, 0.00, -1.00, -1.00, 0.00, -1.00, 0.00, -1.00, 0.00];
             const dafB = [-0.17, -1.00, 0.00, -1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
@@ -922,6 +1018,12 @@
             portamentoTime = 0.01; 
             updateKnobVisual(portaKnob, 0);
 
+            updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('envAttack'), 5);
+            updateKnobVisual(document.getElementById('envDecay'), 30);
+            updateKnobVisual(document.getElementById('envSustain'), 20);
+            updateKnobVisual(document.getElementById('envRelease'), 25);
+
             resetStep = 16; 
             document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
             
@@ -937,6 +1039,10 @@
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "12-cont";
             document.getElementById('chCDest').value = "filter";
+            activeWaveform = 'sawtooth';
+            document.getElementById('waveLabel').innerText = 'SAW';
+
+            attackTime = 0.005; decayTime = 0.12; sustainLevel = 0.1; releaseTime = 0.08;
             
             const acidA = [-1.00, 0.00, 0.25, -1.00, 0.58, 0.00, -0.17, -1.00, 0.83, 1.00, 0.00, -1.00];
             const acidC = [4.00, 1.00, 2.50, 4.50, 0.50, 2.50, 3.50, 2.00, 5.00, 0.20, 2.50, 3.00];
@@ -968,6 +1074,12 @@
             portaKnob.dataset.val = 0;
             portamentoTime = 0.01; 
             updateKnobVisual(portaKnob, 0);
+
+            updateKnobVisual(document.getElementById('waveKnob'), 0);
+            updateKnobVisual(document.getElementById('envAttack'), 2);
+            updateKnobVisual(document.getElementById('envDecay'), 20);
+            updateKnobVisual(document.getElementById('envSustain'), 10);
+            updateKnobVisual(document.getElementById('envRelease'), 10);
 
             resetStep = null; 
             document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
