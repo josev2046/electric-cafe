@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (Unified CRT Monitor & Aligned Grid Matrix)
+    SQ-12 Analog Sequencer (CRT Module Integrated into Master Row)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -277,30 +277,16 @@
             <div class="rack-bolt bolt-bl"></div>
             <div class="rack-bolt bolt-br"></div>
             
-            <!-- Header with Integrated Single CRT Display Monitor -->
+            <!-- Cleaned Header with Title & Subtitle Only -->
             <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#38342e]/30">
                 <div>
                     <h1 class="text-4xl font-black tracking-tighter text-[#1f1a14]"><span class="text-[#c83a2a]">SQ</span>-12</h1>
                     <p class="text-[10px] font-bold tracking-widest text-[#38342e] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
                 </div>
-                
-                <!-- Single Unified CRT Display combining Scope & Patch Bus Telemetry -->
-                <div class="crt-screen w-80 h-16 rounded-md relative flex items-center justify-between px-3">
-                    <canvas id="scopeCanvas" width="100" height="40" class="border border-[#111] z-10"></canvas>
-                    
-                    <div class="border-l border-[#0f0]/30 h-10 mx-2 z-10"></div>
-                    
-                    <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10 flex-1">
-                        <div id="dispStep">STEP: --</div>
-                        <div id="dispVolt">VOLT: 0.00</div>
-                        <div id="dispNote">NOTE: C2</div>
-                        <div id="resetStatus" class="text-[8px] text-[#ffaa00] font-bold tracking-wider mt-0.5">PATCH: NONE</div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Balanced Single Control Row -->
-            <div class="flex flex-wrap gap-4 mb-8 w-full justify-between items-center">
+            <!-- Master Control Row with Integrated Outlined Display Module -->
+            <div class="flex flex-wrap gap-3 mb-8 w-full justify-between items-center">
                 <!-- Transport Module -->
                 <div class="panel-outline flex flex-col gap-2">
                     <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5">
@@ -428,6 +414,22 @@
                         <button class="dest-btn dest-active" data-dest="filter">VCF</button>
                         <button class="dest-btn" data-dest="volume">VCA</button>
                         <button class="dest-btn" data-dest="clock">CLK</button>
+                    </div>
+                </div>
+
+                <!-- Outlined Display Module (Unified CRT Scope & Telemetry Monitor) -->
+                <div class="panel-outline">
+                    <div class="crt-screen w-72 h-16 rounded-md relative flex items-center justify-between px-2">
+                        <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111] z-10"></canvas>
+                        
+                        <div class="border-l border-[#0f0]/30 h-10 mx-1.5 z-10"></div>
+                        
+                        <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight z-10 flex-1">
+                            <div id="dispStep">STEP: --</div>
+                            <div id="dispVolt">VOLT: 0.00</div>
+                            <div id="dispNote">NOTE: C2</div>
+                            <div id="resetStatus" class="text-[8px] text-[#ffaa00] font-bold tracking-wider mt-0.5">PATCH: NONE</div>
+                        </div>
                     </div>
                 </div>
             </div>
