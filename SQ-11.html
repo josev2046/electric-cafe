@@ -30,6 +30,8 @@
         .knob::after { content: ''; position: absolute; top: 4px; left: 17px; width: 2px; height: 12px; background: #fff; border-radius: 1px; }
         
         .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #888; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; }
+
+        .crt-screen { background: #051005; border: 2px solid #222; box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1), inset 0 0 10px #000; }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-start">
@@ -40,7 +42,10 @@
             <div class="flex gap-6 items-end">
                 <div class="flex flex-col gap-3">
                     <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md">START / STOP</button>
-                    <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-5 py-2 font-bold rounded-sm shadow-md">STEP</button>
+                    <div class="flex gap-1 w-full">
+                        <button id="stepRev" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1">&lt; REV</button>
+                        <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1">FWD &gt;</button>
+                    </div>
                 </div>
                 
                 <div class="knob-wrapper ml-4">
@@ -73,14 +78,26 @@
                     <span class="text-[10px] font-bold mt-2 text-gray-400">CH-C DESTINATION</span>
                 </div>
 
-                <div id="resetStatus" class="flex flex-col items-center ml-4 mb-1 text-yellow-600 font-bold text-xs transition-colors">
+                <div id="resetStatus" class="flex flex-col items-center ml-2 mb-1 text-yellow-600 font-bold text-xs transition-colors w-32 text-center">
                     NO RESET PATCHED
                 </div>
             </div>
             
-            <div class="text-right">
-                <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-11</h1>
-                <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
+            <div class="flex items-center gap-6">
+                <!-- Data / Analysis Screen -->
+                <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
+                    <canvas id="scopeCanvas" width="90" height="40" class="border border-[#111]"></canvas>
+                    <div class="text-[#0f0] font-mono text-[9px] text-right leading-tight">
+                        <div id="dispStep">STEP: --</div>
+                        <div id="dispVolt">VOLT: 0.00</div>
+                        <div id="dispNote">NOTE: C2</div>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <h1 class="text-4xl font-black tracking-tighter text-white"><span class="text-red-600">SQ</span>-11</h1>
+                    <p class="text-[10px] tracking-widest text-gray-500 mt-1">ANALOG SEQUENCER</p>
+                </div>
             </div>
         </div>
 
@@ -95,7 +112,7 @@
         
         <!-- Subtle Footer Area -->
         <div class="flex justify-end mt-6 pr-4">
-            <button id="demoBtn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">LOAD DEMO</button>
+            <button id="demoBtn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">LOAD DEMO: DAF</button>
         </div>
     </div>
 
@@ -105,15 +122,16 @@
         let isPlaying = false;
         let nextNoteTime = 0;
         let timerId;
-        let audioCtx;
+        
+        let audioCtx, synthOsc, synthVcf, synthVca, analyser;
         
         let bpm = 120;
         let portamentoTime = 0.01;
         let resetStep = null;
+        let isPreviewing = false;
 
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
-
-        let synthOsc, synthVcf, synthVca;
+        const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
         function initAudio() {
             if(!audioCtx) {
@@ -122,37 +140,133 @@
                 synthOsc = audioCtx.createOscillator();
                 synthVcf = audioCtx.createBiquadFilter();
                 synthVca = audioCtx.createGain();
+                analyser = audioCtx.createAnalyser();
                 
                 synthOsc.type = 'sawtooth';
                 synthVcf.type = 'lowpass';
                 synthVcf.Q.value = 12; 
                 synthVca.gain.value = 0;
                 
+                analyser.fftSize = 256;
+
                 synthOsc.connect(synthVcf);
                 synthVcf.connect(synthVca);
-                synthVca.connect(audioCtx.destination);
+                synthVca.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                
                 synthOsc.start();
+                drawScope();
             }
             if(audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function drawScope() {
+            requestAnimationFrame(drawScope);
+            if (!analyser) return;
+
+            const canvas = document.getElementById('scopeCanvas');
+            const ctx = canvas.getContext('2d');
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            analyser.getByteTimeDomainData(dataArray);
+            
+            ctx.fillStyle = '#051005';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#0f0';
+            ctx.beginPath();
+            
+            const sliceWidth = canvas.width * 1.0 / bufferLength;
+            let x = 0;
+            
+            for(let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * canvas.height / 2;
+                if(i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+                x += sliceWidth;
+            }
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+        }
+
+        function updateDisplay(step, volt) {
+            document.getElementById('dispStep').innerText = `STEP: ${step < 0 ? '--' : step + 1}`;
+            document.getElementById('dispVolt').innerText = `VOLT: ${volt >= 0 ? '+' : ''}${volt.toFixed(2)}`;
+            
+            const semitoneOffset = Math.round(volt * 12);
+            const totalNote = 24 + semitoneOffset; 
+            const noteIndex = ((totalNote % 12) + 12) % 12;
+            const octave = Math.floor(totalNote / 12);
+            document.getElementById('dispNote').innerText = `NOTE: ${noteNames[noteIndex]}${octave}`;
         }
 
         let activeKnob = null, startY = 0, startVal = 0;
 
         function updateKnobVisual(knobEl, val) {
             if (knobEl.hasAttribute('data-ch')) {
-                // Sequencer knobs: -5 to +5 maps to -135deg to +135deg
                 knobEl.style.transform = `rotate(${val * 27}deg)`; 
             } else {
-                // Global knobs: 0 to 100 maps to -135deg to +135deg
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
+            }
+        }
+
+        function previewSynth(pitchVal, cVal) {
+            const semitone = pitchVal * 12; 
+            const freq = 65.41 * Math.pow(2, semitone / 12); 
+            const dest = document.getElementById('chCDest').value;
+
+            synthOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
+
+            let baseCutoff = 400; 
+            let peakVolume = 0.8;
+            const normalizedC = (cVal + 5) / 10; 
+
+            if (dest === 'filter') {
+                baseCutoff = 100 + (normalizedC * 2000);
+            } else if (dest === 'volume') {
+                peakVolume = 0.2 + (normalizedC * 0.8); 
+            }
+
+            synthVcf.frequency.setTargetAtTime(baseCutoff, audioCtx.currentTime, 0.02); 
+            
+            if (!isPreviewing) {
+                synthVca.gain.cancelScheduledValues(audioCtx.currentTime);
+                isPreviewing = true;
+            }
+            synthVca.gain.setTargetAtTime(peakVolume, audioCtx.currentTime, 0.02); 
+        }
+
+        function stopPreview() {
+            if (isPreviewing) {
+                synthVca.gain.cancelScheduledValues(audioCtx.currentTime);
+                synthVca.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+                isPreviewing = false;
             }
         }
 
         document.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('knob')) {
+                initAudio();
                 activeKnob = e.target;
                 startY = e.clientY;
                 startVal = parseFloat(activeKnob.dataset.val);
+                
+                if (activeKnob.hasAttribute('data-step')) {
+                    const ch = activeKnob.dataset.ch;
+                    const uiStep = parseInt(activeKnob.dataset.step);
+                    const is24 = document.getElementById('seqMode').value.startsWith('24');
+                    const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
+                    
+                    updateDisplay(stepIdx, parseFloat(activeKnob.dataset.val));
+                    
+                    if (!isPlaying) {
+                        let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+                        let fVal = tracks.C[uiStep];
+                        previewSynth(pVal, fVal);
+                    }
+                }
             }
         });
 
@@ -164,6 +278,19 @@
                 if (isSeqKnob) {
                     newVal = Math.max(-5, Math.min(5, startVal + (startY - e.clientY) * 0.05));
                     tracks[activeKnob.dataset.ch][activeKnob.dataset.step] = newVal;
+                    
+                    const ch = activeKnob.dataset.ch;
+                    const uiStep = parseInt(activeKnob.dataset.step);
+                    const is24 = document.getElementById('seqMode').value.startsWith('24');
+                    const stepIdx = uiStep + (ch === 'B' && is24 ? 12 : 0);
+                    
+                    updateDisplay(stepIdx, newVal);
+                    
+                    if (!isPlaying && isPreviewing) {
+                        let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+                        let fVal = tracks.C[uiStep];
+                        previewSynth(pVal, fVal);
+                    }
                 } else {
                     newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
                     if(activeKnob.id === 'clockSpeed') bpm = 40 + (newVal / 100) * 200;
@@ -175,7 +302,10 @@
             }
         });
 
-        document.addEventListener('mouseup', () => activeKnob = null);
+        document.addEventListener('mouseup', () => {
+            activeKnob = null;
+            stopPreview();
+        });
 
         function triggerSynth(pitchVal, cVal, time) {
             const semitone = pitchVal * 12; 
@@ -186,7 +316,6 @@
 
             let baseCutoff = 400; 
             let peakVolume = 0.8;
-
             const normalizedC = (cVal + 5) / 10; 
 
             if (dest === 'filter') {
@@ -195,12 +324,10 @@
                 peakVolume = 0.2 + (normalizedC * 0.8); 
             }
 
-            // MS-20 Style Filter Envelope (Sharp "Pew" Attack)
             synthVcf.frequency.cancelScheduledValues(time);
             synthVcf.frequency.setValueAtTime(baseCutoff + 5000, time); 
             synthVcf.frequency.exponentialRampToValueAtTime(baseCutoff, time + 0.1); 
 
-            // Staccato Amplifier Envelope
             synthVca.gain.cancelScheduledValues(time);
             synthVca.gain.setValueAtTime(0, time);
             synthVca.gain.linearRampToValueAtTime(peakVolume, time + 0.01); 
@@ -214,32 +341,28 @@
 
             if (resetStep === step) {
                 if (is24) {
-                    // Cycle to Row B (Mod Behavior)
                     resetStep = step + 12;
                     e.target.classList.remove('patched');
                     e.target.classList.add('patched-b');
-                    statusText.innerText = `EXT RESET PATCHED TO STEP ${resetStep + 1}`;
-                    statusText.className = "flex flex-col items-center ml-4 mb-1 text-blue-500 font-bold text-xs transition-colors";
+                    statusText.innerText = `EXT RESET\nSTEP ${resetStep + 1}`;
+                    statusText.className = "flex flex-col items-center ml-2 mb-1 text-blue-500 font-bold text-xs transition-colors w-32 text-center";
                 } else {
-                    // Turn off
                     resetStep = null;
                     e.target.classList.remove('patched', 'patched-b');
                     statusText.innerText = "NO RESET PATCHED";
-                    statusText.className = "flex flex-col items-center ml-4 mb-1 text-yellow-600 font-bold text-xs transition-colors";
+                    statusText.className = "flex flex-col items-center ml-2 mb-1 text-yellow-600 font-bold text-xs transition-colors w-32 text-center";
                 }
             } else if (resetStep === step + 12) {
-                // Turn off from Row B
                 resetStep = null;
                 e.target.classList.remove('patched-b');
                 statusText.innerText = "NO RESET PATCHED";
-                statusText.className = "flex flex-col items-center ml-4 mb-1 text-yellow-600 font-bold text-xs transition-colors";
+                statusText.className = "flex flex-col items-center ml-2 mb-1 text-yellow-600 font-bold text-xs transition-colors w-32 text-center";
             } else {
-                // Initial click: Row A (Hardware Behavior)
                 document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
                 resetStep = step;
                 e.target.classList.add('patched');
-                statusText.innerText = `RESET PATCHED TO STEP ${step + 1}`;
-                statusText.className = "flex flex-col items-center ml-4 mb-1 text-yellow-600 font-bold text-xs transition-colors";
+                statusText.innerText = `RESET\nSTEP ${step + 1}`;
+                statusText.className = "flex flex-col items-center ml-2 mb-1 text-yellow-600 font-bold text-xs transition-colors w-32 text-center";
             }
         }
 
@@ -273,39 +396,10 @@
             document.getElementById('pilotA').classList.remove('pilot-active');
             document.getElementById('pilotB').classList.remove('pilot-active');
             document.getElementById('startStop').style.backgroundColor = '';
+            updateDisplay(-1, 0);
         }
 
-        function scheduleNextStep(manual = false) {
-            const mode = document.getElementById('seqMode').value;
-            const is24 = mode.startsWith('24');
-            const maxSteps = is24 ? 24 : 12;
-            
-            currentStep++;
-
-            if (currentStep >= maxSteps) {
-                if (mode.endsWith('one')) {
-                    stopSequencer();
-                    return;
-                }
-                currentStep = 0;
-            }
-            
-            // Handle Reset Logic
-            if (resetStep !== null) {
-                // Hardware behavior: shared jack triggers on column match
-                const hardwareMatch = (resetStep < 12) && ((currentStep % 12) === resetStep);
-                // Mod behavior: absolute step match for Row B
-                const absoluteMatch = (resetStep >= 12) && (currentStep === resetStep);
-
-                if (hardwareMatch || absoluteMatch) {
-                    if (mode.endsWith('one')) {
-                        stopSequencer();
-                        return;
-                    }
-                    currentStep = 0;
-                }
-            }
-            
+        function updateUIForStep(is24) {
             const uiStep = currentStep % 12;
 
             document.querySelectorAll('.step-indicator').forEach(el => el.classList.remove('active'));
@@ -323,6 +417,46 @@
             }
 
             let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
+            updateDisplay(currentStep, pVal);
+        }
+
+        function scheduleNextStep(manual = false, direction = 1) {
+            const mode = document.getElementById('seqMode').value;
+            const is24 = mode.startsWith('24');
+            const maxSteps = is24 ? 24 : 12;
+            
+            if (direction === 1) {
+                currentStep++;
+                if (currentStep >= maxSteps) {
+                    if (mode.endsWith('one') && !manual) {
+                        stopSequencer();
+                        return;
+                    }
+                    currentStep = 0;
+                }
+                
+                if (resetStep !== null && !manual) {
+                    const hardwareMatch = (resetStep < 12) && ((currentStep % 12) === resetStep);
+                    const absoluteMatch = (resetStep >= 12) && (currentStep === resetStep);
+                    if (hardwareMatch || absoluteMatch) {
+                        if (mode.endsWith('one')) {
+                            stopSequencer();
+                            return;
+                        }
+                        currentStep = 0;
+                    }
+                }
+            } else {
+                currentStep--;
+                if (currentStep < 0) {
+                    currentStep = maxSteps - 1;
+                }
+            }
+            
+            updateUIForStep(is24);
+
+            const uiStep = currentStep % 12;
+            let pVal = is24 ? (currentStep < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
             let fVal = tracks.C[uiStep]; 
 
             triggerSynth(pVal, fVal, manual ? audioCtx.currentTime : nextNoteTime);
@@ -332,7 +466,7 @@
             if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) return; 
             
             while (nextNoteTime < audioCtx.currentTime + 0.1) {
-                scheduleNextStep();
+                scheduleNextStep(false, 1);
                 
                 let currentStepDuration = (60.0 / bpm) * 0.25;
                 const dest = document.getElementById('chCDest').value;
@@ -364,9 +498,12 @@
 
         document.getElementById('stepAdv').addEventListener('click', () => {
             initAudio();
-            if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) {
-                scheduleNextStep(true);
-            }
+            scheduleNextStep(true, 1);
+        });
+
+        document.getElementById('stepRev').addEventListener('click', () => {
+            initAudio();
+            scheduleNextStep(true, -1);
         });
 
         document.getElementById('demoBtn').addEventListener('click', () => {
@@ -394,7 +531,6 @@
             bpm = 40 + (75 / 100) * 200; 
             updateKnobVisual(speedKnob, 75);
 
-            // Visually patch column 5 (index 4) to Row B (Step 17 / resetStep 16)
             resetStep = 16; 
             document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
             
@@ -402,8 +538,8 @@
             if (targetPatch) targetPatch.classList.add('patched-b');
 
             const statusText = document.getElementById('resetStatus');
-            statusText.innerText = "EXT RESET PATCHED TO STEP 17";
-            statusText.className = "flex flex-col items-center ml-4 mb-1 text-blue-500 font-bold text-xs transition-colors";
+            statusText.innerText = "EXT RESET\nSTEP 17";
+            statusText.className = "flex flex-col items-center ml-2 mb-1 text-blue-500 font-bold text-xs transition-colors w-32 text-center";
         });
 
         renderGrid();
