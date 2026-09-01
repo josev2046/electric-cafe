@@ -118,7 +118,7 @@ The main matrix consists of 12 vertical step columns and 5 horizontal control ro
 At the bottom of each step column lies a **TRIG OUT** patch socket. Clicking or tapping a socket patches an external reset loop:
 
 - **Yellow Patch Cable (Steps 1–12):** Instantly forces the sequencer to reset back to Step 1 upon reaching the patched step (e.g., patching Step 5 creates a 4-step sequence loop).
-- **Blue Patch Cable (Steps 13–24, 24-Step Mode):** Clicking an active yellow patch point while in 24-step mode toggles it to a blue patch point, setting the reset point within the secondary Row B cycle (e.g., Step 17 reset).
+- **Red Patch Cable (Steps 13–24, 24-Step Mode):** Clicking an active yellow patch point while in 24-step mode toggles it to a red patch point, setting the reset point within the secondary Row B cycle (e.g., Step 17 reset).
 - **Reset Status Display:** Displays the current active reset step (e.g., `RESET STEP 5` or `EXT RESET STEP 17`).
 
 ---
