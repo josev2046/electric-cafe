@@ -532,40 +532,46 @@
 
         document.getElementById('demoBtn').addEventListener('click', () => {
             document.getElementById('voltRange').value = "5";
+            document.getElementById('seqMode').value = "12-cont";
+            document.getElementById('chCDest').value = "clock";
             
-            const dafA = [-0.58, -1.00, 0.25, -1.00, 0.00, -1.00, -1.00, 0.00, -1.00, 0.00, -1.00, 0.00];
-            const dafB = [-0.17, -1.00, 0.00, -1.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00];
+            const acidA = [-1.00, 0.00, 0.25, -1.00, 0.58, 0.00, -0.17, -1.00, 0.83, 1.00, 0.00, -1.00];
+            const acidC = [3.00, -3.00, 0.00, 4.00, -2.00, 0.00, 2.00, -1.00, 5.00, -4.00, 0.00, 1.00];
 
             for(let i=0; i<12; i++) {
-                tracks.A[i] = dafA[i];
-                tracks.B[i] = dafB[i];
+                tracks.A[i] = acidA[i];
+                tracks.B[i] = 0;
+                tracks.C[i] = acidC[i];
                 
                 let knobA = document.querySelector(`.knob[data-ch="A"][data-step="${i}"]`);
                 let knobB = document.querySelector(`.knob[data-ch="B"][data-step="${i}"]`);
+                let knobC = document.querySelector(`.knob[data-ch="C"][data-step="${i}"]`);
                 
-                knobA.dataset.val = dafA[i];
-                knobB.dataset.val = dafB[i];
+                knobA.dataset.val = acidA[i];
+                knobB.dataset.val = 0;
+                knobC.dataset.val = acidC[i];
                 
-                updateKnobVisual(knobA, dafA[i]);
-                updateKnobVisual(knobB, dafB[i]);
+                updateKnobVisual(knobA, acidA[i]);
+                updateKnobVisual(knobB, 0);
+                updateKnobVisual(knobC, acidC[i]);
             }
-
-            document.getElementById('seqMode').value = "24-cont";
             
             const speedKnob = document.getElementById('clockSpeed');
-            speedKnob.dataset.val = 75;
-            bpm = 40 + (75 / 100) * 200; 
-            updateKnobVisual(speedKnob, 75);
+            speedKnob.dataset.val = 60;
+            bpm = 40 + (60 / 100) * 200; 
+            updateKnobVisual(speedKnob, 60);
 
-            resetStep = 16; 
+            const portaKnob = document.getElementById('portamento');
+            portaKnob.dataset.val = 35;
+            portamentoTime = 0.01 + (35 / 100) * 0.3; 
+            updateKnobVisual(portaKnob, 35);
+
+            resetStep = null; 
             document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
-            
-            const targetPatch = document.querySelector('.patch-point[data-step="4"]');
-            if (targetPatch) targetPatch.classList.add('patched-b');
 
             const statusText = document.getElementById('resetStatus');
-            statusText.innerText = "EXT RESET\nSTEP 17";
-            statusText.className = "flex flex-col items-center ml-2 mb-1 text-blue-500 font-bold text-xs transition-colors w-32 text-center";
+            statusText.innerText = "NO RESET PATCHED";
+            statusText.className = "flex flex-col items-center ml-2 mb-1 text-yellow-600 font-bold text-xs transition-colors w-32 text-center";
         });
 
         renderGrid();
