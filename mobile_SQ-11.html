@@ -20,24 +20,50 @@
         .patch-point.patched { background: #dca824; box-shadow: 0 0 12px #dca824, inset 0 2px 4px rgba(0,0,0,0.5); border-color: #fff; }
         .patch-point.patched-b { background: #2488dc; box-shadow: 0 0 12px #2488dc, inset 0 2px 4px rgba(0,0,0,0.5); border-color: #fff; }
         
-        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        /* Knob & Tick Mark Styling */
+        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
+        .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
+        
+        /* Radial tick ring generated via conic gradient mask */
+        .tick-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
+            background: conic-gradient(
+                from -135deg,
+                #888 0deg 1.5deg, transparent 1.5deg 27deg,
+                #888 27deg 28.5deg, transparent 28.5deg 54deg,
+                #888 54deg 55.5deg, transparent 55.5deg 81deg,
+                #888 81deg 82.5deg, transparent 82.5deg 108deg,
+                #888 108deg 109.5deg, transparent 109.5deg 135deg,
+                #888 135deg 136.5deg, transparent 136.5deg 162deg,
+                #888 162deg 163.5deg, transparent 163.5deg 189deg,
+                #888 189deg 190.5deg, transparent 190.5deg 216deg,
+                #888 216deg 217.5deg, transparent 217.5deg 243deg,
+                #888 243deg 244.5deg, transparent 244.5deg 270deg,
+                #888 270deg 271.5deg, transparent 271.5deg 360deg
+            );
+            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+        }
+
+        .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #aaa; line-height: 1; pointer-events: none; }
+        .label-top { top: -2px; left: 50%; transform: translateX(-50%); }
+        .label-left { bottom: 2px; left: 2px; }
+        .label-right { bottom: 2px; right: 2px; }
+
         .knob { 
             width: 40px; height: 40px; border-radius: 50%; background: #1a1a1a; 
-            border: 2px solid #000; cursor: ns-resize; position: relative;
+            border: 2px solid #000; cursor: ns-resize; position: relative; z-index: 2;
             box-shadow: inset 0 1px 3px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.6);
-            transform: rotate(-135deg);
-            touch-action: none;
+            transform: rotate(-135deg); touch-action: none;
         }
         .knob::after { content: ''; position: absolute; top: 4px; left: 17px; width: 2px; height: 12px; background: #fff; border-radius: 1px; }
         
         .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #888; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
-
         .crt-screen { background: #051005; border: 2px solid #222; box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1), inset 0 0 10px #000; }
         
         .grid-scroll::-webkit-scrollbar { height: 8px; }
         .grid-scroll::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
         .grid-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        .grid-scroll::-webkit-scrollbar-thumb:hover { background: #555; }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-start">
@@ -56,11 +82,17 @@
                 
                 <div class="flex gap-4">
                     <div class="knob-wrapper">
-                        <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
+                        </div>
                         <span class="text-[10px] font-bold text-gray-400">SPEED</span>
                     </div>
                     <div class="knob-wrapper">
-                        <div class="knob global-knob" id="portamento" data-val="0"></div>
+                        <div class="tick-container">
+                            <div class="tick-ring"></div>
+                            <div class="knob global-knob" id="portamento" data-val="0"></div>
+                        </div>
                         <span class="text-[10px] font-bold text-gray-400">PORTA</span>
                     </div>
                 </div>
@@ -148,7 +180,6 @@
         let resetStep = null;
         let isPreviewing = false;
 
-        // Tracks A & B default to 0V (Bipolar -5 to +5), Track C defaults to 0V (Unipolar 0 to +5)
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -234,10 +265,8 @@
             if (knobEl.hasAttribute('data-ch')) {
                 const ch = knobEl.dataset.ch;
                 if (ch === 'C') {
-                    // Unipolar 0 to +5V: -135deg to +135deg
                     knobEl.style.transform = `rotate(${-135 + (val / 5) * 270}deg)`;
                 } else {
-                    // Bipolar -5 to +5V: -135deg to +135deg centered at 0deg
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
             } else {
@@ -255,7 +284,7 @@
 
             let baseCutoff = 400; 
             let peakVolume = 0.8;
-            const normalizedC = cVal / 5; // Unipolar 0 to 1 scaling
+            const normalizedC = cVal / 5; 
 
             if (dest === 'filter') {
                 baseCutoff = 100 + (normalizedC * 3000);
@@ -318,10 +347,8 @@
                 if (isSeqKnob) {
                     const ch = activeKnob.dataset.ch;
                     if (ch === 'C') {
-                        // Unipolar range: 0 to +5
                         newVal = Math.max(0, Math.min(5, startVal + (startY - e.clientY) * 0.025));
                     } else {
-                        // Bipolar range: -5 to +5
                         newVal = Math.max(-5, Math.min(5, startVal + (startY - e.clientY) * 0.05));
                     }
                     
@@ -430,10 +457,22 @@
         function renderGrid() {
             ['ledRow', 'rowA', 'rowB', 'rowC', 'trigRow'].forEach(id => document.getElementById(id).innerHTML = '');
             for(let i=0; i<NUM_STEPS; i++) {
-                document.getElementById('ledRow').innerHTML += `<div class="w-[40px] flex justify-center step-indicator" data-step="${i}"><div class="led"></div></div>`;
+                document.getElementById('ledRow').innerHTML += `<div class="w-[56px] flex justify-center step-indicator" data-step="${i}"><div class="led"></div></div>`;
+                
                 ['A', 'B', 'C'].forEach(ch => {
-                    // Set default values: 0V for A/B, 0V for C
-                    document.getElementById(`row${ch}`).innerHTML += `<div class="knob" data-ch="${ch}" data-step="${i}" data-val="0"></div>`;
+                    const isBipolar = (ch === 'A' || ch === 'B');
+                    const labelsHTML = isBipolar ? 
+                        `<span class="tick-label label-left">-5</span><span class="tick-label label-top">0</span><span class="tick-label label-right">+5</span>` : 
+                        `<span class="tick-label label-left">0</span><span class="tick-label label-right">+5</span>`;
+
+                    document.getElementById(`row${ch}`).innerHTML += `
+                        <div class="knob-wrapper">
+                            <div class="tick-container">
+                                <div class="tick-ring"></div>
+                                ${labelsHTML}
+                                <div class="knob" data-ch="${ch}" data-step="${i}" data-val="0"></div>
+                            </div>
+                        </div>`;
                 });
                 
                 const patchPoint = document.createElement('div');
@@ -442,15 +481,12 @@
                 patchPoint.addEventListener('click', handlePatchClick);
                 
                 const patchContainer = document.createElement('div');
-                patchContainer.className = 'w-[40px] flex justify-center';
+                patchContainer.className = 'w-[56px] flex justify-center';
                 patchContainer.appendChild(patchPoint);
                 document.getElementById('trigRow').appendChild(patchContainer);
             }
             
-            // Set initial knob visuals
-            document.querySelectorAll('.knob[data-ch]').forEach(k => {
-                updateKnobVisual(k, 0);
-            });
+            document.querySelectorAll('.knob[data-ch]').forEach(k => updateKnobVisual(k, 0));
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
         }
@@ -550,7 +586,7 @@
                 
                 if (dest === 'clock') {
                     const uiStep = currentStep === -1 ? 0 : currentStep % 12;
-                    const cMod = tracks.C[uiStep] / 2.5; // Unipolar modulation factor
+                    const cMod = tracks.C[uiStep] / 2.5; 
                     currentStepDuration = currentStepDuration * Math.max(0.1, (2.1 - cMod)); 
                 }
                 
