@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (1970s Vintage Beige / TVS Style UI)
+    SQ-12 Analog Sequencer (Professional Vintage Cream/Beige UI)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -13,11 +13,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
-            background-color: #0b0d10; 
-            color: #1a1a1a; 
+            background-color: #0d0f12; 
+            color: #1a1e24; 
             font-family: monospace; 
             text-transform: uppercase; 
-            padding: 1rem; 
+            padding: 1.25rem; 
             user-select: none; 
         }
         
@@ -27,11 +27,11 @@
             display: flex;
             align-items: stretch;
             border-radius: 10px;
-            box-shadow: 0 30px 70px rgba(0,0,0,0.95), 0 0 50px rgba(0,0,0,0.8);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,0,0,0.8);
         }
 
         .wooden-ear {
-            width: 28px;
+            width: 26px;
             background: linear-gradient(90deg, #2b150c 0%, #522815 30%, #3a1b0d 70%, #1c0b05 100%);
             border-top: 2px solid #733c1d;
             border-bottom: 3px solid #0f0502;
@@ -41,27 +41,27 @@
         .wooden-ear-left { border-top-left-radius: 10px; border-bottom-left-radius: 10px; border-right: 2px solid #111; }
         .wooden-ear-right { border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-left: 2px solid #111; }
 
-        /* Classic 1970s TVS Vintage Beige Chassis */
+        /* Streamlined All-Beige Panel Surface */
         .chassis { 
             background: 
-                radial-gradient(circle at 50% 20%, #ece8d9 0%, #d8d2c0 65%, #c2bbab 100%); 
-            border-top: 4px solid #8c8577; 
-            border-bottom: 4px solid #545048; 
-            padding: 32px 28px; 
+                radial-gradient(circle at 50% 20%, #f0ebd8 0%, #e2dbc8 60%, #cebba8 100%); 
+            border-top: 3px solid #f7f4e9; 
+            border-bottom: 4px solid #82796e; 
+            padding: 28px; 
             flex-grow: 1;
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.6), inset 0 -2px 5px rgba(0,0,0,0.4);
+            box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8), inset 0 -2px 5px rgba(0,0,0,0.3);
         }
 
         /* Rack Bolts */
         .rack-bolt {
             width: 12px; height: 12px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #888 0%, #222 80%);
-            border: 1px solid #000;
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.4);
+            background: radial-gradient(circle at 30% 30%, #a39c8e 0%, #3a362f 80%);
+            border: 1px solid #1a1815;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.3);
             position: absolute;
         }
         .bolt-tl { top: 12px; left: 12px; }
@@ -69,26 +69,24 @@
         .bolt-bl { bottom: 12px; left: 12px; }
         .bolt-br { bottom: 12px; right: 12px; }
 
-        /* Classic Oberheim Black Inlaid Modules with Blue Border Accents */
-        .panel-module {
-            background: linear-gradient(180deg, #18191c 0%, #0d0e10 100%);
-            border: 2px solid #000;
-            border-top: 2px solid #1d6fa5; /* Oberheim Blue Accent Top Border */
+        /* Silkscreened Panel Outlines (No Dark Insets) */
+        .panel-outline {
+            border: 1.5px solid #2e3846;
             border-radius: 6px;
-            padding: 12px 16px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 1px 2px rgba(255,255,255,0.4);
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.02);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.7);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ece8d9;
         }
 
         /* Convex Glass Dome LEDs */
         .led { 
             width: 14px; height: 12px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #5a1212 0%, #200303 70%); 
-            border: 2px solid #050505; 
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4); 
+            border: 2px solid #111; 
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.3); 
             margin: 0 auto; 
         }
         .active .led { 
@@ -99,7 +97,7 @@
         .pilot { 
             width: 9px; height: 9px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #4a0f0f 0%, #1a0202 80%); 
-            border: 1px solid #000; 
+            border: 1px solid #111; 
             box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); 
             transition: all 0.1s; 
         }
@@ -112,8 +110,8 @@
         .patch-point { 
             width: 24px; height: 24px; border-radius: 50%; 
             background: radial-gradient(circle, #080808 40%, #1a1a1a 50%, #8a6f27 85%, #d4af37 100%); 
-            border: 2px solid #050505; 
-            box-shadow: inset 0 2px 5px rgba(0,0,0,1), 0 2px 4px rgba(0,0,0,0.3); 
+            border: 2px solid #111; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.6); 
             margin: 0 auto; cursor: pointer; transition: all 0.2s; 
         }
         .patch-point:hover { filter: brightness(1.2); }
@@ -134,44 +132,44 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
             background: conic-gradient(
                 from -135deg,
-                #1a1a1a 0deg 1.5deg, transparent 1.5deg 27deg,
-                #1a1a1a 27deg 28.5deg, transparent 28.5deg 54deg,
-                #1a1a1a 54deg 55.5deg, transparent 55.5deg 81deg,
-                #1a1a1a 81deg 82.5deg, transparent 82.5deg 108deg,
-                #1a1a1a 108deg 109.5deg, transparent 109.5deg 135deg,
-                #1a1a1a 135deg 136.5deg, transparent 136.5deg 162deg,
-                #1a1a1a 162deg 163.5deg, transparent 163.5deg 189deg,
-                #1a1a1a 189deg 190.5deg, transparent 190.5deg 216deg,
-                #1a1a1a 216deg 217.5deg, transparent 217.5deg 243deg,
-                #1a1a1a 243deg 244.5deg, transparent 244.5deg 270deg,
-                #1a1a1a 270deg 271.5deg, transparent 271.5deg 360deg
+                #2e3846 0deg 1.5deg, transparent 1.5deg 27deg,
+                #2e3846 27deg 28.5deg, transparent 28.5deg 54deg,
+                #2e3846 54deg 55.5deg, transparent 55.5deg 81deg,
+                #2e3846 81deg 82.5deg, transparent 82.5deg 108deg,
+                #2e3846 108deg 109.5deg, transparent 109.5deg 135deg,
+                #2e3846 135deg 136.5deg, transparent 136.5deg 162deg,
+                #2e3846 162deg 163.5deg, transparent 163.5deg 189deg,
+                #2e3846 189deg 190.5deg, transparent 190.5deg 216deg,
+                #2e3846 216deg 217.5deg, transparent 217.5deg 243deg,
+                #2e3846 243deg 244.5deg, transparent 244.5deg 270deg,
+                #2e3846 270deg 271.5deg, transparent 271.5deg 360deg
             );
             -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
             mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
-        .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #222; line-height: 1; pointer-events: none; }
+        .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #2e3846; line-height: 1; pointer-events: none; }
         .label-top { top: -2px; left: 50%; transform: translateX(-50%); }
         .label-left { bottom: 2px; left: 2px; }
         .label-right { bottom: 2px; right: 2px; }
 
         .knob { 
             width: 42px; height: 40px; border-radius: 50%; 
-            background: radial-gradient(circle at 35% 35%, #2a2c30 0%, #111214 70%, #000000 100%); 
+            background: radial-gradient(circle at 35% 35%, #2d3036 0%, #15171a 70%, #050608 100%); 
             border: 2px solid #000; cursor: ns-resize; position: relative; z-index: 2;
-            box-shadow: inset 0 1px 2px rgba(255,255,255,0.25), 0 4px 7px rgba(0,0,0,0.5);
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 4px 7px rgba(0,0,0,0.35);
             transform: rotate(-135deg); touch-action: none;
         }
         .knob::after { content: ''; position: absolute; top: 3px; left: 18px; width: 2px; height: 13px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.9); }
         
-        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #111; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
+        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #1e2530; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
         
-        /* CRT Glass Display */
+        /* CRT Display Glass Screen */
         .crt-screen { 
             background: #041004; 
-            border: 3px solid #1a1b1e; 
+            border: 3px solid #2e3846; 
             border-radius: 6px;
-            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.25), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.4); 
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.25), inset 0 0 12px #000, 0 2px 4px rgba(0,0,0,0.3); 
             position: relative; overflow: hidden;
         }
         .crt-screen::before {
@@ -184,34 +182,34 @@
         .rocker-button {
             background: linear-gradient(180deg, #991b1b 0%, #5c0f0f 100%);
             border: 2px solid #280505;
-            box-shadow: 0 4px 0 #1a0303, 0 5px 8px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3);
+            box-shadow: 0 3px 0 #1a0303, 0 4px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.3);
             transition: all 0.08s ease;
         }
-        .rocker-button:active { transform: translateY(3px); box-shadow: 0 1px 0 #1a0303, 0 2px 4px rgba(0,0,0,0.5); }
+        .rocker-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #1a0303, 0 2px 3px rgba(0,0,0,0.3); }
         .rocker-button.is-active {
             background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
             border-color: #fca5a5;
-            box-shadow: 0 4px 0 #1a0303, 0 0 18px rgba(239, 68, 68, 0.7), inset 0 1px 2px rgba(255,255,255,0.7);
+            box-shadow: 0 3px 0 #1a0303, 0 0 16px rgba(239, 68, 68, 0.7), inset 0 1px 2px rgba(255,255,255,0.7);
         }
 
         .tactile-button {
             background: linear-gradient(180deg, #33363d 0%, #191a1e 100%);
             border: 2px solid #000;
-            color: #ece8d9;
-            box-shadow: 0 3px 0 #000, 0 4px 6px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2);
+            color: #f0ebd8;
+            box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
             transition: all 0.08s ease;
         }
-        .tactile-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,0.4); }
+        .tactile-button:active { transform: translateY(1px); box-shadow: 0 1px 0 #000, 0 2px 3px rgba(0,0,0,0.3); }
 
         /* Keyboard Styling */
-        .key-white { background: linear-gradient(180deg, #ffffff 0%, #d8d3c5 100%); color: #111; border: 2px solid #000; border-radius: 0 0 4px 4px; box-shadow: 0 4px 4px rgba(0,0,0,0.3); }
+        .key-white { background: linear-gradient(180deg, #ffffff 0%, #d8d3c5 100%); color: #111; border: 2px solid #111; border-radius: 0 0 4px 4px; box-shadow: 0 3px 4px rgba(0,0,0,0.25); }
         .key-white.active-key { background: #1d6fa5; color: #fff; box-shadow: 0 0 12px #1d6fa5; }
-        .key-black { background: linear-gradient(180deg, #222 0%, #050505 100%); color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; box-shadow: 0 3px 4px rgba(0,0,0,0.6); }
+        .key-black { background: linear-gradient(180deg, #222 0%, #050505 100%); color: #888; border: 2px solid #000; border-radius: 0 0 3px 3px; z-index: 10; box-shadow: 0 3px 4px rgba(0,0,0,0.5); }
         .key-black.active-key { background: #1d6fa5; color: #fff; box-shadow: 0 0 12px #1d6fa5; }
 
         .grid-scroll::-webkit-scrollbar { height: 8px; }
-        .grid-scroll::-webkit-scrollbar-track { background: #c2bbab; border-radius: 4px; }
-        .grid-scroll::-webkit-scrollbar-thumb { background: #1d6fa5; border-radius: 4px; }
+        .grid-scroll::-webkit-scrollbar-track { background: #cebba8; border-radius: 4px; }
+        .grid-scroll::-webkit-scrollbar-thumb { background: #2e3846; border-radius: 4px; }
     </style>
 </head>
 <body class="min-h-screen flex justify-center items-start">
@@ -228,10 +226,10 @@
             <div class="rack-bolt bolt-br"></div>
             
             <!-- Top Header & Branding -->
-            <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#111]">
+            <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#2e3846]/40">
                 <div>
-                    <h1 class="text-4xl font-black tracking-tighter text-[#1d6fa5]"><span class="text-[#111]">SQ</span>-12</h1>
-                    <p class="text-[10px] font-bold tracking-widest text-[#333] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
+                    <h1 class="text-4xl font-black tracking-tighter text-[#1d6fa5]"><span class="text-[#1a1e24]">SQ</span>-12</h1>
+                    <p class="text-[10px] font-bold tracking-widest text-[#2e3846] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
                 </div>
                 
                 <div class="crt-screen w-48 h-16 rounded-md relative flex items-center justify-between px-2">
@@ -244,10 +242,10 @@
                 </div>
             </div>
 
-            <!-- Top Panel: Centered Module Groups -->
+            <!-- Top Panel: Streamlined Outlined Modules -->
             <div class="flex flex-wrap gap-4 mb-8 w-full justify-center items-stretch">
                 <!-- Transport Module -->
-                <div class="panel-module flex flex-col gap-2">
+                <div class="panel-outline flex flex-col gap-2">
                     <button id="startStop" class="rocker-button text-white px-4 py-2 font-black text-xs rounded-sm tracking-wider flex items-center justify-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
                         START / STOP
@@ -259,27 +257,27 @@
                 </div>
                 
                 <!-- Speed & Porta Module -->
-                <div class="panel-module flex gap-4">
+                <div class="panel-outline flex gap-4">
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="clockSpeed" data-val="50"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-[#ece8d9]">SPEED</span>
+                        <span class="text-[10px] font-bold text-[#1e2530]">SPEED</span>
                     </div>
                     <div class="knob-wrapper">
                         <div class="tick-container">
                             <div class="tick-ring"></div>
                             <div class="knob global-knob" id="portamento" data-val="0"></div>
                         </div>
-                        <span class="text-[10px] font-bold text-[#ece8d9]">PORTA</span>
+                        <span class="text-[10px] font-bold text-[#1e2530]">PORTA</span>
                     </div>
                 </div>
                 
                 <!-- Dropdown Selectors Module -->
-                <div class="panel-module flex flex-wrap gap-4 items-center">
+                <div class="panel-outline flex flex-wrap gap-4 items-center">
                     <div class="flex flex-col items-center">
-                        <select id="seqMode" class="bg-[#222] text-[#ece8d9] border-2 border-[#1d6fa5] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
+                        <select id="seqMode" class="bg-[#1a1e24] text-[#f0ebd8] border-2 border-[#2e3846] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
                             <option value="12-step">12-STEP: STEPPED</option>
                             <option value="12-cont" selected>12-STEP: CONTINUOUS</option>
                             <option value="12-one">12-STEP: ONE-TIME</option>
@@ -287,50 +285,50 @@
                             <option value="24-cont">24-STEP: CONTINUOUS</option>
                             <option value="24-one">24-STEP: ONE-TIME</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#ece8d9]">MODE SELECTOR</span>
+                        <span class="text-[10px] font-bold mt-1 text-[#1e2530]">MODE SELECTOR</span>
                     </div>
 
                     <div class="flex flex-col items-center">
-                        <select id="voltRange" class="bg-[#222] text-[#ece8d9] border-2 border-[#1d6fa5] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
+                        <select id="voltRange" class="bg-[#1a1e24] text-[#f0ebd8] border-2 border-[#2e3846] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
                             <option value="5" selected>+/- 5V</option>
                             <option value="1">+/- 1V</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#ece8d9]">VOLTAGE RANGE</span>
+                        <span class="text-[10px] font-bold mt-1 text-[#1e2530]">VOLTAGE RANGE</span>
                     </div>
 
                     <div class="flex flex-col items-center">
-                        <select id="chCDest" class="bg-[#222] text-[#ece8d9] border-2 border-[#1d6fa5] p-2 text-xs font-bold outline-none rounded-sm shadow-inner cursor-pointer">
+                        <select id="chCDest" class="bg-[#1a1e24] text-[#f0ebd8] border-2 border-[#2e3846] p-2 text-xs font-bold outline-none rounded-sm shadow-sm cursor-pointer">
                             <option value="filter" selected>FILTER</option>
                             <option value="volume">VOLUME</option>
                             <option value="clock">CLOCK</option>
                         </select>
-                        <span class="text-[10px] font-bold mt-1 text-[#ece8d9]">CH-C DEST</span>
+                        <span class="text-[10px] font-bold mt-1 text-[#1e2530]">CH-C DEST</span>
                     </div>
                 </div>
 
                 <!-- Patch Status Module -->
-                <div class="panel-module min-w-[120px]">
-                    <div id="resetStatus" class="text-yellow-400 font-bold text-xs transition-colors text-center">
+                <div class="panel-outline min-w-[120px]">
+                    <div id="resetStatus" class="text-[#8a5b00] font-bold text-xs transition-colors text-center">
                         NO RESET PATCHED
                     </div>
                 </div>
             </div>
 
-            <!-- Centered Sequencer Grid -->
-            <div class="panel-module w-full overflow-x-auto grid-scroll py-6 mb-6">
+            <!-- Centered Sequencer Grid Outlined -->
+            <div class="panel-outline w-full overflow-x-auto grid-scroll py-6 mb-6">
                 <div class="flex flex-col gap-6 min-w-max mx-auto px-4">
                     <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
-                    <div class="flex"><div class="row-label text-[#ece8d9]"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
-                    <div class="flex"><div class="row-label text-[#ece8d9]"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
-                    <div class="flex"><div class="row-label text-[#ece8d9]">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
-                    <div class="flex mt-2"><div class="row-label text-[#ece8d9] text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
+                    <div class="flex"><div class="row-label text-[#1e2530]"><div id="pilotA" class="pilot"></div>CH-A</div><div class="flex gap-4 flex-1" id="rowA"></div></div>
+                    <div class="flex"><div class="row-label text-[#1e2530]"><div id="pilotB" class="pilot"></div>CH-B</div><div class="flex gap-4 flex-1" id="rowB"></div></div>
+                    <div class="flex"><div class="row-label text-[#1e2530]">CH-C</div><div class="flex gap-4 flex-1" id="rowC"></div></div>
+                    <div class="flex mt-2"><div class="row-label text-[#1e2530] text-[10px]">TRIG<br>OUT</div><div class="flex gap-4 flex-1" id="trigRow"></div></div>
                 </div>
             </div>
             
             <!-- Footer: Transpose Keyboard, Demos & Credits -->
-            <div class="flex flex-wrap items-center justify-between gap-6 w-full pt-4 border-t-2 border-[#111]">
+            <div class="flex flex-wrap items-center justify-between gap-6 w-full pt-4 border-t-2 border-[#2e3846]/40">
                 <div class="flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-[#222]">KEYBOARD TRANSPOSE</span>
+                    <span class="text-[10px] font-bold text-[#1e2530]">KEYBOARD TRANSPOSE</span>
                     <div class="flex relative h-16" id="keyboardContainer">
                         <!-- Virtual keys injected via JS -->
                     </div>
@@ -343,7 +341,7 @@
                     </div>
                     
                     <!-- Line Credits & Copyright -->
-                    <div class="text-[9px] text-[#333] font-mono font-bold tracking-widest text-right mt-1">
+                    <div class="text-[9px] text-[#2e3846] font-mono font-bold tracking-widest text-right mt-1">
                         &copy; JOSE VELAZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer" class="hover:text-[#1d6fa5] underline transition-colors">VOLTAGE &amp; WAVE</a>
                     </div>
                 </div>
@@ -626,24 +624,24 @@
                     e.target.classList.remove('patched');
                     e.target.classList.add('patched-b');
                     statusText.innerText = `EXT RESET\nSTEP ${resetStep + 1}`;
-                    statusText.className = "text-blue-400 font-bold text-xs transition-colors text-center";
+                    statusText.className = "text-[#1d6fa5] font-bold text-xs transition-colors text-center";
                 } else {
                     resetStep = null;
                     e.target.classList.remove('patched', 'patched-b');
                     statusText.innerText = "NO RESET PATCHED";
-                    statusText.className = "text-yellow-400 font-bold text-xs transition-colors text-center";
+                    statusText.className = "text-[#8a5b00] font-bold text-xs transition-colors text-center";
                 }
             } else if (resetStep === step + 12) {
                 resetStep = null;
                 e.target.classList.remove('patched-b');
                 statusText.innerText = "NO RESET PATCHED";
-                statusText.className = "text-yellow-400 font-bold text-xs transition-colors text-center";
+                statusText.className = "text-[#8a5b00] font-bold text-xs transition-colors text-center";
             } else {
                 document.querySelectorAll('.patch-point').forEach(el => el.classList.remove('patched', 'patched-b'));
                 resetStep = step;
                 e.target.classList.add('patched');
                 statusText.innerText = `RESET\nSTEP ${step + 1}`;
-                statusText.className = "text-yellow-400 font-bold text-xs transition-colors text-center";
+                statusText.className = "text-[#8a5b00] font-bold text-xs transition-colors text-center";
             }
         }
 
@@ -927,7 +925,7 @@
 
             const statusText = document.getElementById('resetStatus');
             statusText.innerText = "EXT RESET\nSTEP 17";
-            statusText.className = "text-blue-400 font-bold text-xs transition-colors text-center";
+            statusText.className = "text-[#1d6fa5] font-bold text-xs transition-colors text-center";
         });
 
         document.getElementById('demo2Btn').addEventListener('click', async () => {
@@ -972,7 +970,7 @@
 
             const statusText = document.getElementById('resetStatus');
             statusText.innerText = "NO RESET PATCHED";
-            statusText.className = "text-yellow-400 font-bold text-xs transition-colors text-center";
+            statusText.className = "text-[#8a5b00] font-bold text-xs transition-colors text-center";
         });
 
         renderGrid();
