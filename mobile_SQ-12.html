@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 
-    SQ-12 Analog Sequencer (100% Hardware Controls & ADSR)
+    SQ-12 Analog Sequencer (Pixel-Aligned Step Grid & Hardware Controls)
     Created & Developed by Jose Velazquez MA
     Voltage & Wave (https://voltageandwave.co.uk/)
     Copyright (c) 2026 Jose Velazquez MA / Voltage & Wave. All rights reserved.
@@ -92,6 +92,7 @@
             width: 9px; height: 9px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #4a0f0f 0%, #1a0202 80%); 
             border: 1px solid #111; 
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2); 
             transition: all 0.1s; 
         }
         .pilot-active { 
@@ -110,8 +111,8 @@
         .patch-point.patched { background: radial-gradient(circle, #ffea78 20%, #dca824 60%, #523b00 100%); box-shadow: 0 0 14px #dca824; }
         .patch-point.patched-b { background: radial-gradient(circle, #ff9e78 20%, #dc5a24 60%, #521800 100%); box-shadow: 0 0 14px #dc5a24; }
         
-        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 50px; }
-        .tick-container { position: relative; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
+        .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
         
         .tick-ring {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
@@ -129,8 +130,8 @@
                 #221e1a 243deg 244.5deg, transparent 244.5deg 270deg,
                 #221e1a 270deg 271.5deg, transparent 271.5deg 360deg
             );
-            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
-            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
         .step4-ring {
@@ -142,8 +143,8 @@
                 #221e1a 180deg 182deg, transparent 182deg 270deg,
                 #221e1a 270deg 272deg, transparent 272deg 360deg
             );
-            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
-            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
         .step6-ring {
@@ -157,8 +158,8 @@
                 #221e1a 216deg 218deg, transparent 218deg 270deg,
                 #221e1a 270deg 272deg, transparent 272deg 360deg
             );
-            -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
-            mask: radial-gradient(circle, transparent 19px, #000 20px, #000 25px, transparent 25px);
+            -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
+            mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
         }
 
         .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #221e1a; line-height: 1; pointer-events: none; }
@@ -166,22 +167,22 @@
         .label-left { bottom: 2px; left: 2px; }
         .label-right { bottom: 2px; right: 2px; }
 
-        .wave-saw { bottom: 2px; left: 1px; font-size: 9px; font-weight: 900; }
-        .wave-sqr { top: -2px; left: 2px; font-size: 9px; font-weight: 900; }
-        .wave-tri { top: -2px; right: 2px; font-size: 9px; font-weight: 900; }
-        .wave-sin { bottom: 2px; right: 1px; font-size: 9px; font-weight: 900; }
+        .wave-saw { bottom: 2px; left: 1px; font-size: 10px; font-weight: 900; }
+        .wave-sqr { top: -2px; left: 2px; font-size: 10px; font-weight: 900; }
+        .wave-tri { top: -2px; right: 2px; font-size: 10px; font-weight: 900; }
+        .wave-sin { bottom: 2px; right: 1px; font-size: 10px; font-weight: 900; }
 
         .knob { 
-            width: 38px; height: 36px; border-radius: 50%; 
+            width: 42px; height: 40px; border-radius: 50%; 
             background: radial-gradient(circle at 35% 35%, #2d3036 0%, #15171a 70%, #050608 100%); 
             border: 2px solid #000; cursor: ns-resize; position: relative; z-index: 2;
             box-shadow: inset 0 1px 2px rgba(255,255,255,0.3), 0 4px 7px rgba(0,0,0,0.35);
             transform: rotate(-135deg); touch-action: none;
             transition: transform 0.08s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        .knob::after { content: ''; position: absolute; top: 3px; left: 16px; width: 2px; height: 11px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.9); }
+        .knob::after { content: ''; position: absolute; top: 3px; left: 18px; width: 2px; height: 13px; background: #fff; border-radius: 1px; box-shadow: 0 0 2px rgba(255,255,255,0.9); }
         
-        .row-label { width: 52px; font-weight: bold; font-size: 11px; text-align: right; color: #1f1a14; margin-right: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; line-height: 1.1; flex-shrink: 0; }
+        .row-label { width: 55px; font-weight: bold; font-size: 12px; text-align: right; color: #1f1a14; margin-right: 16px; display: flex; align-items: center; justify-content: flex-end; gap: 6px; line-height: 1.1; flex-shrink: 0; }
         
         .crt-screen { 
             background: #041004; 
@@ -371,7 +372,7 @@
                     </div>
                 </div>
 
-                <!-- Restored ADSR Envelope Generator -->
+                <!-- ADSR Envelope Generator -->
                 <div class="panel-outline flex gap-2.5 items-center">
                     <div class="knob-wrapper">
                         <div class="tick-container">
