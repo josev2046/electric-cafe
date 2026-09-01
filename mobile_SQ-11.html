@@ -26,7 +26,7 @@
             border: 2px solid #000; cursor: ns-resize; position: relative;
             box-shadow: inset 0 1px 3px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.6);
             transform: rotate(-135deg);
-            touch-action: none; /* Crucial for mobile dragging */
+            touch-action: none;
         }
         .knob::after { content: ''; position: absolute; top: 4px; left: 17px; width: 2px; height: 12px; background: #fff; border-radius: 1px; }
         
@@ -34,7 +34,6 @@
 
         .crt-screen { background: #051005; border: 2px solid #222; box-shadow: inset 0 0 15px rgba(0, 255, 0, 0.1), inset 0 0 10px #000; }
         
-        /* Custom scrollbar for mobile sequencer grid */
         .grid-scroll::-webkit-scrollbar { height: 8px; }
         .grid-scroll::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
         .grid-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -48,10 +47,10 @@
         <div class="flex flex-wrap gap-8 mb-8 pb-6 border-b-2 border-[#222] items-end justify-between">
             <div class="flex flex-wrap gap-6 items-end">
                 <div class="flex flex-col gap-3">
-                    <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md">START / STOP</button>
+                    <button id="startStop" class="bg-red-700 hover:bg-red-600 border-2 border-red-900 text-white px-5 py-2 font-bold rounded-sm shadow-md active:scale-95 transition-transform">START / STOP</button>
                     <div class="flex gap-1 w-full">
-                        <button id="stepRev" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1">&lt; REV</button>
-                        <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1">FWD &gt;</button>
+                        <button id="stepRev" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">&lt; REV</button>
+                        <button id="stepAdv" class="bg-gray-700 hover:bg-gray-600 border-2 border-gray-900 text-white px-3 py-2 font-bold rounded-sm shadow-md flex-1 active:scale-95 transition-transform">FWD &gt;</button>
                     </div>
                 </div>
                 
@@ -118,7 +117,7 @@
             </div>
         </div>
 
-        <!-- 3x12 Sequencer Grid (Scrollable on Mobile) -->
+        <!-- 3x12 Sequencer Grid -->
         <div class="w-full overflow-x-auto grid-scroll pb-6">
             <div class="flex flex-col gap-6 min-w-max pr-4">
                 <div class="flex"><div class="row-label"></div><div class="flex gap-4 flex-1" id="ledRow"></div></div>
@@ -131,8 +130,8 @@
         
         <!-- Subtle Footer Area -->
         <div class="flex justify-end gap-6 mt-6 pr-4">
-            <button id="demo1Btn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">DEMO 1: DAF</button>
-            <button id="demo2Btn" class="text-[10px] text-[#333] hover:text-[#888] font-bold tracking-widest transition-colors cursor-pointer outline-none">DEMO 2: ACID</button>
+            <button id="demo1Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 1: DAF</button>
+            <button id="demo2Btn" class="text-[10px] text-[#555] hover:text-[#aaa] font-bold tracking-widest transition-colors cursor-pointer outline-none p-2">DEMO 2: ACID</button>
         </div>
     </div>
 
@@ -153,9 +152,10 @@
         const tracks = { A: new Array(NUM_STEPS).fill(0), B: new Array(NUM_STEPS).fill(0), C: new Array(NUM_STEPS).fill(0) };
         const noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-        function initAudio() {
+        async function initAudio() {
             if(!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioCtxClass();
                 
                 synthOsc = audioCtx.createOscillator();
                 synthVcf = audioCtx.createBiquadFilter();
@@ -177,7 +177,9 @@
                 synthOsc.start();
                 drawScope();
             }
-            if(audioCtx.state === 'suspended') audioCtx.resume();
+            if(audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
         }
 
         function drawScope() {
@@ -233,6 +235,7 @@
         }
 
         function previewSynth(pitchVal, cVal) {
+            if(!audioCtx) return;
             const semitone = pitchVal * 12; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
@@ -259,20 +262,18 @@
         }
 
         function stopPreview() {
-            if (isPreviewing) {
+            if (isPreviewing && audioCtx) {
                 synthVca.gain.cancelScheduledValues(audioCtx.currentTime);
                 synthVca.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
                 isPreviewing = false;
             }
         }
 
-        // Replaced mousedown with pointerdown for touch support
-        document.addEventListener('pointerdown', (e) => {
+        document.addEventListener('pointerdown', async (e) => {
             if (e.target.classList.contains('knob')) {
-                initAudio();
-                // Capture pointer to track dragging outside the element boundary
-                e.target.setPointerCapture(e.pointerId);
+                await initAudio();
                 activeKnob = e.target;
+                if (activeKnob.setPointerCapture) activeKnob.setPointerCapture(e.pointerId);
                 startY = e.clientY;
                 startVal = parseFloat(activeKnob.dataset.val);
                 
@@ -298,7 +299,6 @@
             }
         });
 
-        // Replaced mousemove with pointermove
         document.addEventListener('pointermove', (e) => {
             if (activeKnob) {
                 let isSeqKnob = activeKnob.hasAttribute('data-ch');
@@ -336,10 +336,11 @@
             }
         });
 
-        // Replaced mouseup with pointerup and added pointercancel
         const endDrag = (e) => {
             if (activeKnob) {
-                activeKnob.releasePointerCapture(e.pointerId);
+                if (activeKnob.releasePointerCapture && e.pointerId) {
+                    try { activeKnob.releasePointerCapture(e.pointerId); } catch(err){}
+                }
                 activeKnob = null;
                 stopPreview();
             }
@@ -348,6 +349,7 @@
         document.addEventListener('pointercancel', endDrag);
 
         function triggerSynth(pitchVal, cVal, time) {
+            if(!audioCtx) return;
             const semitone = pitchVal * 12; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
             const dest = document.getElementById('chCDest').value;
@@ -374,8 +376,8 @@
             synthVca.gain.exponentialRampToValueAtTime(0.001, time + 0.15); 
         }
 
-        function handlePatchClick(e) {
-            initAudio();
+        async function handlePatchClick(e) {
+            await initAudio();
             const step = parseInt(e.target.dataset.step);
             const statusText = document.getElementById('resetStatus');
             const is24 = document.getElementById('seqMode').value.startsWith('24');
@@ -509,9 +511,13 @@
             triggerSynth(pVal, fVal, manual ? audioCtx.currentTime : nextNoteTime);
         }
 
-        function scheduler() {
+        async function scheduler() {
             if(!isPlaying || document.getElementById('seqMode').value.endsWith('step')) return; 
             
+            if(audioCtx && audioCtx.state === 'suspended') {
+                await audioCtx.resume();
+            }
+
             while (nextNoteTime < audioCtx.currentTime + 0.1) {
                 scheduleNextStep(false, 1);
                 
@@ -529,8 +535,8 @@
             timerId = setTimeout(scheduler, 25);
         }
 
-        document.getElementById('startStop').addEventListener('click', (e) => {
-            initAudio();
+        document.getElementById('startStop').addEventListener('click', async (e) => {
+            await initAudio();
             const mode = document.getElementById('seqMode').value;
             
             if(isPlaying) {
@@ -543,17 +549,18 @@
             }
         });
 
-        document.getElementById('stepAdv').addEventListener('click', () => {
-            initAudio();
+        document.getElementById('stepAdv').addEventListener('click', async () => {
+            await initAudio();
             scheduleNextStep(true, 1);
         });
 
-        document.getElementById('stepRev').addEventListener('click', () => {
-            initAudio();
+        document.getElementById('stepRev').addEventListener('click', async () => {
+            await initAudio();
             scheduleNextStep(true, -1);
         });
 
-        document.getElementById('demo1Btn').addEventListener('click', () => {
+        document.getElementById('demo1Btn').addEventListener('click', async () => {
+            await initAudio();
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "24-cont";
             document.getElementById('chCDest').value = "filter";
@@ -600,7 +607,8 @@
             statusText.className = "flex flex-col items-center mb-1 text-blue-500 font-bold text-xs transition-colors w-24 text-center";
         });
 
-        document.getElementById('demo2Btn').addEventListener('click', () => {
+        document.getElementById('demo2Btn').addEventListener('click', async () => {
+            await initAudio();
             document.getElementById('voltRange').value = "5";
             document.getElementById('seqMode').value = "12-cont";
             document.getElementById('chCDest').value = "clock";
