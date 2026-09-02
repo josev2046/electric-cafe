@@ -545,7 +545,7 @@
             <!-- Footer -->
             <div class="flex flex-wrap items-center justify-between gap-6 w-full pt-4 border-t-2 border-[#38342e]/30">
                 <div class="flex flex-col gap-1">
-                    <span class="text-[10px] font-bold text-[#1f1a14]">KEYBOARD TRANSPOSE</span>
+                    <span class="text-[10px] font-bold text-[#1f1a14]">KEYBOARD TRANSPOSE / PREVIEW</span>
                     <div class="flex relative h-16" id="keyboardContainer"></div>
                 </div>
 
@@ -791,13 +791,13 @@
             });
         });
 
-        function previewSynth(pitchVal, cVal) {
+        function previewSynth(pitchVal, cVal, retrigger = false) {
             if(!audioCtx) return;
             const semitone = (pitchVal * 12) + transposeSemitones + octaveOffsetSemitones + finePitchTuneSemitones; 
             const freq = 65.41 * Math.pow(2, semitone / 12); 
 
             synthOsc.type = activeWaveform;
-            synthOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.02);
+            synthOsc.frequency.setTargetAtTime(freq, audioCtx.currentTime, portamentoTime);
 
             let baseCutoff = 400; 
             let peakVolume = 0.8;
@@ -809,19 +809,33 @@
                 peakVolume = 0.1 + (normalizedC * 0.9); 
             }
 
-            synthVcf.frequency.setTargetAtTime(baseCutoff, audioCtx.currentTime, 0.02); 
-            
-            if (!isPreviewing) {
-                synthVca.gain.cancelScheduledValues(audioCtx.currentTime);
+            const now = audioCtx.currentTime;
+
+            if (retrigger || !isPreviewing) {
+                synthVcf.frequency.cancelScheduledValues(now);
+                synthVcf.frequency.setValueAtTime(baseCutoff, now); 
+                synthVcf.frequency.linearRampToValueAtTime(baseCutoff + 5000, now + attackTime);
+                synthVcf.frequency.exponentialRampToValueAtTime(Math.max(100, baseCutoff + (5000 * sustainLevel)), now + attackTime + decayTime);
+
+                synthVca.gain.cancelScheduledValues(now);
+                synthVca.gain.setValueAtTime(synthVca.gain.value || 0, now);
+                synthVca.gain.linearRampToValueAtTime(peakVolume, now + attackTime);
+                synthVca.gain.linearRampToValueAtTime(peakVolume * sustainLevel, now + attackTime + decayTime);
+                
                 isPreviewing = true;
+            } else {
+                synthVcf.frequency.setTargetAtTime(baseCutoff + (5000 * sustainLevel), now, 0.05);
+                synthVca.gain.setTargetAtTime(peakVolume * sustainLevel, now, 0.05);
             }
-            synthVca.gain.setTargetAtTime(peakVolume, audioCtx.currentTime, 0.02); 
         }
 
         function stopPreview() {
             if (isPreviewing && audioCtx) {
-                synthVca.gain.cancelScheduledValues(audioCtx.currentTime);
-                synthVca.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+                const now = audioCtx.currentTime;
+                synthVca.gain.cancelScheduledValues(now);
+                const currentGain = Math.max(0.001, synthVca.gain.value);
+                synthVca.gain.setValueAtTime(currentGain, now);
+                synthVca.gain.exponentialRampToValueAtTime(0.0001, now + releaseTime);
                 isPreviewing = false;
             }
         }
@@ -849,7 +863,7 @@
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
                         pVal *= voltageRangeMultiplier;
                         let fVal = tracks.C[uiStep];
-                        previewSynth(pVal, fVal);
+                        previewSynth(pVal, fVal, true);
                     }
                 }
             }
@@ -883,7 +897,7 @@
                         let pVal = is24 ? (stepIdx < 12 ? tracks.A[uiStep] : tracks.B[uiStep]) : tracks.A[uiStep];
                         pVal *= voltageRangeMultiplier;
                         let fVal = tracks.C[uiStep];
-                        previewSynth(pVal, fVal);
+                        previewSynth(pVal, fVal, false);
                     }
                     activeKnob.dataset.val = newVal;
                 } else if (activeKnob.id === 'waveKnob') {
@@ -1087,10 +1101,28 @@
                     document.querySelectorAll('#keyboardContainer button').forEach(el => el.classList.remove('active-key'));
                     e.target.classList.add('active-key');
                     
+                    let pVal = tracks.A[0] * voltageRangeMultiplier;
+                    
+                    // Manually compute and update CRT display for Keyboard trigger
+                    const totalSemitone = Math.round(pVal * 12) + transposeSemitones + octaveOffsetSemitones + Math.round(finePitchTuneSemitones);
+                    const totalNote = 24 + totalSemitone; 
+                    const noteIndex = ((totalNote % 12) + 12) % 12;
+                    const octave = Math.floor(totalNote / 12);
+                    const noteStr = `NOTE: ${noteNames[noteIndex]}${octave}`;
+
+                    document.getElementById('dispStep').innerText = 'STEP: KB';
+                    document.getElementById('dispVolt').innerText = `VOLT: ${pVal >= 0 ? '+' : ''}${pVal.toFixed(2)}`;
+                    document.getElementById('dispNote').innerText = noteStr;
+
+                    if (document.getElementById('dispStepMobile')) {
+                        document.getElementById('dispStepMobile').innerText = 'STEP: KB';
+                        document.getElementById('dispVoltMobile').innerText = `VOLT: ${pVal >= 0 ? '+' : ''}${pVal.toFixed(2)}`;
+                        document.getElementById('dispNoteMobile').innerText = noteStr;
+                    }
+
                     if (!isPlaying) {
-                        let pVal = tracks.A[0] * voltageRangeMultiplier;
                         let fVal = tracks.C[0];
-                        previewSynth(pVal, fVal);
+                        previewSynth(pVal, fVal, true);
                     }
                 });
 
