@@ -14,7 +14,7 @@
 
 ## 1. Introduction
 
-Welcome to the **SQ-12 Analog Sequencer**, a 12-step control voltage generator and monophonic synthesiser designed as a tribute and homage to classic 1970s Japanese electronic instruments — most notably akin to the legendary quirks of the Korg SQ-10, albeit with an Oberheim feel.
+Welcome to the **SQ-12 Analog Sequencer**, a 12-step control voltage generator and monophonic synthesiser designed as a tribute and homage to classic 1970s Japanese electronic instruments — most notably akin to the legendary Korg MS-10, albeit with an Oberheim feel.
 
 The SQ-12 provides independent three-channel voltage control (**Channels A, B, and C**), allowing you to sequence pitch, filter cutoff frequencies, dynamic volume accents, and non-linear clock modulation simultaneously. A full **VCO / ADSR** voice sits behind the sequencer, giving you waveform, footage/scale, coarse pitch, and envelope shaping alongside the classic step-sequencing workflow — bridging the raw character of vintage hardware with modern browser and mobile flexibility.
 
@@ -30,21 +30,13 @@ The front panel is partitioned into functional zones:
 - **Oscillator (VCO)**
 - **Envelope (ADSR)**
 - **The 3×12 Sequencer Grid**
-- **Keyboard Transpose / Preview** & **Demo Patches** (bottom of panel)
+- **Keyboard Transpose / Preview** & **Demo Patches**
 
-<img width="2520" height="860" alt="sq12-top-panel" src="https://github.com/user-attachments/assets/766f1010-57ac-4421-84e1-2007964e8040" />
+<img width="2520" height="860" alt="sq12-top-panel" src="https://github.com/user-attachments/assets/5342e503-ca90-4bef-a28f-e3b3bc4c3fff" />
 
+### 2.1 Logo Badge
 
-### 2.1 Global Engine Badge
-
-At the top left, four small indicator buttons sit above the `ANALOG SEQUENCER • VCA / GATE` legend:
-
-| Button | Function |
-| :--- | :--- |
-| **S (MOD)** | Global modulation engine indicator/toggle. |
-| **Q** | Auxiliary status LED for the modulation engine. |
-| **1 (CH)** | Channel routing indicator. |
-| **2 (OUT)** | Output routing indicator. |
+At the top left, four small nameplate panels spell out the unit's name as a stylised patch-bay logotype — **S**, **Q**, **1**, **2** ("SQ‑12") — sitting above the `ANALOG SEQUENCER • VCA / GATE` legend. This badge is purely decorative and has no functional role; the only moving part is a small LED dot on the **Q** panel that blinks gently as an ambient "signal peak" accent light.
 
 ### 2.2 Transport / Clock
 
@@ -89,8 +81,7 @@ Four knobs shape the VCA's amplitude envelope on every triggered step:
 
 The main matrix consists of 12 vertical step columns and three control-voltage rows, with step LEDs above and trigger/reset jacks below.
 
-<img width="2520" height="1280" alt="sq12-sequencer-grid" src="https://github.com/user-attachments/assets/8ad5a103-5296-40de-b39c-226f67efe2b8" />
-
+<img width="2520" height="1280" alt="sq12-sequencer-grid" src="https://github.com/user-attachments/assets/758f3881-df96-4a72-8a5c-eba01a65fd92" />
 
 *Diagram shows the grid at rest (Step 1), with an example reset patch (lit orange jack) on Step 5, and the keyboard transpose bar with root key C active.*
 
@@ -128,7 +119,7 @@ At the bottom of each step column lies a **TRIG OUT** jack. Clicking or tapping 
 
 - **Patched Jack (Steps 1–12):** Glows amber and instantly forces the sequencer back to Step 1 upon reaching that step (e.g., patching Step 5 creates a 4-step loop).
 - **Secondary Patch (Steps 13–24, 24-Step Mode):** Clicking an active jack while in 24-step mode moves the reset point into the Row B cycle (e.g., Step 17 reset).
-- **Reset Status:** The active reset step is displayed on the CRT as `EXT: STEP nn` (see Section 4).
+- **Reset Status:** The active reset step is displayed on the CRT (`RESET: STEP nn` or `EXT: STEP nn`) — see Section 4.
 
 ---
 
@@ -144,7 +135,7 @@ The green phosphor CRT screen, top right of the panel, provides real-time diagno
 | **STEP** | Displays current step index (`STEP: 01` to `STEP: 24`). Shows `STEP: --` when stopped. |
 | **VOLT** | Displays exact active control voltage under the current `RANGE` setting (e.g., `VOLT: +1.25`). |
 | **NOTE** | Displays the active pitch in musical notation relative to root pitch C3 (e.g., `NOTE: C3`, `NOTE: F#3`). |
-| **EXT** | Shows the current patched reset point, e.g. `EXT: STEP 17`, or is blank when no reset is patched. |
+| **Patch Status** | Reads `PATCH: NONE` when no reset is patched, `RESET: STEP nn` for a patch on steps 1–12, or `EXT: STEP nn` once a 24-step secondary patch is set. |
 
 ### 4.2 Keyboard Transpose / Preview Bar
 
