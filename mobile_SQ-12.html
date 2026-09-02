@@ -154,13 +154,10 @@
         .knob-wrapper { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; width: 56px; }
         .tick-container { position: relative; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
         
-        .tick-ring, .step4-ring, .step6-ring {
+        .tick-ring {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
             -webkit-mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
             mask: radial-gradient(circle, transparent 22px, #000 23px, #000 28px, transparent 28px);
-        }
-
-        .tick-ring {
             background: conic-gradient(from -135deg,
                 #221e1a 0deg 1.5deg, transparent 1.5deg 27deg, #221e1a 27deg 28.5deg, transparent 28.5deg 54deg,
                 #221e1a 54deg 55.5deg, transparent 55.5deg 81deg, #221e1a 81deg 82.5deg, transparent 82.5deg 108deg,
@@ -171,30 +168,10 @@
             );
         }
 
-        .step4-ring {
-            background: conic-gradient(from -135deg,
-                #221e1a 0deg 2deg, transparent 2deg 90deg, #221e1a 90deg 92deg, transparent 92deg 180deg,
-                #221e1a 180deg 182deg, transparent 182deg 270deg, #221e1a 270deg 272deg, transparent 272deg 360deg
-            );
-        }
-
-        .step6-ring {
-            background: conic-gradient(from -135deg,
-                #221e1a 0deg 2deg, transparent 2deg 54deg, #221e1a 54deg 56deg, transparent 56deg 108deg,
-                #221e1a 108deg 110deg, transparent 110deg 162deg, #221e1a 162deg 164deg, transparent 164deg 216deg,
-                #221e1a 216deg 218deg, transparent 218deg 270deg, #221e1a 270deg 272deg, transparent 272deg 360deg
-            );
-        }
-
         .tick-label { position: absolute; font-size: 8px; font-weight: bold; color: #221e1a; line-height: 1; pointer-events: none; }
         .label-top { top: -2px; left: 50%; transform: translateX(-50%); }
         .label-left { bottom: 2px; left: 2px; }
         .label-right { bottom: 2px; right: 2px; }
-
-        .wave-saw { bottom: 2px; left: 1px; font-size: 10px; font-weight: 900; }
-        .wave-sqr { top: -2px; left: 2px; font-size: 10px; font-weight: 900; }
-        .wave-tri { top: -2px; right: 2px; font-size: 10px; font-weight: 900; }
-        .wave-sin { bottom: 2px; right: 1px; font-size: 10px; font-weight: 900; }
 
         .knob { 
             width: 42px; height: 40px; border-radius: 50%; 
@@ -245,7 +222,7 @@
         }
         .tactile-button:active { transform: translateY(1px); }
 
-        .oct-btn, .dest-btn, .mode-btn {
+        .oct-btn, .dest-btn, .mode-btn, .wave-btn {
             background: linear-gradient(180deg, #2d3036 0%, #17181c 100%);
             border: 1.5px solid #000;
             color: #cebba8;
@@ -256,8 +233,11 @@
             box-shadow: 0 2px 0 #000;
             transition: all 0.08s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .oct-btn.oct-active, .dest-btn.dest-active, .mode-btn.mode-active {
+        .oct-btn.oct-active, .dest-btn.dest-active, .mode-btn.mode-active, .wave-btn.wave-active {
             background: linear-gradient(180deg, #c83a2a 0%, #801f13 100%);
             border-color: #ff8878;
             color: #fff;
@@ -473,17 +453,32 @@
                     <div class="flex items-center gap-4 relative">
                         <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] font-bold tracking-widest text-[#82796e] whitespace-nowrap">OSCILLATOR (VCO)</span>
                         
-                        <div class="knob-wrapper">
-                            <div class="tick-container">
-                                <div class="step4-ring"></div>
-                                <span class="tick-label wave-saw">&#x223F;</span>
-                                <span class="tick-label wave-sqr">&#x2293;</span>
-                                <span class="tick-label wave-tri">&#x2206;</span>
-                                <span class="tick-label wave-sin">&#x223E;</span>
-                                <div class="knob global-knob" id="waveKnob" data-val="0"></div>
+                        <div class="flex flex-col items-center justify-center h-full">
+                            <div class="grid grid-cols-2 gap-1 mb-1.5" id="waveBtnBank">
+                                <button class="wave-btn wave-active" data-wave="0" title="Sawtooth">
+                                    <svg width="16" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round">
+                                        <path d="M4 14 L12 2 V14 L20 2 V14" />
+                                    </svg>
+                                </button>
+                                <button class="wave-btn" data-wave="1" title="Square">
+                                    <svg width="16" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round">
+                                        <path d="M3 14 V4 h8 v10 h8 v-10" />
+                                    </svg>
+                                </button>
+                                <button class="wave-btn" data-wave="2" title="Triangle">
+                                    <svg width="16" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round">
+                                        <path d="M3 14 L8 2 L16 14 L21 2" />
+                                    </svg>
+                                </button>
+                                <button class="wave-btn" data-wave="3" title="Sine">
+                                    <svg width="16" height="12" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                                        <path d="M2 8 C 6 -4, 10 -4, 12 8 C 14 20, 18 20, 22 8" />
+                                    </svg>
+                                </button>
                             </div>
-                            <span class="text-[9px] font-bold text-[#1f1a14]">WAVE</span>
+                            <span class="text-[8px] font-bold text-[#1f1a14]">WAVE</span>
                         </div>
+
                         <div class="flex flex-col items-center justify-center h-full">
                             <div class="grid grid-cols-2 gap-1 mb-1.5" id="octaveBtnBank">
                                 <button class="oct-btn" data-oct="0">32'</button>
@@ -493,6 +488,7 @@
                             </div>
                             <span class="text-[8px] font-bold text-[#1f1a14]">SCALE</span>
                         </div>
+
                         <div class="knob-wrapper">
                             <div class="tick-container">
                                 <div class="tick-ring"></div>
@@ -732,13 +728,25 @@
                 } else {
                     knobEl.style.transform = `rotate(${val * 27}deg)`; 
                 }
-            } else if (knobEl.id === 'waveKnob') {
-                const stepIdx = Math.min(3, Math.max(0, parseInt(val)));
-                knobEl.style.transform = `rotate(${-135 + stepIdx * 90}deg)`;
             } else {
                 knobEl.style.transform = `rotate(${-135 + (val / 100) * 270}deg)`;
             }
         }
+
+        function setWaveform(idx) {
+            activeWaveform = waveforms[idx];
+            if(synthOsc) synthOsc.type = activeWaveform;
+            document.querySelectorAll('#waveBtnBank .wave-btn').forEach(btn => {
+                btn.classList.toggle('wave-active', parseInt(btn.dataset.wave) === idx);
+            });
+        }
+
+        document.querySelectorAll('#waveBtnBank .wave-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                await initAudio();
+                setWaveform(parseInt(e.currentTarget.dataset.wave));
+            });
+        });
 
         function setOctave(octIdx) {
             octaveOffsetSemitones = (octIdx - 1) * 12;
@@ -913,12 +921,6 @@
                         previewSynth(pVal, fVal, false);
                     }
                     activeKnob.dataset.val = newVal;
-                } else if (activeKnob.id === 'waveKnob') {
-                    const delta = (startY - e.clientY);
-                    let stepIdx = Math.min(3, Math.max(0, Math.round(startVal + delta / 30)));
-                    activeWaveform = waveforms[stepIdx];
-                    if(synthOsc) synthOsc.type = activeWaveform;
-                    activeKnob.dataset.val = stepIdx;
                 } else {
                     let newVal = Math.max(0, Math.min(100, startVal + (startY - e.clientY)));
                     
@@ -1063,7 +1065,6 @@
             });
             updateKnobVisual(document.getElementById('clockSpeed'), 50);
             updateKnobVisual(document.getElementById('portamento'), 0);
-            updateKnobVisual(document.getElementById('waveKnob'), 0);
             updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 5);
             updateKnobVisual(document.getElementById('envDecay'), 30);
@@ -1071,6 +1072,7 @@
             updateKnobVisual(document.getElementById('envRelease'), 25);
             
             setOctave(1);
+            setWaveform(0);
         }
 
         function renderKeyboard() {
@@ -1296,8 +1298,8 @@
                 b.classList.toggle('dest-active', b.dataset.dest === 'filter');
             });
 
-            activeWaveform = 'sawtooth';
             setOctave(1); 
+            setWaveform(0);
             finePitchTuneSemitones = 0;
             
             attackTime = 0.01; decayTime = 0.15; sustainLevel = 0.2; releaseTime = 0.2;
@@ -1333,7 +1335,6 @@
             portamentoTime = 0.01; 
             updateKnobVisual(portaKnob, 0);
 
-            updateKnobVisual(document.getElementById('waveKnob'), 0);
             updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 5);
             updateKnobVisual(document.getElementById('envDecay'), 30);
@@ -1371,8 +1372,8 @@
                 b.classList.toggle('dest-active', b.dataset.dest === 'filter');
             });
 
-            activeWaveform = 'sawtooth';
             setOctave(1); 
+            setWaveform(0);
             finePitchTuneSemitones = 0;
 
             attackTime = 0.005; decayTime = 0.12; sustainLevel = 0.1; releaseTime = 0.08;
@@ -1408,7 +1409,6 @@
             portamentoTime = 0.01; 
             updateKnobVisual(portaKnob, 0);
 
-            updateKnobVisual(document.getElementById('waveKnob'), 0);
             updateKnobVisual(document.getElementById('pitchTuneKnob'), 50);
             updateKnobVisual(document.getElementById('envAttack'), 2);
             updateKnobVisual(document.getElementById('envDecay'), 20);
