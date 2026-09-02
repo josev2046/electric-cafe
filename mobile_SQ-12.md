@@ -24,13 +24,13 @@ The SQ-12 provides independent three-channel voltage control (**Channels A, B, a
 
 The front panel is partitioned into functional zones:
 
-- **Global Engine Badge** (top left) & **CRT Data Screen** (top right)
+- **CRT Data Screen** (top right)
 - **Transport / Clock**
 - **Routing & Mode**
 - **Oscillator (VCO)**
 - **Envelope (ADSR)**
 - **The 3×12 Sequencer Grid**
-- **Keyboard Transpose / Preview** & **Demo Patches**
+- **Keyboard Transpose / Preview** & **Demo Patches** (bottom of panel)
 
 <img width="2520" height="860" alt="sq12-top-panel" src="https://github.com/user-attachments/assets/766f1010-57ac-4421-84e1-2007964e8040" />
 
