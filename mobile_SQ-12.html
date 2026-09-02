@@ -384,13 +384,26 @@
                         <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] font-bold tracking-widest text-[#82796e] whitespace-nowrap">TRANSPORT / CLOCK</span>
                         
                         <div class="flex flex-col gap-2 justify-center w-[110px]">
-                            <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5 w-full">
+                            <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black rounded-sm flex items-center justify-center gap-2 w-full">
                                 <span class="w-1.5 h-1.5 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
-                                START / STOP
+                                <svg width="16" height="12" viewBox="0 0 20 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <polygon points="1,1 9,7 1,13" />
+                                    <rect x="12" y="2" width="7" height="10" />
+                                </svg>
                             </button>
                             <div class="flex gap-1.5 w-full">
-                                <button id="stepRev" class="tactile-button px-2 py-1 font-bold text-[9px] rounded-sm flex-1">&lt; REV</button>
-                                <button id="stepAdv" class="tactile-button px-2 py-1 font-bold text-[9px] rounded-sm flex-1">FWD &gt;</button>
+                                <button id="stepRev" class="tactile-button py-1 flex items-center justify-center rounded-sm flex-1">
+                                    <svg width="12" height="12" viewBox="0 0 14 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <rect x="1" y="2" width="2" height="10" />
+                                        <polygon points="13,1 4,7 13,13" />
+                                    </svg>
+                                </button>
+                                <button id="stepAdv" class="tactile-button py-1 flex items-center justify-center rounded-sm flex-1">
+                                    <svg width="12" height="12" viewBox="0 0 14 14" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <polygon points="1,1 10,7 1,13" />
+                                        <rect x="11" y="2" width="2" height="10" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                         <div class="flex gap-3">
