@@ -67,6 +67,36 @@
         .bolt-bl { bottom: 12px; left: 12px; }
         .bolt-br { bottom: 12px; right: 12px; }
 
+        /* Concept 3: Modular Patch-Bay Stencil Logo */
+        .logo-panel {
+            background: linear-gradient(180deg, #2a2722 0%, #171614 100%);
+            border: 1.5px solid #000;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4);
+        }
+        .logo-panel-accent {
+            background: linear-gradient(180deg, #8a2217 0%, #4a0d07 100%);
+            border: 1.5px solid #000;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.3), 0 0 10px rgba(200, 58, 42, 0.4);
+        }
+        .logo-panel-accent .logo-char {
+            color: #ff9d93;
+        }
+        .logo-panel .logo-char {
+            color: #f0ebd8;
+        }
+        .patch-jack-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #ff7777 0%, #ff1111 60%, #990000 100%);
+            box-shadow: 0 0 6px #ff2a2a, inset 0 1px 1px rgba(255,255,255,0.8);
+            animation: blink-led 2s infinite ease-in-out;
+        }
+        @keyframes blink-led {
+            0%, 100% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.4; filter: brightness(0.6); }
+        }
+
         /* Unified Continuous Panel Frame */
         .panel-outline {
             border: 1.5px solid #38342e;
@@ -278,9 +308,41 @@
             
             <!-- HEADER: Logo & Restored Unified Display Module -->
             <div class="flex items-center justify-between w-full mb-6 pb-4 border-b-2 border-[#38342e]/30">
-                <div>
-                    <h1 class="text-4xl font-black tracking-tighter text-[#1f1a14]"><span class="text-[#c83a2a]">SQ</span>-12</h1>
-                    <p class="text-[10px] font-bold tracking-widest text-[#38342e] mt-0.5">ANALOG SEQUENCER & SYNTH ENGINE</p>
+                
+                <!-- CONCEPT 3 MODULAR PATCH-BAY LOGO (NO HYPHEN) -->
+                <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center gap-1.5 select-none">
+                        <!-- Module Panel S -->
+                        <div class="logo-panel-accent w-10 h-11 rounded flex flex-col items-center justify-center relative">
+                            <span class="logo-char font-mono font-black text-xl tracking-tighter leading-none">S</span>
+                            <span class="text-[6px] font-bold text-[#ff9d93]/60 tracking-widest mt-0.5">MOD</span>
+                        </div>
+
+                        <!-- Module Panel Q (with Patch Jack LED accent) -->
+                        <div class="logo-panel-accent w-10 h-11 rounded flex flex-col items-center justify-between py-1 relative">
+                            <span class="logo-char font-mono font-black text-xl tracking-tighter leading-none mt-0.5">Q</span>
+                            <div class="patch-jack-dot mb-0.5" title="Signal Peak LED"></div>
+                        </div>
+
+                        <!-- Module Panel 1 -->
+                        <div class="logo-panel w-10 h-11 rounded flex flex-col items-center justify-center relative ml-1">
+                            <span class="logo-char font-mono font-black text-xl tracking-tighter leading-none">1</span>
+                            <span class="text-[6px] font-bold text-[#82796e] tracking-widest mt-0.5">CH</span>
+                        </div>
+
+                        <!-- Module Panel 2 -->
+                        <div class="logo-panel w-10 h-11 rounded flex flex-col items-center justify-center relative">
+                            <span class="logo-char font-mono font-black text-xl tracking-tighter leading-none">2</span>
+                            <span class="text-[6px] font-bold text-[#82796e] tracking-widest mt-0.5">OUT</span>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Subtitle Alignment -->
+                    <div class="flex items-center justify-between w-full text-[8px] font-mono font-bold tracking-widest text-[#38342e] border-t border-[#38342e]/30 pt-1">
+                        <span>ANALOG SEQUENCER</span>
+                        <span class="text-[#c83a2a]">•</span>
+                        <span>VCA / GATE</span>
+                    </div>
                 </div>
                 
                 <div class="crt-screen w-[320px] h-[72px] flex items-center justify-between px-4 py-2 flex-shrink-0 ml-4 hidden md:flex">
@@ -318,7 +380,9 @@
                 <div class="flex flex-nowrap items-center justify-between min-w-max gap-6 px-4 py-6 mx-auto h-full">
                     
                     <!-- 1. TRANSPORT & CLOCK -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 relative">
+                        <span class="absolute -top-5 left-0 text-[7px] font-bold tracking-widest text-[#82796e]">TRANSPORT / CLOCK</span>
+                        
                         <div class="flex flex-col gap-2 justify-center w-[110px]">
                             <button id="startStop" class="rocker-button text-white px-3 py-1.5 font-black text-[10px] rounded-sm tracking-wider flex items-center justify-center gap-1.5 w-full">
                                 <span class="w-1.5 h-1.5 rounded-full bg-red-400 opacity-60" id="rockerLed"></span>
@@ -350,7 +414,9 @@
                     <div class="panel-divider"></div>
 
                     <!-- 2. ROUTING & MODE -->
-                    <div class="flex items-center gap-5">
+                    <div class="flex items-center gap-5 relative">
+                        <span class="absolute -top-5 left-0 text-[7px] font-bold tracking-widest text-[#82796e]">ROUTING & MODE</span>
+                        
                         <div class="flex flex-col items-center gap-1">
                             <span class="text-[7px] font-bold text-[#1f1a14]">12</span>
                             <div class="volt-rocker volt-toggle-top" id="lengthRockerBtn">
@@ -388,7 +454,9 @@
                     <div class="panel-divider"></div>
 
                     <!-- 3. OSCILLATOR MODULE -->
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 relative">
+                        <span class="absolute -top-5 left-0 text-[7px] font-bold tracking-widest text-[#82796e]">OSCILLATOR (VCO)</span>
+                        
                         <div class="knob-wrapper">
                             <div class="tick-container">
                                 <div class="step4-ring"></div>
@@ -407,7 +475,7 @@
                                 <button class="oct-btn" data-oct="2">8'</button>
                                 <button class="oct-btn" data-oct="3">4'</button>
                             </div>
-                            <span class="text-[8px] font-bold text-[#1f1a14]">OCTAVE</span>
+                            <span class="text-[8px] font-bold text-[#1f1a14]">SCALE</span>
                         </div>
                         <div class="knob-wrapper">
                             <div class="tick-container">
@@ -424,7 +492,9 @@
                     <div class="panel-divider"></div>
 
                     <!-- 4. ADSR ENVELOPE -->
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 relative">
+                        <span class="absolute -top-5 left-0 text-[7px] font-bold tracking-widest text-[#82796e]">ENVELOPE (ADSR)</span>
+                        
                         <div class="knob-wrapper">
                             <div class="tick-container">
                                 <div class="tick-ring"></div>
