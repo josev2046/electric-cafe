@@ -164,7 +164,7 @@ Use the built-in demo buttons at the bottom right of the panel to load classic s
 | Dest | VCF |
 | Reset Point | Patched to Step 17 (creates a 16-step sequence chaining Row A and B) |
 
-**Sound Profile:** A driving 16-step EBM/electro bassline demonstrating 24-step row chaining.
+**Sound Profile:** A driving, DAF inspired 16-step bassline demonstrating 24-step row chaining.
 
 ### 5.2 Demo 2: "ACID" (12-Step Continuous Modulation)
 
