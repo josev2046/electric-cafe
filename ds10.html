@@ -292,6 +292,7 @@
 let ctx, master, chorusWet, chorusDry, chorusLfo, chorusLfoGain, delayNode, delayFb, delayWet, delayDry;
 let synths = {}, lfo, lfoGain, patch = {};
 let initialized = false;
+let knobControls = {};
 
 const params = {
   syn1:{wave:'sawtooth',octave:0,tune:0,cutoff:0.75,reso:0.15,envAmt:0.4,attack:0.05,decay:0.3,sustain:0.6,release:0.25,level:0.7,legato:false},
@@ -542,7 +543,7 @@ function setupKnob(knob, onChange, initNorm){
 
 document.querySelectorAll('.knob[data-synth]').forEach(knob=>{
   const name = knob.dataset.synth, prm = knob.dataset.param;
-  setupKnob(knob, (v)=>{
+  const ctrl = setupKnob(knob, (v)=>{
     params[name][prm] = v;
     const out = document.querySelector(`[data-out="${name}-${prm}"]`);
     if(out) out.textContent = (prm==='cutoff') ? Math.round(cutoffHz(v))+'Hz'
@@ -553,6 +554,7 @@ document.querySelectorAll('.knob[data-synth]').forEach(knob=>{
       if(prm==='level') synths[name].level.gain.setTargetAtTime(v, ctx.currentTime, 0.02);
     }
   });
+  knobControls[`${name}-${prm}`] = ctrl;
 });
 
 document.querySelectorAll('select.dsel[data-synth]').forEach(sel=>{
@@ -633,7 +635,7 @@ function applyPatch(key, depth){
   node.gain.setValueAtTime(node.gain.value, t);
   node.gain.linearRampToValueAtTime(depth * dest.scale, t + 0.02);
 }
-setupKnob(document.getElementById('lfo-rate-knob'), (v)=>{
+knobControls.lfoRate = setupKnob(document.getElementById('lfo-rate-knob'), (v)=>{
   params.lfoRate = v;
   document.getElementById('lfo-rate-val').textContent = v.toFixed(2)+'Hz';
   if(initialized) lfo.frequency.setTargetAtTime(v, ctx.currentTime, 0.02);
@@ -741,25 +743,34 @@ function scheduler(){
   }
 }
 
+function updateTransportButtons(){
+  const seqBtn = document.getElementById('seq-play');
+  const songBtn = document.getElementById('song-play');
+  seqBtn.textContent = playing ? '■ STOP' : '▶ PLAY';
+  seqBtn.classList.toggle('on', playing);
+  songBtn.textContent = playing ? '■ STOP' : '▶ PLAY SONG';
+  songBtn.classList.toggle('on', playing);
+}
+
 function startSeq(){
   initAudio();
   ensureRunning();
   if(playing) return;
   playing = true; curStep = 0; nextStepTime = ctx.currentTime + 0.05;
   timerId = setInterval(scheduler, lookahead);
-  document.getElementById('seq-play').textContent = '■ STOP';
-  document.getElementById('seq-play').classList.add('on');
+  updateTransportButtons();
 }
 function stopSeq(){
-  playing = false; songMode=false;
+  playing = false; songMode=false; activeSongPattern=null;
   clearInterval(timerId);
-  document.getElementById('seq-play').textContent = '▶ PLAY';
-  document.getElementById('seq-play').classList.remove('on');
-  document.getElementById('song-play').textContent = '▶ PLAY SONG';
-  document.getElementById('song-play').classList.remove('on');
+  updateTransportButtons();
   renderSteps(); // Final render to reset UI state properly
 }
-document.getElementById('seq-play').addEventListener('click', ()=> playing? stopSeq() : startSeq());
+document.getElementById('seq-play').addEventListener('click', ()=>{
+  if(playing){ stopSeq(); return; }
+  songMode = false; activeSongPattern = null;
+  startSeq();
+});
 
 /* ============ SONG MODE ============ */
 function renderSong(){
@@ -775,11 +786,9 @@ function advanceSong(){
 }
 document.getElementById('song-play').addEventListener('click', ()=>{
   if(!songChain.length) return;
-  if(playing && songMode){ stopSeq(); return; }
+  if(playing){ stopSeq(); return; }
   songMode = true; songIndex = 0; activeSongPattern = songChain[0];
   startSeq();
-  document.getElementById('song-play').textContent = '■ STOP';
-  document.getElementById('song-play').classList.add('on');
 });
 
 /* ============ KAOSS PAD ============ */
@@ -846,23 +855,23 @@ document.getElementById('delay-toggle').addEventListener('click', function(){
   this.classList.toggle('on', params.delayOn);
   delayWet.gain.setTargetAtTime(params.delayOn?params.delayMix:0, ctx.currentTime, 0.05);
 });
-setupKnob(document.getElementById('chorus-rate'), v=>{
+knobControls.chorusRate = setupKnob(document.getElementById('chorus-rate'), v=>{
   params.chorusRate=v; document.getElementById('chorus-rate-val').textContent=v.toFixed(2)+'Hz';
   if(initialized) chorusLfo.frequency.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
-setupKnob(document.getElementById('chorus-depth'), v=>{
+knobControls.chorusDepth = setupKnob(document.getElementById('chorus-depth'), v=>{
   params.chorusDepth=v; document.getElementById('chorus-depth-val').textContent=v.toFixed(2);
   if(initialized) chorusLfoGain.gain.setTargetAtTime(0.004*v, ctx.currentTime, 0.02);
 });
-setupKnob(document.getElementById('delay-time'), v=>{
+knobControls.delayTime = setupKnob(document.getElementById('delay-time'), v=>{
   params.delayTime=v; document.getElementById('delay-time-val').textContent=v.toFixed(2)+'s';
   if(initialized) delayNode.delayTime.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
-setupKnob(document.getElementById('delay-fb'), v=>{
+knobControls.delayFb = setupKnob(document.getElementById('delay-fb'), v=>{
   params.delayFb=v; document.getElementById('delay-fb-val').textContent=v.toFixed(2);
   if(initialized) delayFb.gain.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
-setupKnob(document.getElementById('delay-mix'), v=>{
+knobControls.delayMix = setupKnob(document.getElementById('delay-mix'), v=>{
   params.delayMix=v; document.getElementById('delay-mix-val').textContent=v.toFixed(2);
   if(initialized && params.delayOn) delayWet.gain.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
@@ -875,6 +884,61 @@ document.getElementById('save-btn').addEventListener('click', ()=>{
     flashMsg('PROJECT SAVED');
   }catch(err){ flashMsg('SAVE FAILED'); }
 });
+
+function applyLoadedState(){
+  // synth knobs + selects
+  ['syn1','syn2'].forEach(name=>{
+    ['tune','cutoff','reso','envAmt','attack','decay','sustain','release','level'].forEach(prm=>{
+      const ctrl = knobControls[`${name}-${prm}`];
+      if(ctrl) ctrl.set(params[name][prm]);
+    });
+    const waveSel = document.querySelector(`select.dsel[data-synth="${name}"][data-param="wave"]`);
+    if(waveSel){ waveSel.value = params[name].wave; waveSel.dispatchEvent(new Event('change')); }
+    const octSel = document.querySelector(`select.dsel[data-synth="${name}"][data-param="octave"]`);
+    if(octSel){ octSel.value = params[name].octave; octSel.dispatchEvent(new Event('change')); }
+  });
+
+  // global knobs (LFO + FX)
+  ['lfoRate','chorusRate','chorusDepth','delayTime','delayFb','delayMix'].forEach(key=>{
+    if(knobControls[key]) knobControls[key].set(params[key]);
+  });
+
+  // legato buttons
+  document.querySelectorAll('.tgl-btn[data-param="legato"]').forEach(btn => {
+    const p = params[btn.dataset.synth].legato;
+    btn.textContent = 'LEGATO ' + (p ? 'ON' : 'OFF');
+    btn.classList.toggle('on', p);
+  });
+
+  // patch bay: jacks, depth sliders, and live routing
+  destinations.forEach(d=>{
+    const depth = params.patch[d.key] || 0;
+    const jack = pg.querySelector(`.jack[data-dest="${d.key}"]`);
+    const depthInput = pg.querySelector(`[data-depth="${d.key}"]`);
+    if(jack) jack.classList.toggle('active', depth>0);
+    if(depthInput) depthInput.value = depth;
+    applyPatch(d.key, depth);
+  });
+
+  // FX on/off toggles
+  const chorusBtn = document.getElementById('chorus-toggle');
+  chorusBtn.textContent = 'CHORUS ' + (params.chorusOn?'ON':'OFF');
+  chorusBtn.classList.toggle('on', params.chorusOn);
+  const delayBtn = document.getElementById('delay-toggle');
+  delayBtn.textContent = 'DELAY ' + (params.delayOn?'ON':'OFF');
+  delayBtn.classList.toggle('on', params.delayOn);
+  if(initialized){
+    chorusWet.gain.setTargetAtTime(params.chorusOn?0.5:0, ctx.currentTime, 0.05);
+    chorusDry.gain.setTargetAtTime(params.chorusOn?0.7:1, ctx.currentTime, 0.05);
+    delayWet.gain.setTargetAtTime(params.delayOn?params.delayMix:0, ctx.currentTime, 0.05);
+  }
+
+  // LFO wave select (not persisted in params, left as-is)
+
+  renderSteps();
+  renderSong();
+}
+
 document.getElementById('load-btn').addEventListener('click', ()=>{
   try{
     const raw = localStorage.getItem('ds10-project');
@@ -883,16 +947,8 @@ document.getElementById('load-btn').addEventListener('click', ()=>{
     Object.assign(params, data.params);
     pattern = data.pattern;
     songChain = data.songChain || [];
-    renderSteps(); renderSong();
-    
-    // Sync Legato buttons
-    document.querySelectorAll('.tgl-btn[data-param="legato"]').forEach(btn => {
-      const p = params[btn.dataset.synth].legato;
-      btn.textContent = 'LEGATO ' + (p ? 'ON' : 'OFF');
-      btn.classList.toggle('on', p);
-    });
-
-    flashMsg('PROJECT LOADED — reopen tabs to refresh knobs');
+    applyLoadedState();
+    flashMsg('PROJECT LOADED');
   }catch(err){ flashMsg('LOAD FAILED'); }
 });
 function flashMsg(msg){
