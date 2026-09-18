@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Audio Synth Sequencer</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .panel {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      max-width: 800px;
+      width: 100%;
+    }
+    .controls {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #444;
+      flex-wrap: wrap;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .sequencer {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .step input[type="range"] {
+      writing-mode: vertical-lr;
+      direction: rtl;
+      height: 120px;
+      appearance: slider-vertical;
+    }
+    .step input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #444;
+    }
+    .indicator.active {
+      background: #00ff00;
+      box-shadow: 0 0 8px #00ff00;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover { background: #0056b3; }
+    button.playing { background: #dc3545; }
+  </style>
+</head>
+<body>
+
+<div class="panel">
+  <div class="controls">
+    <button id="playBtn">Play / Stop</button>
+    <div class="control-group">
+      <label>BPM: <span id="bpmVal">120</span></label>
+      <input type="range" id="bpm" min="60" max="240" value="120">
+    </div>
+    <div class="control-group">
+      <label>Cutoff: <span id="cutoffVal">2000</span> Hz</label>
+      <input type="range" id="cutoff" min="100" max="8000" value="2000">
+    </div>
+    <div class="control-group">
+      <label>Resonance (Q): <span id="resVal">5</span></label>
+      <input type="range" id="resonance" min="0" max="30" value="5">
+    </div>
+    <div class="control-group">
+      <label>LFO to VCF: <span id="lfoVal">500</span></label>
+      <input type="range" id="lfoDepth" min="0" max="2000" value="500">
+    </div>
+  </div>
+
+  <div class="sequencer" id="sequencerGrid">
+    <!-- Steps injected via JS -->
+  </div>
+</div>
+
+<script>
+  let audioCtx;
+  let isPlaying = false;
+  let currentStep = 0;
+  let nextNoteTime = 0.0;
+  let timerID;
+  
+  // Timing variables
+  const lookahead = 25.0; // ms
+  const scheduleAheadTime = 0.1; // s
+
+  // Synthesiser parameters connected to UI
+  const params = {
+    bpm: 120,
+    cutoff: 2000,
+    resonance: 5,
+    lfoDepth: 500
+  };
+
+  // Generate 16-step UI
+  const grid = document.getElementById('sequencerGrid');
+  const stepsData = [];
+  
+  for (let i = 0; i < 16; i++) {
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'step';
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'indicator';
+    indicator.id = `indicator-${i}`;
+    
+    const toggle = document.createElement('input');
+    toggle.type = 'checkbox';
+    toggle.checked = i % 4 === 0; // Pre-check every 4th beat
+    
+    const pitch = document.createElement('input');
+    pitch.type = 'range';
+    pitch.min = 36; // MIDI note C2
+    pitch.max = 72; // MIDI note C5
+    pitch.value = 48 + [0, 3, 7, 10][i % 4]; // Minor pentatonic defaults
+    
+    stepDiv.append(indicator, pitch, toggle);
+    grid.appendChild(stepDiv);
+    
+    stepsData.push({ toggle, pitch });
+  }
+
+  // Bind UI Controls
+  ['bpm', 'cutoff', 'resonance', 'lfoDepth'].forEach(id => {
+    const el = document.getElementById(id);
+    const valDisplay = document.getElementById(`${id}Val`);
+    el.addEventListener('input', (e) => {
+      params[id] = Number(e.target.value);
+      valDisplay.textContent = params[id];
+    });
+  });
+
+  // Helper: Convert MIDI note to Frequency
+  function midiToFreq(midiNote) {
+    return 440 * Math.pow(2, (midiNote - 69) / 12);
+  }
+
+  class SynthVoice {
+    constructor(ctx, time, frequency) {
+      // 1. Core Nodes
+      this.vco = ctx.createOscillator();
+      this.vcf = ctx.createBiquadFilter();
+      this.vca = ctx.createGain();
+      
+      // 2. LFO (Modulation mapping)
+      this.lfo = ctx.createOscillator();
+      this.lfoGain = ctx.createGain();
+
+      // Routing
+      this.vco.connect(this.vcf);
+      this.vcf.connect(this.vca);
+      this.vca.connect(ctx.destination);
+      
+      // Patch LFO -> LFO Gain -> Filter Frequency
+      this.lfo.connect(this.lfoGain);
+      this.lfoGain.connect(this.vcf.frequency);
+
+      // Node Configurations
+      this.vco.type = 'sawtooth';
+      this.vco.frequency.value = frequency;
+      
+      this.vcf.type = 'lowpass';
+      this.vcf.frequency.value = params.cutoff;
+      this.vcf.Q.value = params.resonance;
+      
+      this.lfo.type = 'sine';
+      this.lfo.frequency.value = 5; // 5Hz LFO speed
+      this.lfoGain.gain.value = params.lfoDepth;
+
+      // EG (Envelope) Scheduling
+      this.vca.gain.setValueAtTime(0, time);
+      this.vca.gain.linearRampToValueAtTime(0.5, time + 0.01); // 10ms Attack
+      this.vca.gain.exponentialRampToValueAtTime(0.001, time + 0.3); // 300ms Decay
+
+      // Start / Stop lifecycle
+      this.vco.start(time);
+      this.lfo.start(time);
+      this.vco.stop(time + 0.4);
+      this.lfo.stop(time + 0.4);
+    }
+  }
+
+  function nextNote() {
+    const secondsPerBeat = 60.0 / params.bpm;
+    nextNoteTime += 0.25 * secondsPerBeat; // 16th notes
+    currentStep++;
+    if (currentStep === 16) {
+      currentStep = 0;
+    }
+  }
+
+  function scheduleNote(stepNumber, time) {
+    // Schedule UI update
+    setTimeout(() => {
+      document.querySelectorAll('.indicator').forEach(el => el.classList.remove('active'));
+      document.getElementById(`indicator-${stepNumber}`).classList.add('active');
+    }, (time - audioCtx.currentTime) * 1000);
+
+    // Play Synth Note if step is enabled
+    const step = stepsData[stepNumber];
+    if (step.toggle.checked) {
+      const frequency = midiToFreq(step.pitch.value);
+      new SynthVoice(audioCtx, time, frequency);
+    }
+  }
+
+  function scheduler() {
+    while (nextNoteTime < audioCtx.currentTime + scheduleAheadTime) {
+      scheduleNote(currentStep, nextNoteTime);
+      nextNote();
+    }
+    timerID = setTimeout(scheduler, lookahead);
+  }
+
+  document.getElementById('playBtn').addEventListener('click', (e) => {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    
+    isPlaying = !isPlaying;
+    
+    if (isPlaying) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      currentStep = 0;
+      nextNoteTime = audioCtx.currentTime + 0.05;
+      scheduler();
+      e.target.textContent = 'Stop';
+      e.target.classList.add('playing');
+    } else {
+      clearTimeout(timerID);
+      e.target.textContent = 'Play';
+      e.target.classList.remove('playing');
+      document.querySelectorAll('.indicator').forEach(el => el.classList.remove('active'));
+    }
+  });
+</script>
+</body>
+</html>
