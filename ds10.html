@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DS-10 Synth Engine</title>
+<title>DS-10 Synth Engine (Optimised)</title>
 <style>
   :root{
     --lcd-bg:#0a1a10; --lcd:#4af55d; --lcd-dim:#276e34;
@@ -64,8 +64,9 @@
     padding:8px 14px; font-size:10px; letter-spacing:1px; border-radius:3px; cursor:pointer;
   }
   .btn:hover{border-color:var(--amber);}
-  .btn.on{background:var(--red); color:#fff; box-shadow:0 0 8px rgba(217,79,79,.7);}
-  .btn.lcdbtn.on{background:var(--lcd-dim); color:#001a05;}
+  .btn.on{background:var(--amber); color:#000; box-shadow:0 0 8px rgba(232,161,58,.5);}
+  .btn.lcdbtn.on{background:var(--lcd-dim); color:#001a05; box-shadow:none;}
+  .btn.testbtn.on{background:var(--red); color:#fff; box-shadow:0 0 8px rgba(217,79,79,.7);}
   .divider{width:1px; align-self:stretch; background:rgba(74,245,93,.15); margin:0 4px;}
   /* PATCH */
   .patch-grid{display:grid; grid-template-columns:auto repeat(4,1fr); gap:6px; font-size:9px;}
@@ -125,7 +126,7 @@
   <div class="screen" id="screen">
     <div class="overlay" id="start-overlay"><div>▶ TAP TO POWER ON<br><span style="font-size:10px;opacity:.6;">(starts audio engine)</span></div></div>
 
-    <!-- SYN1 / SYN2 panels (share markup via data-synth) -->
+    <!-- SYN1 Panel -->
     <div class="panel" data-panel="syn1" style="display:block;">
       <p class="screen-title">SYN1 — VCO / VCF / VCA / EG</p>
       <div class="row">
@@ -140,6 +141,9 @@
             <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
           </select>
         </div>
+        <div class="ctrl" style="justify-content:center;">
+          <button class="btn tgl-btn" data-synth="syn1" data-param="legato">LEGATO OFF</button>
+        </div>
         <div class="ctrl"><div class="knob" data-synth="syn1" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn1-tune">0</span></div>
         <div class="divider"></div>
         <div class="ctrl"><div class="knob" data-synth="syn1" data-param="cutoff" data-min="0" data-max="1" data-default="0.75"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn1-cutoff">—</span></div>
@@ -152,11 +156,12 @@
         <div class="ctrl"><div class="knob" data-synth="syn1" data-param="release" data-min="0" data-max="1" data-default="0.25"><i></i></div><label>RELEASE</label><span class="val" data-out="syn1-release">—</span></div>
       </div>
       <div class="row" style="margin-top:14px;">
-        <button class="btn" data-hold="syn1">HOLD TO TEST ▶</button>
+        <button class="btn testbtn" data-hold="syn1">HOLD TO TEST ▶</button>
         <div class="ctrl"><div class="knob" data-synth="syn1" data-param="level" data-min="0" data-max="1" data-default="0.7"><i></i></div><label>LEVEL</label><span class="val" data-out="syn1-level">—</span></div>
       </div>
     </div>
 
+    <!-- SYN2 Panel -->
     <div class="panel" data-panel="syn2" style="display:none;">
       <p class="screen-title">SYN2 — VCO / VCF / VCA / EG</p>
       <div class="row">
@@ -171,6 +176,9 @@
             <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
           </select>
         </div>
+        <div class="ctrl" style="justify-content:center;">
+          <button class="btn tgl-btn" data-synth="syn2" data-param="legato">LEGATO OFF</button>
+        </div>
         <div class="ctrl"><div class="knob" data-synth="syn2" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn2-tune">0</span></div>
         <div class="divider"></div>
         <div class="ctrl"><div class="knob" data-synth="syn2" data-param="cutoff" data-min="0" data-max="1" data-default="0.55"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn2-cutoff">—</span></div>
@@ -183,11 +191,12 @@
         <div class="ctrl"><div class="knob" data-synth="syn2" data-param="release" data-min="0" data-max="1" data-default="0.2"><i></i></div><label>RELEASE</label><span class="val" data-out="syn2-release">—</span></div>
       </div>
       <div class="row" style="margin-top:14px;">
-        <button class="btn" data-hold="syn2">HOLD TO TEST ▶</button>
+        <button class="btn testbtn" data-hold="syn2">HOLD TO TEST ▶</button>
         <div class="ctrl"><div class="knob" data-synth="syn2" data-param="level" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>LEVEL</label><span class="val" data-out="syn2-level">—</span></div>
       </div>
     </div>
 
+    <!-- Other Panels remain structurally identical in HTML -->
     <div class="panel" data-panel="drum" style="display:none;">
       <p class="screen-title">DRUM — 4 part percussion</p>
       <div class="row" id="drum-parts"></div>
@@ -259,11 +268,11 @@
     <div class="panel" data-panel="fx" style="display:none;">
       <p class="screen-title">MASTER FX</p>
       <div class="row">
-        <button class="btn" id="chorus-toggle">CHORUS OFF</button>
+        <button class="btn tgl-btn" id="chorus-toggle">CHORUS OFF</button>
         <div class="ctrl"><div class="knob" id="chorus-rate" data-min="0.1" data-max="5" data-default="1.2"><i></i></div><label>RATE</label><span class="val" id="chorus-rate-val">—</span></div>
         <div class="ctrl"><div class="knob" id="chorus-depth" data-min="0" data-max="1" data-default="0.5"><i></i></div><label>DEPTH</label><span class="val" id="chorus-depth-val">—</span></div>
         <div class="divider"></div>
-        <button class="btn" id="delay-toggle">DELAY OFF</button>
+        <button class="btn tgl-btn" id="delay-toggle">DELAY OFF</button>
         <div class="ctrl"><div class="knob" id="delay-time" data-min="0.05" data-max="0.9" data-default="0.32"><i></i></div><label>TIME</label><span class="val" id="delay-time-val">—</span></div>
         <div class="ctrl"><div class="knob" id="delay-fb" data-min="0" data-max="0.85" data-default="0.35"><i></i></div><label>FEEDBACK</label><span class="val" id="delay-fb-val">—</span></div>
         <div class="ctrl"><div class="knob" id="delay-mix" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>MIX</label><span class="val" id="delay-mix-val">—</span></div>
@@ -275,7 +284,7 @@
     <button class="btn" id="save-btn">SAVE PROJECT</button>
     <button class="btn" id="load-btn">LOAD PROJECT</button>
   </div>
-  <footer>DS-10 ENGINE · web audio emulation · not affiliated with KORG</footer>
+  <footer>DS-10 ENGINE · optimised logic · web audio emulation</footer>
 </div>
 
 <script>
@@ -285,22 +294,21 @@ let synths = {}, lfo, lfoGain, patch = {};
 let initialized = false;
 
 const params = {
-  syn1:{wave:'sawtooth',octave:0,tune:0,cutoff:0.75,reso:0.15,envAmt:0.4,attack:0.05,decay:0.3,sustain:0.6,release:0.25,level:0.7},
-  syn2:{wave:'square',octave:0,tune:0,cutoff:0.55,reso:0.3,envAmt:0.5,attack:0.01,decay:0.4,sustain:0.3,release:0.2,level:0.6},
+  syn1:{wave:'sawtooth',octave:0,tune:0,cutoff:0.75,reso:0.15,envAmt:0.4,attack:0.05,decay:0.3,sustain:0.6,release:0.25,level:0.7,legato:false},
+  syn2:{wave:'square',octave:0,tune:0,cutoff:0.55,reso:0.3,envAmt:0.5,attack:0.01,decay:0.4,sustain:0.3,release:0.2,level:0.6,legato:false},
   lfoRate:4, chorusRate:1.2, chorusDepth:0.5, delayTime:0.32, delayFb:0.35, delayMix:0.3,
   chorusOn:false, delayOn:false,
   patch:{'syn1-pitch':0,'syn1-cutoff':0,'syn2-pitch':0,'syn2-cutoff':0}
 };
 
 function noteFreq(semi){ return 261.6256 * Math.pow(2, semi/12); }
-function curve(min,max,n){ return min + (max-min)*n; } // linear helper
+function curve(min,max,n){ return min + (max-min)*n; } 
 
 function initAudio(){
   if(initialized) return;
   ctx = new (window.AudioContext||window.webkitAudioContext)();
   master = ctx.createGain(); master.gain.value = 0.9;
 
-  // FX chain: source bus -> chorus -> delay -> destination
   const fxIn = ctx.createGain();
   chorusDry = ctx.createGain(); chorusWet = ctx.createGain();
   const chorusDelay = ctx.createDelay(0.05); chorusDelay.delayTime.value = 0.012;
@@ -326,9 +334,8 @@ function initAudio(){
 
   window.__fxIn = fxIn;
 
-  // shared LFO for patch bay
   lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value = params.lfoRate;
-  lfoGain = ctx.createGain(); lfoGain.gain.value = 1; // master depth unit
+  lfoGain = ctx.createGain(); lfoGain.gain.value = 1;
   lfo.connect(lfoGain); lfo.start();
 
   synths.syn1 = buildSynth('syn1');
@@ -349,7 +356,6 @@ function buildSynth(name){
   vco.connect(vcf); vcf.connect(vca); vca.connect(level); level.connect(window.__fxIn);
   vco.start();
 
-  // patch connection gain nodes (LFO -> pitch / cutoff), always present, scaled by depth
   const pitchModGain = ctx.createGain(); pitchModGain.gain.value = 0;
   const cutoffModGain = ctx.createGain(); cutoffModGain.gain.value = 0;
   lfoGain.connect(pitchModGain); pitchModGain.connect(vco.detune);
@@ -357,10 +363,10 @@ function buildSynth(name){
 
   applyFilter(name, vcf);
 
-  return {vco, vcf, vca, level, pitchModGain, cutoffModGain, baseNote:0};
+  return {vco, vcf, vca, level, pitchModGain, cutoffModGain, baseNote:0, _held:false};
 }
 
-function cutoffHz(n){ return 80 * Math.pow(60, n); } // 80Hz .. ~4800Hz
+function cutoffHz(n){ return 80 * Math.pow(60, n); } 
 function applyFilter(name, vcf){
   const p = params[name];
   vcf.frequency.setTargetAtTime(cutoffHz(p.cutoff), ctx.currentTime, 0.02);
@@ -372,22 +378,31 @@ function triggerEnvelope(name, note){
   if(!s) return;
   const t = ctx.currentTime;
   const freq = noteFreq((note||0) + p.octave*12) * Math.pow(2, p.tune/1200);
-  s.vco.frequency.setTargetAtTime(freq, t, 0.005);
-  const peak = p.level;
-  const sustainLevel = peak * p.sustain;
-  s.vca.gain.cancelScheduledValues(t);
-  s.vca.gain.setValueAtTime(s.vca.gain.value, t);
-  s.vca.gain.linearRampToValueAtTime(peak, t + Math.max(0.002,p.attack*1.2));
-  s.vca.gain.linearRampToValueAtTime(sustainLevel, t + p.attack*1.2 + p.decay*1.2);
+  
+  if (p.legato && s._held) {
+    // FIX 2: Legato logic (portamento slide instead of envelope re-trigger)
+    s.vco.frequency.setTargetAtTime(freq, t, 0.04);
+  } else {
+    // Standard Envelope Trigger
+    s.vco.frequency.setTargetAtTime(freq, t, 0.005);
+    const peak = p.level;
+    const sustainLevel = peak * p.sustain;
+    
+    s.vca.gain.cancelScheduledValues(t);
+    s.vca.gain.setValueAtTime(s.vca.gain.value, t);
+    s.vca.gain.linearRampToValueAtTime(peak, t + Math.max(0.002,p.attack*1.2));
+    s.vca.gain.linearRampToValueAtTime(sustainLevel, t + p.attack*1.2 + p.decay*1.2);
 
-  const baseCut = cutoffHz(p.cutoff);
-  const envCut = baseCut * (1 + p.envAmt*3);
-  s.vcf.frequency.cancelScheduledValues(t);
-  s.vcf.frequency.setValueAtTime(s.vcf.frequency.value, t);
-  s.vcf.frequency.linearRampToValueAtTime(Math.min(12000,Math.max(40,envCut)), t + Math.max(0.002,p.attack*1.2));
-  s.vcf.frequency.linearRampToValueAtTime(baseCut, t + p.attack*1.2 + p.decay*1.2);
+    const baseCut = cutoffHz(p.cutoff);
+    const envCut = baseCut * (1 + p.envAmt*3);
+    s.vcf.frequency.cancelScheduledValues(t);
+    s.vcf.frequency.setValueAtTime(s.vcf.frequency.value, t);
+    s.vcf.frequency.linearRampToValueAtTime(Math.min(12000,Math.max(40,envCut)), t + Math.max(0.002,p.attack*1.2));
+    s.vcf.frequency.linearRampToValueAtTime(baseCut, t + p.attack*1.2 + p.decay*1.2);
+  }
   s._held = true;
 }
+
 function releaseEnvelope(name){
   const s = synths[name], p = params[name];
   if(!s) return;
@@ -397,17 +412,16 @@ function releaseEnvelope(name){
   s.vca.gain.linearRampToValueAtTime(0, t + Math.max(0.02,p.release*1.5));
   s._held = false;
 }
+
 function ensureRunning(){
   if(ctx && ctx.state==='suspended'){ ctx.resume().catch(()=>{}); }
 }
-/* Kaoss pad uses its own light note-on/off for the amp only, and hands full
-   live control of pitch + cutoff to the X/Y drag — this avoids fighting the
-   scheduled ADSR ramps used by triggerEnvelope/releaseEnvelope. */
+
 function kaossNoteOn(name){
   const s = synths[name], p = params[name];
   if(!s) return;
   const t = ctx.currentTime;
-  s.vcf.frequency.cancelScheduledValues(t); // release filter env ownership so XY fully controls cutoff
+  s.vcf.frequency.cancelScheduledValues(t); 
   s.vca.gain.cancelScheduledValues(t);
   s.vca.gain.setValueAtTime(s.vca.gain.value, t);
   s.vca.gain.linearRampToValueAtTime(p.level, t + 0.02);
@@ -421,7 +435,7 @@ function kaossNoteOff(name){
   s.vca.gain.linearRampToValueAtTime(0, t + Math.max(0.03,p.release*1.2));
 }
 
-/* ---- DRUM synthesis ---- */
+/* ---- DRUM synthesis (FIX 4: Added analog punch and layered transients) ---- */
 const drumDefs = [
   {id:'kick', name:'KICK'}, {id:'snare', name:'SNARE'},
   {id:'hihat', name:'HI-HAT'}, {id:'tom', name:'TOM'}
@@ -433,44 +447,71 @@ function makeNoiseBuffer(){
   return b;
 }
 let noiseBuf = null;
+
 function playDrum(id){
   if(!ctx) return;
   if(!noiseBuf) noiseBuf = makeNoiseBuffer();
   const t = ctx.currentTime;
+  
   if(id==='kick'){
     const o = ctx.createOscillator(); o.type='sine';
     const g = ctx.createGain();
-    o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(40,t+0.25);
-    g.gain.setValueAtTime(0.9,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    // Fast transient spike for analog click
+    o.frequency.setValueAtTime(400, t); 
+    o.frequency.exponentialRampToValueAtTime(150, t + 0.015);
+    o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
+    g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
     o.connect(g); g.connect(window.__fxIn); o.start(t); o.stop(t+0.4);
+    
   } else if(id==='snare'){
+    // Layer 1: Filtered Noise
     const src = ctx.createBufferSource(); src.buffer = noiseBuf;
-    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1800;
-    const g = ctx.createGain(); g.gain.setValueAtTime(0.7,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+    const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2200; bp.Q.value=1.5;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.8, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.2);
     src.connect(bp); bp.connect(g); g.connect(window.__fxIn); src.start(t); src.stop(t+0.2);
+    // Layer 2: Pitched Body
+    const o = ctx.createOscillator(); o.type='triangle';
+    const bodyG = ctx.createGain();
+    o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(180, t + 0.1);
+    bodyG.gain.setValueAtTime(0.6, t); bodyG.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    o.connect(bodyG); bodyG.connect(window.__fxIn); o.start(t); o.stop(t+0.2);
+    
   } else if(id==='hihat'){
     const src = ctx.createBufferSource(); src.buffer = noiseBuf;
-    const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=7000;
-    const g = ctx.createGain(); g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
+    const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=8000;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.05);
     src.connect(hp); hp.connect(g); g.connect(window.__fxIn); src.start(t); src.stop(t+0.08);
+    
   } else if(id==='tom'){
     const o = ctx.createOscillator(); o.type='sine';
     const g = ctx.createGain();
-    o.frequency.setValueAtTime(220,t); o.frequency.exponentialRampToValueAtTime(90,t+0.3);
-    g.gain.setValueAtTime(0.7,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+    // Transient spike
+    o.frequency.setValueAtTime(600, t);
+    o.frequency.exponentialRampToValueAtTime(220, t + 0.02);
+    o.frequency.exponentialRampToValueAtTime(90, t + 0.3);
+    g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
     o.connect(g); g.connect(window.__fxIn); o.start(t); o.stop(t+0.4);
   }
 }
 
 document.getElementById('start-overlay').addEventListener('click', initAudio);
 
-/* ============ TABS ============ */
+/* ============ TABS & BUTTONS ============ */
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
     tab.classList.add('active');
     document.querySelector(`.panel[data-panel="${tab.dataset.tab}"]`).style.display='block';
+  });
+});
+
+document.querySelectorAll('.tgl-btn[data-param="legato"]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const synth = e.target.dataset.synth;
+    params[synth].legato = !params[synth].legato;
+    e.target.textContent = 'LEGATO ' + (params[synth].legato ? 'ON' : 'OFF');
+    e.target.classList.toggle('on', params[synth].legato);
   });
 });
 
@@ -495,7 +536,6 @@ function setupKnob(knob, onChange, initNorm){
   });
   knob.addEventListener('pointerup', e=>{ dragging=false; });
   knob.addEventListener('pointercancel', ()=>{ dragging=false; });
-  // init callback so labels populate
   onChange(min+(max-min)*norm, norm);
   return {set:(v)=>{ norm=(v-min)/(max-min); paintKnob(knob,norm); onChange(v,norm); }};
 }
@@ -514,6 +554,7 @@ document.querySelectorAll('.knob[data-synth]').forEach(knob=>{
     }
   });
 });
+
 document.querySelectorAll('select.dsel[data-synth]').forEach(sel=>{
   sel.addEventListener('change', ()=>{
     const name=sel.dataset.synth, prm=sel.dataset.param;
@@ -524,6 +565,7 @@ document.querySelectorAll('select.dsel[data-synth]').forEach(sel=>{
     }
   });
 });
+
 document.querySelectorAll('[data-hold]').forEach(btn=>{
   const name = btn.dataset.hold;
   const down = ()=>{ initAudio(); ensureRunning(); btn.classList.add('on'); triggerEnvelope(name, 0); };
@@ -537,12 +579,15 @@ document.querySelectorAll('[data-hold]').forEach(btn=>{
 const drumHost = document.getElementById('drum-parts');
 drumDefs.forEach(d=>{
   const c = document.createElement('div'); c.className='ctrl';
-  c.innerHTML = `<button class="btn" style="padding:16px 10px;">${d.name}</button>`;
-  c.querySelector('button').addEventListener('click', ()=>{ initAudio(); ensureRunning(); playDrum(d.id); });
+  c.innerHTML = `<button class="btn testbtn" style="padding:16px 10px;">${d.name}</button>`;
+  const btn = c.querySelector('button');
+  btn.addEventListener('pointerdown', ()=>{ initAudio(); ensureRunning(); playDrum(d.id); btn.classList.add('on'); });
+  btn.addEventListener('pointerup', ()=> btn.classList.remove('on'));
+  btn.addEventListener('pointerleave', ()=> btn.classList.remove('on'));
   drumHost.appendChild(c);
 });
 
-/* ============ PATCH BAY ============ */
+/* ============ PATCH BAY (FIX 1: Anti-pop ramping) ============ */
 const destinations = [
   {key:'syn1-pitch', label:'SYN1 PITCH', synth:'syn1', mod:'pitchModGain', scale:1200},
   {key:'syn1-cutoff', label:'SYN1 CUTOFF', synth:'syn1', mod:'cutoffModGain', scale:4000},
@@ -582,7 +627,11 @@ function applyPatch(key, depth){
   const dest = destinations.find(d=>d.key===key);
   if(!initialized || !dest) return;
   const node = synths[dest.synth][dest.mod];
-  node.gain.setTargetAtTime(depth*dest.scale, ctx.currentTime, 0.02);
+  const t = ctx.currentTime;
+  // FIX 1: Ramp to prevent clicking
+  node.gain.cancelScheduledValues(t);
+  node.gain.setValueAtTime(node.gain.value, t);
+  node.gain.linearRampToValueAtTime(depth * dest.scale, t + 0.02);
 }
 setupKnob(document.getElementById('lfo-rate-knob'), (v)=>{
   params.lfoRate = v;
@@ -598,11 +647,10 @@ let pattern = {A:{}, B:{}};
 ['A','B'].forEach(p=> tracks.forEach(t=> pattern[p][t] = Array.from({length:16}, ()=>({on:false, note:0})) ));
 
 let curTrack = 'syn1', curPattern = 'A';
-/* state used by renderSteps() below — declared here, ahead of the call at
-   the bottom of this block, to avoid a temporal-dead-zone ReferenceError */
 let playing=false, curStep=0, nextStepTime=0, timerId=null, activeSongPattern=null;
 let songChain = [], songIndex = 0, songMode=false;
 const seqTracksHost = document.getElementById('seq-tracks');
+
 tracks.forEach(t=>{
   const b = document.createElement('div'); b.className='btn'+(t===curTrack?' on':''); b.textContent=trackLabel[t];
   b.dataset.track = t;
@@ -610,7 +658,7 @@ tracks.forEach(t=>{
     curTrack = t;
     seqTracksHost.querySelectorAll('.btn').forEach(x=>x.classList.remove('on'));
     b.classList.add('on');
-    renderSteps();
+    renderSteps(); // Render strictly on data change
   });
   seqTracksHost.appendChild(b);
 });
@@ -622,7 +670,8 @@ function renderSteps(){
   const arr = pattern[curPattern][curTrack];
   arr.forEach((st, i)=>{
     const el = document.createElement('div');
-    el.className = 'step'+(i%4===0?' beat':'')+(st.on?' on':'')+(i===curStep && playing?' cur':'');
+    // Ensure accurate visual state if rendering while paused/playing
+    el.className = 'step'+(i%4===0?' beat':'')+(st.on?' on':'')+(i===curStep && !playing?' cur':'');
     if(st.on && (curTrack==='syn1'||curTrack==='syn2')){
       el.innerHTML = `<span class="n">${noteName(st.note)}</span>`;
     }
@@ -670,15 +719,28 @@ function triggerStepNote(name, note){
   triggerEnvelope(name, note);
   setTimeout(()=>releaseEnvelope(name), stepDuration()*900);
 }
+
 function scheduler(){
   while(nextStepTime < ctx.currentTime + scheduleAhead){
     scheduleStep(curStep, nextStepTime);
+    
+    // FIX 3: Decouple visual UI update from DOM rebuilds
+    const visualDelay = Math.max(0, (nextStepTime - ctx.currentTime)) * 1000;
+    const stepToHighlight = curStep;
+    setTimeout(() => {
+      if (playing) {
+        document.querySelectorAll('#steps .step').forEach(el => el.classList.remove('cur'));
+        const stepEls = document.querySelectorAll('#steps .step');
+        if (stepEls[stepToHighlight]) stepEls[stepToHighlight].classList.add('cur');
+      }
+    }, visualDelay);
+
     nextStepTime += stepDuration();
     curStep = (curStep+1)%16;
     if(curStep===0 && songMode) advanceSong();
   }
-  renderSteps();
 }
+
 function startSeq(){
   initAudio();
   ensureRunning();
@@ -695,7 +757,7 @@ function stopSeq(){
   document.getElementById('seq-play').classList.remove('on');
   document.getElementById('song-play').textContent = '▶ PLAY SONG';
   document.getElementById('song-play').classList.remove('on');
-  renderSteps();
+  renderSteps(); // Final render to reset UI state properly
 }
 document.getElementById('seq-play').addEventListener('click', ()=> playing? stopSeq() : startSeq());
 
@@ -805,7 +867,7 @@ setupKnob(document.getElementById('delay-mix'), v=>{
   if(initialized && params.delayOn) delayWet.gain.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
 
-/* ============ SAVE / LOAD (per-browser, local) ============ */
+/* ============ SAVE / LOAD ============ */
 document.getElementById('save-btn').addEventListener('click', ()=>{
   try{
     const data = { params, pattern, songChain };
@@ -822,6 +884,14 @@ document.getElementById('load-btn').addEventListener('click', ()=>{
     pattern = data.pattern;
     songChain = data.songChain || [];
     renderSteps(); renderSong();
+    
+    // Sync Legato buttons
+    document.querySelectorAll('.tgl-btn[data-param="legato"]').forEach(btn => {
+      const p = params[btn.dataset.synth].legato;
+      btn.textContent = 'LEGATO ' + (p ? 'ON' : 'OFF');
+      btn.classList.toggle('on', p);
+    });
+
     flashMsg('PROJECT LOADED — reopen tabs to refresh knobs');
   }catch(err){ flashMsg('LOAD FAILED'); }
 });
