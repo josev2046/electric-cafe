@@ -168,11 +168,11 @@
   select.dsel:active { border-bottom-width: 1px; border-top-width: 3px; transform: translateY(2px); }
 
   /* Buttons */
-  .btn {
+  .btn, a.btn {
     background: linear-gradient(180deg, var(--cream-grad-top) 0%, var(--cream-grad-bot) 100%);
     color: var(--text-main); font-weight: 900; border: 1.5px solid var(--border-dark); 
     border-bottom-width: 3px; border-radius: 4px; font-family: inherit; text-transform: uppercase;
-    padding: 8px 14px; font-size: 10px; letter-spacing: 1px; cursor: pointer; 
+    padding: 8px 14px; font-size: 10px; letter-spacing: 1px; cursor: pointer; text-decoration: none;
     box-shadow: inset 0 1px 1px #fff; transition: all 0.08s ease; display: inline-flex; align-items: center; justify-content: center;
   }
   .btn:active { transform: translateY(2px); border-bottom-width: 1px; border-top-width: 3px; }
@@ -182,6 +182,19 @@
     border-color: var(--red-border); color: white;
     border-bottom-width: 1px; border-top-width: 3px; transform: translateY(2px);
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+  
+  .rec-live {
+    background: linear-gradient(180deg, #e0261c 0%, #b31a11 100%) !important;
+    border-color: #730e07 !important; color: #fff !important;
+    border-bottom-width: 1px !important; border-top-width: 3px !important;
+    transform: translateY(1px); animation: rec-pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes rec-pulse {
+    0%, 100% { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 0 rgba(224,38,28,0.6); }
+    50% { box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 0 8px rgba(224,38,28,0.9); }
   }
 
   .divider { width: 1px; align-self: stretch; background: rgba(56, 52, 46, 0.15); border-right: 1px solid rgba(255,255,255,0.6); margin: 0 4px; }
@@ -301,7 +314,6 @@
       <!-- SYN1 Panel -->
       <div class="panel" data-panel="syn1" style="display:block;">
         <p class="screen-title">SYN1 — SUBTRACTIVE VOICE</p>
-        
         <div class="synth-row">
           <div class="module-group" style="flex: 2;">
             <span class="module-group-title">VCO</span>
@@ -321,7 +333,6 @@
               <button class="btn tgl-btn" data-synth="syn1" data-param="legato">LEGATO OFF</button>
             </div>
           </div>
-          
           <div class="module-group" style="flex: 2;">
             <span class="module-group-title">VCF</span>
             <div class="ctrl"><div class="knob" data-synth="syn1" data-param="cutoff" data-min="0" data-max="1" data-default="0.75"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn1-cutoff">—</span></div>
@@ -329,7 +340,6 @@
             <div class="ctrl"><div class="knob" data-synth="syn1" data-param="envAmt" data-min="-1" data-max="1" data-default="0.4"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn1-envAmt">—</span></div>
           </div>
         </div>
-
         <div class="synth-row" style="margin-bottom: 0;">
           <div class="module-group" style="flex: 3;">
             <span class="module-group-title">EG (ENVELOPE GENERATOR)</span>
@@ -338,7 +348,6 @@
             <div class="ctrl"><div class="knob" data-synth="syn1" data-param="sustain" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn1-sustain">—</span></div>
             <div class="ctrl"><div class="knob" data-synth="syn1" data-param="release" data-min="0" data-max="1" data-default="0.25"><i></i></div><label>RELEASE</label><span class="val" data-out="syn1-release">—</span></div>
           </div>
-          
           <div class="module-group" style="flex: 1;">
             <span class="module-group-title">AMP</span>
             <div class="ctrl"><div class="knob" data-synth="syn1" data-param="level" data-min="0" data-max="1" data-default="0.7"><i></i></div><label>LEVEL</label><span class="val" data-out="syn1-level">—</span></div>
@@ -352,7 +361,6 @@
       <!-- SYN2 Panel -->
       <div class="panel" data-panel="syn2" style="display:none;">
         <p class="screen-title">SYN2 — SUBTRACTIVE VOICE</p>
-        
         <div class="synth-row">
           <div class="module-group" style="flex: 2;">
             <span class="module-group-title">VCO</span>
@@ -372,7 +380,6 @@
               <button class="btn tgl-btn" data-synth="syn2" data-param="legato">LEGATO OFF</button>
             </div>
           </div>
-          
           <div class="module-group" style="flex: 2;">
             <span class="module-group-title">VCF</span>
             <div class="ctrl"><div class="knob" data-synth="syn2" data-param="cutoff" data-min="0" data-max="1" data-default="0.55"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn2-cutoff">—</span></div>
@@ -380,7 +387,6 @@
             <div class="ctrl"><div class="knob" data-synth="syn2" data-param="envAmt" data-min="-1" data-max="1" data-default="0.5"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn2-envAmt">—</span></div>
           </div>
         </div>
-
         <div class="synth-row" style="margin-bottom: 0;">
           <div class="module-group" style="flex: 3;">
             <span class="module-group-title">EG (ENVELOPE GENERATOR)</span>
@@ -389,7 +395,6 @@
             <div class="ctrl"><div class="knob" data-synth="syn2" data-param="sustain" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn2-sustain">—</span></div>
             <div class="ctrl"><div class="knob" data-synth="syn2" data-param="release" data-min="0" data-max="1" data-default="0.2"><i></i></div><label>RELEASE</label><span class="val" data-out="syn2-release">—</span></div>
           </div>
-          
           <div class="module-group" style="flex: 1;">
             <span class="module-group-title">AMP</span>
             <div class="ctrl"><div class="knob" data-synth="syn2" data-param="level" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>LEVEL</label><span class="val" data-out="syn2-level">—</span></div>
@@ -501,11 +506,19 @@
       </div>
     </div>
 
+    <!-- Recorder / STEM Export Bar -->
     <div class="row" style="margin-top:12px; justify-content:space-between; align-items: center; border-top: 2px solid rgba(56, 52, 46, 0.2); padding-top: 16px;">
-      <span id="sys-msg" class="val" style="background:transparent; border:none; color:var(--border-dark); text-shadow:none;">READY</span>
-      <div style="display:flex; gap:12px;">
-        <button class="btn" id="save-btn">SAVE PROJECT</button>
-        <button class="btn" id="load-btn">LOAD PROJECT</button>
+      <span id="sys-msg" class="val" style="background:transparent; border:none; color:#4af55d; text-shadow:none;">READY</span>
+      
+      <div style="display:flex; gap:12px; align-items:center;">
+        <span style="font-size:9px; color:var(--border-dark); font-weight:800; letter-spacing:1px;">STEM EXPORT:</span>
+        <button class="btn" id="recordBtn" style="color:var(--red-grad-top);">● REC</button>
+        <span class="val" id="recordStatus" style="min-width: 60px;">00:00</span>
+        <div class="divider"></div>
+        <a class="btn btn-disabled" id="dl-master">MSTR</a>
+        <a class="btn btn-disabled" id="dl-syn1">SYN1</a>
+        <a class="btn btn-disabled" id="dl-syn2">SYN2</a>
+        <a class="btn btn-disabled" id="dl-drum">DRUM</a>
       </div>
     </div>
   </div>
@@ -528,6 +541,16 @@ const params = {
   patch:{'syn1-pitch':0,'syn1-cutoff':0,'syn2-pitch':0,'syn2-cutoff':0}
 };
 
+/* ============ RECORDING ENGINE ============ */
+const recordDest = {};
+const mediaRecorders = {};
+const recordedChunks = {};
+const STEMS = ['master', 'syn1', 'syn2', 'drum'];
+let isRecording = false;
+let recordStartTime = 0;
+let recordTimerInterval = null;
+let takeStamp = '';
+
 function noteFreq(semi){ return 261.6256 * Math.pow(2, semi/12); }
 function curve(min,max,n){ return min + (max-min)*n; } 
 
@@ -536,7 +559,28 @@ function initAudio(){
   ctx = new (window.AudioContext||window.webkitAudioContext)();
   master = ctx.createGain(); master.gain.value = 0.9;
 
+  // Master bus feeds speakers AND Master Rec
+  recordDest.master = ctx.createMediaStreamDestination();
+  master.connect(recordDest.master);
+
+  // Stem buses feed FX/Master AND their respective Stem Recs
+  const busSyn1 = ctx.createGain(); busSyn1.gain.value = 1;
+  recordDest.syn1 = ctx.createMediaStreamDestination(); busSyn1.connect(recordDest.syn1);
+  window.__busSyn1 = busSyn1;
+
+  const busSyn2 = ctx.createGain(); busSyn2.gain.value = 1;
+  recordDest.syn2 = ctx.createMediaStreamDestination(); busSyn2.connect(recordDest.syn2);
+  window.__busSyn2 = busSyn2;
+
+  const busDrum = ctx.createGain(); busDrum.gain.value = 1;
+  recordDest.drum = ctx.createMediaStreamDestination(); busDrum.connect(recordDest.drum);
+  window.__busDrum = busDrum;
+
   const fxIn = ctx.createGain();
+  busSyn1.connect(fxIn);
+  busSyn2.connect(fxIn);
+  busDrum.connect(fxIn);
+
   chorusDry = ctx.createGain(); chorusWet = ctx.createGain();
   const chorusDelay = ctx.createDelay(0.05); chorusDelay.delayTime.value = 0.012;
   chorusLfo = ctx.createOscillator(); chorusLfo.type='sine'; chorusLfo.frequency.value = params.chorusRate;
@@ -559,7 +603,7 @@ function initAudio(){
   delayDry.connect(master); delayWet.connect(master);
   master.connect(ctx.destination);
 
-  window.__fxIn = fxIn;
+  window.__fxIn = fxIn; // Needed for patch bay routing
 
   lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value = params.lfoRate;
   lfoGain = ctx.createGain(); lfoGain.gain.value = 1;
@@ -580,7 +624,9 @@ function buildSynth(name){
   const vca = ctx.createGain(); vca.gain.value = 0;
   const level = ctx.createGain(); level.gain.value = params[name].level;
 
-  vco.connect(vcf); vcf.connect(vca); vca.connect(level); level.connect(window.__fxIn);
+  // Route to specific stem bus
+  vco.connect(vcf); vcf.connect(vca); vca.connect(level); 
+  level.connect(name === 'syn1' ? window.__busSyn1 : window.__busSyn2);
   vco.start();
 
   const pitchModGain = ctx.createGain(); pitchModGain.gain.value = 0;
@@ -685,24 +731,24 @@ function playDrum(id){
     o.frequency.exponentialRampToValueAtTime(150, t + 0.015);
     o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
     g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-    o.connect(g); g.connect(window.__fxIn); o.start(t); o.stop(t+0.4);
+    o.connect(g); g.connect(window.__busDrum); o.start(t); o.stop(t+0.4);
     
   } else if(id==='snare'){
     const src = ctx.createBufferSource(); src.buffer = noiseBuf;
     const bp = ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=2200; bp.Q.value=1.5;
     const g = ctx.createGain(); g.gain.setValueAtTime(0.8, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.2);
-    src.connect(bp); bp.connect(g); g.connect(window.__fxIn); src.start(t); src.stop(t+0.2);
+    src.connect(bp); bp.connect(g); g.connect(window.__busDrum); src.start(t); src.stop(t+0.2);
     const o = ctx.createOscillator(); o.type='triangle';
     const bodyG = ctx.createGain();
     o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(180, t + 0.1);
     bodyG.gain.setValueAtTime(0.6, t); bodyG.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-    o.connect(bodyG); bodyG.connect(window.__fxIn); o.start(t); o.stop(t+0.2);
+    o.connect(bodyG); bodyG.connect(window.__busDrum); o.start(t); o.stop(t+0.2);
     
   } else if(id==='hihat'){
     const src = ctx.createBufferSource(); src.buffer = noiseBuf;
     const hp = ctx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=8000;
     const g = ctx.createGain(); g.gain.setValueAtTime(0.4, t); g.gain.exponentialRampToValueAtTime(0.001, t+0.05);
-    src.connect(hp); hp.connect(g); g.connect(window.__fxIn); src.start(t); src.stop(t+0.08);
+    src.connect(hp); hp.connect(g); g.connect(window.__busDrum); src.start(t); src.stop(t+0.08);
     
   } else if(id==='tom'){
     const o = ctx.createOscillator(); o.type='sine';
@@ -711,7 +757,7 @@ function playDrum(id){
     o.frequency.exponentialRampToValueAtTime(220, t + 0.02);
     o.frequency.exponentialRampToValueAtTime(90, t + 0.3);
     g.gain.setValueAtTime(0.7, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
-    o.connect(g); g.connect(window.__fxIn); o.start(t); o.stop(t+0.4);
+    o.connect(g); g.connect(window.__busDrum); o.start(t); o.stop(t+0.4);
   }
 }
 
@@ -1093,74 +1139,142 @@ knobControls.delayMix = setupKnob(document.getElementById('delay-mix'), v=>{
   if(initialized && params.delayOn) delayWet.gain.setTargetAtTime(v, ctx.currentTime, 0.02);
 });
 
-/* ============ SAVE / LOAD ============ */
-document.getElementById('save-btn').addEventListener('click', ()=>{
-  try{
-    const data = { params, pattern, songChain };
-    localStorage.setItem('ds10-project', JSON.stringify(data));
-    flashMsg('PROJECT SAVED');
-  }catch(err){ flashMsg('SAVE FAILED'); }
-});
+/* ============ WAV STEM EXPORT ============ */
+const recordBtn = document.getElementById('recordBtn');
+const recordStatus = document.getElementById('recordStatus');
+const downloadEls = {};
+STEMS.forEach(key => downloadEls[key] = document.getElementById(`dl-${key}`));
 
-function applyLoadedState(){
-  ['syn1','syn2'].forEach(name=>{
-    ['tune','cutoff','reso','envAmt','attack','decay','sustain','release','level'].forEach(prm=>{
-      const ctrl = knobControls[`${name}-${prm}`];
-      if(ctrl) ctrl.set(params[name][prm]);
-    });
-    const waveSel = document.querySelector(`select.dsel[data-synth="${name}"][data-param="wave"]`);
-    if(waveSel){ waveSel.value = params[name].wave; waveSel.dispatchEvent(new Event('change')); }
-    const octSel = document.querySelector(`select.dsel[data-synth="${name}"][data-param="octave"]`);
-    if(octSel){ octSel.value = params[name].octave; octSel.dispatchEvent(new Event('change')); }
+if (typeof MediaRecorder === 'undefined') {
+  recordBtn.classList.add('btn-disabled');
+  recordBtn.innerText = 'REC N/A';
+  recordStatus.innerText = 'NO SUPPORT';
+} else {
+  recordBtn.addEventListener('click', async () => {
+    if (audioCtx.state === 'suspended') await audioCtx.resume();
+
+    if (!isRecording) {
+      STEMS.forEach(key => {
+        recordedChunks[key] = [];
+        downloadEls[key].classList.add('btn-disabled');
+
+        let options;
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options = { mimeType: 'audio/webm;codecs=opus' };
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+            options = { mimeType: 'audio/webm' };
+        }
+        const rec = new MediaRecorder(recordDest[key].stream, options);
+        rec.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) recordedChunks[key].push(e.data);
+        };
+        rec.onstop = () => encodeStem(key);
+        mediaRecorders[key] = rec;
+        rec.start();
+      });
+
+      isRecording = true;
+      recordStartTime = Date.now();
+      {
+        const d = new Date(recordStartTime);
+        const pad = (n) => String(n).padStart(2, '0');
+        takeStamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+      }
+      recordBtn.classList.add('rec-live');
+      recordBtn.innerText = '■ STOP';
+      recordStatus.innerText = '00:00';
+
+      recordTimerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+        const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const ss = String(elapsed % 60).padStart(2, '0');
+        recordStatus.innerText = `${mm}:${ss}`;
+      }, 500);
+    } else {
+      STEMS.forEach(key => mediaRecorders[key] && mediaRecorders[key].stop());
+      isRecording = false;
+      clearInterval(recordTimerInterval);
+      recordBtn.classList.remove('rec-live');
+      recordBtn.innerText = '● REC';
+      recordStatus.innerText = 'ENCODING';
+    }
   });
-
-  ['lfoRate','chorusRate','chorusDepth','delayTime','delayFb','delayMix'].forEach(key=>{
-    if(knobControls[key]) knobControls[key].set(params[key]);
-  });
-
-  document.querySelectorAll('.tgl-btn[data-param="legato"]').forEach(btn => {
-    const p = params[btn.dataset.synth].legato;
-    btn.textContent = 'LEGATO ' + (p ? 'ON' : 'OFF');
-    btn.classList.toggle('on', p);
-  });
-
-  destinations.forEach(d=>{
-    const depth = params.patch[d.key] || 0;
-    const jack = pg.querySelector(`.jack[data-dest="${d.key}"]`);
-    const depthInput = pg.querySelector(`[data-depth="${d.key}"]`);
-    if(jack) jack.classList.toggle('active', depth>0);
-    if(depthInput) depthInput.value = depth;
-    applyPatch(d.key, depth);
-  });
-
-  const chorusBtn = document.getElementById('chorus-toggle');
-  chorusBtn.textContent = 'CHORUS ' + (params.chorusOn?'ON':'OFF');
-  chorusBtn.classList.toggle('on', params.chorusOn);
-  const delayBtn = document.getElementById('delay-toggle');
-  delayBtn.textContent = 'DELAY ' + (params.delayOn?'ON':'OFF');
-  delayBtn.classList.toggle('on', params.delayOn);
-  if(initialized){
-    chorusWet.gain.setTargetAtTime(params.chorusOn?0.5:0, ctx.currentTime, 0.05);
-    chorusDry.gain.setTargetAtTime(params.chorusOn?0.7:1, ctx.currentTime, 0.05);
-    delayWet.gain.setTargetAtTime(params.delayOn?params.delayMix:0, ctx.currentTime, 0.05);
-  }
-
-  renderSteps();
-  renderSong();
 }
 
-document.getElementById('load-btn').addEventListener('click', ()=>{
-  try{
-    const raw = localStorage.getItem('ds10-project');
-    if(!raw){ flashMsg('NO SAVED PROJECT'); return; }
-    const data = JSON.parse(raw);
-    Object.assign(params, data.params);
-    pattern = data.pattern;
-    songChain = data.songChain || [];
-    applyLoadedState();
-    flashMsg('PROJECT LOADED');
-  }catch(err){ flashMsg('LOAD FAILED'); }
-});
+async function encodeStem(key) {
+  const el = downloadEls[key];
+  const rec = mediaRecorders[key];
+  const rawBlob = new Blob(recordedChunks[key], { type: (rec && rec.mimeType) || 'audio/webm' });
+  try {
+    const arrayBuffer = await rawBlob.arrayBuffer();
+    const decoded = await ctx.decodeAudioData(arrayBuffer);
+    const wavBlob = audioBufferToWav(decoded);
+    el.href = URL.createObjectURL(wavBlob);
+    el.download = recordingFilename(key, 'wav');
+  } catch (err) {
+    el.href = URL.createObjectURL(rawBlob);
+    el.download = recordingFilename(key, 'webm');
+  }
+  el.classList.remove('btn-disabled');
+  if (STEMS.every(k => !downloadEls[k].classList.contains('btn-disabled'))) {
+    flashMsg('STEMS READY');
+    recordStatus.innerText = '00:00';
+  }
+}
+
+function audioBufferToWav(buffer) {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+  const samples = numChannels === 2
+      ? interleaveChannels(buffer.getChannelData(0), buffer.getChannelData(1))
+      : buffer.getChannelData(0);
+
+  const bytesPerSample = 2;
+  const blockAlign = numChannels * bytesPerSample;
+  const dataSize = samples.length * bytesPerSample;
+  const arrayBuffer = new ArrayBuffer(44 + dataSize);
+  const view = new DataView(arrayBuffer);
+
+  writeAscii(view, 0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeAscii(view, 8, 'WAVE');
+  writeAscii(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * blockAlign, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, 16, true);
+  writeAscii(view, 36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  let offset = 44;
+  for (let i = 0; i < samples.length; i++, offset += 2) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+
+  return new Blob([view], { type: 'audio/wav' });
+}
+
+function interleaveChannels(left, right) {
+  const result = new Float32Array(left.length + right.length);
+  let idx = 0;
+  for (let i = 0; i < left.length; i++) {
+      result[idx++] = left[i];
+      result[idx++] = right[i];
+  }
+  return result;
+}
+
+function writeAscii(view, offset, text) {
+  for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i));
+}
+
+function recordingFilename(stem, ext) {
+  return `vwds10-${takeStamp}-${stem}.${ext}`;
+}
 
 function flashMsg(msg){
   const f = document.getElementById('sys-msg');
