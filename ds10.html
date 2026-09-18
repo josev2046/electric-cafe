@@ -397,6 +397,29 @@ function releaseEnvelope(name){
   s.vca.gain.linearRampToValueAtTime(0, t + Math.max(0.02,p.release*1.5));
   s._held = false;
 }
+function ensureRunning(){
+  if(ctx && ctx.state==='suspended'){ ctx.resume().catch(()=>{}); }
+}
+/* Kaoss pad uses its own light note-on/off for the amp only, and hands full
+   live control of pitch + cutoff to the X/Y drag — this avoids fighting the
+   scheduled ADSR ramps used by triggerEnvelope/releaseEnvelope. */
+function kaossNoteOn(name){
+  const s = synths[name], p = params[name];
+  if(!s) return;
+  const t = ctx.currentTime;
+  s.vcf.frequency.cancelScheduledValues(t); // release filter env ownership so XY fully controls cutoff
+  s.vca.gain.cancelScheduledValues(t);
+  s.vca.gain.setValueAtTime(s.vca.gain.value, t);
+  s.vca.gain.linearRampToValueAtTime(p.level, t + 0.02);
+}
+function kaossNoteOff(name){
+  const s = synths[name], p = params[name];
+  if(!s) return;
+  const t = ctx.currentTime;
+  s.vca.gain.cancelScheduledValues(t);
+  s.vca.gain.setValueAtTime(s.vca.gain.value, t);
+  s.vca.gain.linearRampToValueAtTime(0, t + Math.max(0.03,p.release*1.2));
+}
 
 /* ---- DRUM synthesis ---- */
 const drumDefs = [
@@ -503,7 +526,7 @@ document.querySelectorAll('select.dsel[data-synth]').forEach(sel=>{
 });
 document.querySelectorAll('[data-hold]').forEach(btn=>{
   const name = btn.dataset.hold;
-  const down = ()=>{ initAudio(); btn.classList.add('on'); triggerEnvelope(name, 0); };
+  const down = ()=>{ initAudio(); ensureRunning(); btn.classList.add('on'); triggerEnvelope(name, 0); };
   const up = ()=>{ btn.classList.remove('on'); releaseEnvelope(name); };
   btn.addEventListener('pointerdown', down);
   btn.addEventListener('pointerup', up);
@@ -515,7 +538,7 @@ const drumHost = document.getElementById('drum-parts');
 drumDefs.forEach(d=>{
   const c = document.createElement('div'); c.className='ctrl';
   c.innerHTML = `<button class="btn" style="padding:16px 10px;">${d.name}</button>`;
-  c.querySelector('button').addEventListener('click', ()=>{ initAudio(); playDrum(d.id); });
+  c.querySelector('button').addEventListener('click', ()=>{ initAudio(); ensureRunning(); playDrum(d.id); });
   drumHost.appendChild(c);
 });
 
@@ -575,6 +598,10 @@ let pattern = {A:{}, B:{}};
 ['A','B'].forEach(p=> tracks.forEach(t=> pattern[p][t] = Array.from({length:16}, ()=>({on:false, note:0})) ));
 
 let curTrack = 'syn1', curPattern = 'A';
+/* state used by renderSteps() below — declared here, ahead of the call at
+   the bottom of this block, to avoid a temporal-dead-zone ReferenceError */
+let playing=false, curStep=0, nextStepTime=0, timerId=null, activeSongPattern=null;
+let songChain = [], songIndex = 0, songMode=false;
 const seqTracksHost = document.getElementById('seq-tracks');
 tracks.forEach(t=>{
   const b = document.createElement('div'); b.className='btn'+(t===curTrack?' on':''); b.textContent=trackLabel[t];
@@ -621,7 +648,6 @@ document.getElementById('seq-clear').addEventListener('click', ()=>{
 });
 
 /* ---- scheduler ---- */
-let playing=false, curStep=0, nextStepTime=0, timerId=null, activeSongPattern=null;
 const lookahead = 25, scheduleAhead = 0.1;
 document.getElementById('tempo').addEventListener('input', e=>{
   document.getElementById('tempo-val').textContent = e.target.value+' BPM';
@@ -655,6 +681,7 @@ function scheduler(){
 }
 function startSeq(){
   initAudio();
+  ensureRunning();
   if(playing) return;
   playing = true; curStep = 0; nextStepTime = ctx.currentTime + 0.05;
   timerId = setInterval(scheduler, lookahead);
@@ -673,7 +700,6 @@ function stopSeq(){
 document.getElementById('seq-play').addEventListener('click', ()=> playing? stopSeq() : startSeq());
 
 /* ============ SONG MODE ============ */
-let songChain = [], songIndex = 0, songMode=false;
 function renderSong(){
   document.getElementById('song-chain').textContent = songChain.length? songChain.join(' ') : '(empty — add A/B blocks)';
 }
@@ -717,17 +743,30 @@ function updateKaoss(e){
   }
 }
 kpad.addEventListener('pointerdown', e=>{
-  initAudio(); kActive=true; kcursor.style.display='block'; kpad.setPointerCapture(e.pointerId);
-  const target = document.getElementById('kaoss-target').value;
-  triggerEnvelope(target, 0);
-  updateKaoss(e);
+  initAudio();
+  ensureRunning();
+  kActive = true;
+  kcursor.style.display = 'block';
+  try{ kpad.setPointerCapture(e.pointerId); }catch(err){ /* not fatal */ }
+  try{
+    const target = document.getElementById('kaoss-target').value;
+    kaossNoteOn(target);
+    updateKaoss(e);
+  }catch(err){ console.error('kaoss pointerdown error:', err); }
 });
-kpad.addEventListener('pointermove', updateKaoss);
-kpad.addEventListener('pointerup', ()=>{
-  kActive=false; kcursor.style.display='none';
+kpad.addEventListener('pointermove', e=>{
+  try{ updateKaoss(e); }catch(err){ console.error('kaoss move error:', err); }
+});
+function endKaoss(){
+  if(!kActive) return;
+  kActive = false;
+  kcursor.style.display = 'none';
   kdisplay.textContent = 'PITCH: — · CUTOFF: —';
-  releaseEnvelope(document.getElementById('kaoss-target').value);
-});
+  try{ kaossNoteOff(document.getElementById('kaoss-target').value); }catch(err){ console.error('kaoss release error:', err); }
+}
+kpad.addEventListener('pointerup', endKaoss);
+kpad.addEventListener('pointercancel', endKaoss);
+kpad.addEventListener('pointerleave', e=>{ if(e.buttons===0) endKaoss(); });
 
 /* ============ FX ============ */
 document.getElementById('chorus-toggle').addEventListener('click', function(){
