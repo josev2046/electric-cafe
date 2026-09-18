@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DS-10 UI Shell</title>
+  <title>DS-10 Fully Functional UI</title>
   <style>
     body {
       background: #111;
@@ -14,10 +14,8 @@
       min-height: 100vh;
       margin: 0;
       font-family: monospace;
-      user-select: none; /* Prevent text selection while dragging knobs */
+      user-select: none;
     }
-
-    /* Nintendo DS Screen Dimensions (Scaled up) */
     .screen {
       width: 512px;
       height: 384px;
@@ -29,22 +27,17 @@
       overflow: hidden;
       box-shadow: inset 0 0 20px #000;
     }
-
-    /* TOP SCREEN: Display area */
     .top-screen {
       background: #0a1a10;
       color: #4af55d;
       padding: 20px;
       box-sizing: border-box;
     }
-
     .lcd-text {
       font-size: 24px;
-      margin: 0;
+      margin: 10px 0;
       text-shadow: 0 0 5px #4af55d;
     }
-
-    /* BOTTOM SCREEN: Touch Controls */
     .bottom-screen {
       background: #333;
       display: flex;
@@ -52,15 +45,12 @@
       box-sizing: border-box;
       gap: 30px;
     }
-
-    /* --- Custom Rotary Knob --- */
     .knob-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       color: #fff;
     }
-    
     .knob {
       width: 80px;
       height: 80px;
@@ -70,14 +60,9 @@
       box-shadow: 0 5px 10px rgba(0,0,0,0.5);
       position: relative;
       cursor: grab;
-      /* Start at bottom left (-135deg) */
       transform: rotate(-135deg); 
     }
-    
-    .knob:active {
-      cursor: grabbing;
-    }
-
+    .knob:active { cursor: grabbing; }
     .knob-indicator {
       position: absolute;
       width: 6px;
@@ -88,17 +73,14 @@
       transform: translateX(-50%);
       border-radius: 3px;
     }
-
-    /* --- Kaoss Pad --- */
     .kaoss-pad {
       flex-grow: 1;
       background: #111;
       border: 2px solid #555;
       position: relative;
-      touch-action: none; /* Prevent scrolling on mobile */
+      touch-action: none;
       cursor: crosshair;
     }
-    
     .kaoss-cursor {
       width: 20px;
       height: 20px;
@@ -111,43 +93,80 @@
       display: none;
       box-shadow: 0 0 15px red;
     }
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <!-- TOP SCREEN (Non-touch, visual feedback) -->
   <div class="screen top-screen">
-    <p class="lcd-text">KORG DS-10 VIRTUAL</p>
-    <p class="lcd-text" id="display">CUTOFF: 2000Hz</p>
-    <p class="lcd-text" id="kaoss-display">X: 0.00 | Y: 0.00</p>
+    <div id="start-overlay" class="overlay">
+      <h2 style="color:white;">CLICK TO START AUDIO</h2>
+    </div>
+    <p class="lcd-text">KORG DS-10 ENGINE</p>
+    <p class="lcd-text" id="display">CUTOFF: 2000 Hz</p>
+    <p class="lcd-text" id="kaoss-display">PITCH: --- | RES: ---</p>
   </div>
 
-  <!-- BOTTOM SCREEN (Touch interface) -->
   <div class="screen bottom-screen">
-    
-    <!-- Rotary Knob -->
     <div class="knob-container">
       <div class="knob" id="cutoff-knob">
         <div class="knob-indicator"></div>
       </div>
       <p>CUTOFF</p>
     </div>
-
-    <!-- Kaoss Pad -->
     <div class="kaoss-pad" id="kaoss-pad">
       <div class="kaoss-cursor" id="kaoss-cursor"></div>
     </div>
-
   </div>
 
 <script>
-  // --- KNOB LOGIC ---
+  let audioCtx, vco, vcf, vca;
+  let isAudioInitialized = false;
+
+  // --- AUDIO ENGINE INIT ---
+  document.getElementById('start-overlay').addEventListener('click', function() {
+    if (isAudioInitialized) return;
+    
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Create Nodes
+    vco = audioCtx.createOscillator();
+    vcf = audioCtx.createBiquadFilter();
+    vca = audioCtx.createGain();
+
+    // Route: VCO -> VCF -> VCA -> Master
+    vco.connect(vcf);
+    vcf.connect(vca);
+    vca.connect(audioCtx.destination);
+
+    // Initial Params
+    vco.type = 'sawtooth';
+    vcf.type = 'lowpass';
+    vcf.frequency.value = 2000;
+    vca.gain.value = 0; // Muted by default
+
+    vco.start();
+    
+    this.style.display = 'none';
+    isAudioInitialized = true;
+  });
+
+  // --- KNOB LOGIC (Controls Cutoff) ---
   const knob = document.getElementById('cutoff-knob');
   const display = document.getElementById('display');
   
   let isDraggingKnob = false;
   let startY = 0;
-  let currentRotation = -135; // Min rotation
+  let currentRotation = 0; // Starts centered (approx 2000Hz)
   const minRot = -135;
   const maxRot = 135;
 
@@ -160,63 +179,69 @@
   knob.addEventListener('pointermove', (e) => {
     if (!isDraggingKnob) return;
     
-    // Calculate movement delta
-    const deltaY = startY - e.clientY;
-    startY = e.clientY; // Reset for continuous movement
+    currentRotation += (startY - e.clientY) * 1.5; 
+    startY = e.clientY; 
     
-    // Apply delta to rotation (adjust multiplier for sensitivity)
-    currentRotation += deltaY * 1.5; 
-    
-    // Clamp values
     if (currentRotation < minRot) currentRotation = minRot;
     if (currentRotation > maxRot) currentRotation = maxRot;
     
-    // Update visuals
     knob.style.transform = `rotate(${currentRotation}deg)`;
     
-    // Map rotation (-135 to 135) to Audio Parameter (e.g., 100Hz to 8000Hz)
+    // Map rotation to exponential frequency (100Hz to 8000Hz)
     const normalized = (currentRotation - minRot) / (maxRot - minRot);
-    const cutoffFreq = Math.floor(100 + (normalized * 7900));
-    display.innerText = `CUTOFF: ${cutoffFreq}Hz`;
+    const cutoffFreq = Math.floor(100 * Math.pow(80, normalized)); 
+    display.innerText = `CUTOFF: ${cutoffFreq} Hz`;
+
+    // Apply to Web Audio
+    if (isAudioInitialized) {
+      vcf.frequency.setTargetAtTime(cutoffFreq, audioCtx.currentTime, 0.05);
+    }
   });
 
   knob.addEventListener('pointerup', () => isDraggingKnob = false);
   knob.addEventListener('pointercancel', () => isDraggingKnob = false);
 
-  // --- KAOSS PAD LOGIC ---
+  // --- KAOSS PAD LOGIC (X = Pitch, Y = Resonance, Touch = Volume) ---
   const pad = document.getElementById('kaoss-pad');
   const cursor = document.getElementById('kaoss-cursor');
   const kaossDisplay = document.getElementById('kaoss-display');
-  
   let isPadActive = false;
 
   function updateKaoss(e) {
-    if (!isPadActive) return;
+    if (!isPadActive || !isAudioInitialized) return;
     
-    // Get bounding box to calculate relative coordinates
     const rect = pad.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+    let x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    let y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
 
-    // Clamp to boundaries
-    x = Math.max(0, Math.min(x, rect.width));
-    y = Math.max(0, Math.min(y, rect.height));
-
-    // Move visual cursor
     cursor.style.left = `${x}px`;
     cursor.style.top = `${y}px`;
 
-    // Normalize values 0.0 to 1.0 (Note: Web Audio usually maps Y inverted, bottom is lower)
-    const normX = (x / rect.width).toFixed(2);
-    const normY = (1 - (y / rect.height)).toFixed(2);
+    const normX = x / rect.width;
+    const normY = 1 - (y / rect.height); // Invert Y so up is higher value
     
-    kaossDisplay.innerText = `X: ${normX} | Y: ${normY}`;
+    // Map X to Pitch (100Hz to 1000Hz)
+    const pitch = 100 + (normX * 900);
+    // Map Y to Resonance (Q from 0 to 20)
+    const resonance = normY * 20;
+    
+    kaossDisplay.innerText = `PITCH: ${Math.floor(pitch)}Hz | RES: ${resonance.toFixed(1)}`;
+
+    // Apply to Web Audio smoothly
+    vco.frequency.setTargetAtTime(pitch, audioCtx.currentTime, 0.02);
+    vcf.Q.setTargetAtTime(resonance, audioCtx.currentTime, 0.02);
   }
 
   pad.addEventListener('pointerdown', (e) => {
     isPadActive = true;
     cursor.style.display = 'block';
     pad.setPointerCapture(e.pointerId);
+    
+    // Trigger Envelope Attack
+    if (isAudioInitialized) {
+      vca.gain.cancelScheduledValues(audioCtx.currentTime);
+      vca.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.02);
+    }
     updateKaoss(e);
   });
 
@@ -225,6 +250,13 @@
   pad.addEventListener('pointerup', () => {
     isPadActive = false;
     cursor.style.display = 'none';
+    kaossDisplay.innerText = `PITCH: --- | RES: ---`;
+    
+    // Trigger Envelope Release
+    if (isAudioInitialized) {
+      vca.gain.cancelScheduledValues(audioCtx.currentTime);
+      vca.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.1);
+    }
   });
 </script>
 </body>
