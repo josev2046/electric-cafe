@@ -25,19 +25,14 @@
   body {
     background-color: var(--bg-dark); 
     margin: 0; min-height: 100vh; padding: 40px 20px;
-    display: flex; flex-direction: column; align-items: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     font-family: 'Inter', sans-serif; color: var(--text-main); 
     text-transform: uppercase; user-select: none;
   }
 
-  /* Typography & Branding */
-  h1 { font-family: 'Archivo Black', sans-serif; font-size: 28px; margin: 0 0 4px 0; letter-spacing: -1px; }
-  .vw-red { color: #c83a2a; }
-  .subtitle { font-size: 10px; font-weight: 800; letter-spacing: 2px; color: var(--border-dark); opacity: 0.8; margin: 0 0 20px 0; }
-
   /* Hardware Wrapper */
   .synth-wrapper {
-    display: flex; width: min(860px, 100%);
+    display: flex; width: min(880px, 100%);
     box-shadow: 0 20px 50px rgba(0,0,0,0.9);
     border-radius: 12px;
   }
@@ -61,6 +56,18 @@
     padding: 24px; box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8), inset 0 -2px 5px rgba(0,0,0,0.3);
   }
 
+  /* Branding Bar */
+  .branding-bar {
+    display: flex; justify-content: space-between; align-items: flex-end; 
+    margin-bottom: 16px; padding-bottom: 16px; border-bottom: 2px solid rgba(56, 52, 46, 0.15);
+  }
+  .branding-title { font-family: 'Archivo Black', sans-serif; font-size: 32px; margin: 0; letter-spacing: -1px; line-height: 1; }
+  .vw-red { color: #c83a2a; }
+  .branding-sub { font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--border-dark); opacity: 0.7; margin-top: 4px; }
+  .branding-credits { font-size: 9px; font-weight: 800; letter-spacing: 1px; color: var(--border-dark); opacity: 0.8; text-align: right; }
+  .branding-credits a { color: var(--text-main); text-decoration: none; transition: color 0.2s; }
+  .branding-credits a:hover { color: var(--red-grad-top); }
+
   /* Tabs */
   .tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
   .tab {
@@ -77,23 +84,36 @@
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
   }
 
-  /* Screen Container (Transparent, housing the panels) */
+  /* Screen Container */
   .screen { position: relative; min-height: 300px; margin-bottom: 20px; }
   
-  /* Panels (Module Groups) */
+  /* Main Panels */
   .panel {
     border: 1.5px solid var(--border-dark); border-radius: 6px; 
     background: rgba(0, 0, 0, 0.03); 
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.6);
-    padding: 24px 16px 16px; position: relative; margin-top: 10px;
+    padding: 30px 16px 16px; position: relative; margin-top: 10px;
   }
   .screen-title {
     position: absolute; top: -10px; left: 16px; margin: 0;
     background: var(--chassis); color: var(--text-main); 
     border: 1.5px solid var(--border-dark); border-radius: 4px; 
-    padding: 2px 8px; font-size: 9px; font-weight: 900; letter-spacing: 1px; 
+    padding: 2px 8px; font-size: 10px; font-weight: 900; letter-spacing: 1px; 
     box-shadow: 0 1px 0 rgba(255,255,255,0.7);
   }
+
+  /* Sub-Module Groups (For SYN1/SYN2 layout balancing) */
+  .module-group {
+    border: 1.5px solid var(--border-dark); border-radius: 6px; background: rgba(0, 0, 0, 0.03);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 1px 0 rgba(255,255,255,0.6);
+    padding: 20px 14px 14px; position: relative; display: flex; gap: 12px; align-items: flex-start; justify-content: center;
+  }
+  .module-group-title {
+    position: absolute; top: -8px; left: 10px; background: var(--chassis); color: var(--text-main);
+    border: 1.5px solid var(--border-dark); border-radius: 4px; padding: 2px 6px; font-size: 8px; font-weight: 900; letter-spacing: 1px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.7);
+  }
+  .synth-row { display: flex; gap: 16px; flex-wrap: wrap; width: 100%; justify-content: space-between; margin-bottom: 16px; }
 
   .overlay {
     position: absolute; inset: 0; background: rgba(22, 19, 15, 0.85); z-index: 50;
@@ -108,10 +128,10 @@
 
   /* Controls layout */
   .row { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 12px; }
-  .ctrl { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 64px; }
+  .ctrl { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 60px; }
   .ctrl label { font-size: 9px; font-weight: 800; letter-spacing: 0.5px; color: var(--border-dark); }
   
-  /* Digital Readouts (Space Mono Red Chips) */
+  /* Digital Readouts */
   .val {
     font-family: 'Space Mono', monospace; background: #0a0a0a; color: #ff3333;
     border: 1.5px inset var(--border-dark); padding: 2px 6px; border-radius: 3px; 
@@ -242,27 +262,28 @@
     pointer-events: none; display: none; box-shadow: 0 0 16px var(--amber);
   }
   .side { display: flex; flex-direction: column; gap: 12px; min-width: 140px; }
-  
-  /* Footer */
-  footer {
-    color: rgba(255,255,255,0.5); font-size: 10px; margin-top: 16px; 
-    letter-spacing: 1px; text-align: center; width: 100%; max-width: 860px; font-weight: 600;
-  }
-  footer a { color: var(--chassis); text-decoration: none; transition: color 0.2s; }
-  footer a:hover { color: var(--red-grad-top); }
 
   @media (max-width: 600px) { .kaoss-wrap { flex-direction: column; } }
 </style>
 </head>
 <body>
 
-<h1><span class="vw-red">VW</span>-DS10</h1>
-<p class="subtitle">Web Audio Analog Engine</p>
-
 <div class="synth-wrapper">
   <div class="wood-cheek wood-left"></div>
   
   <div class="unit">
+    <!-- Branding Header Inside Chassis -->
+    <div class="branding-bar">
+      <div>
+        <h1 class="branding-title"><span class="vw-red">VW</span>-DS10</h1>
+        <div class="branding-sub">WEB AUDIO ANALOG ENGINE</div>
+      </div>
+      <div class="branding-credits">
+        &copy; 2026 JOSÉ VELÁZQUEZ MA<br>
+        <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer">VOLTAGE &amp; WAVE</a>
+      </div>
+    </div>
+
     <div class="tabs" id="tabs">
       <div class="tab active" data-tab="syn1">SYN1</div>
       <div class="tab" data-tab="syn2">SYN2</div>
@@ -277,101 +298,142 @@
     <div class="screen" id="screen">
       <div class="overlay" id="start-overlay"><div>▶ TAP TO POWER ON</div></div>
 
-      <!-- SYN1 Panel -->
+      <!-- SYN1 Panel (Balanced Modular Layout) -->
       <div class="panel" data-panel="syn1" style="display:block;">
-        <p class="screen-title">SYN1 — VCO / VCF / VCA / EG</p>
-        <div class="row">
-          <div class="ctrl"><label>WAVE</label>
-            <select class="dsel" data-synth="syn1" data-param="wave">
-              <option value="sawtooth">SAW</option><option value="square">SQUARE</option>
-              <option value="triangle">TRI</option><option value="sine">SINE</option>
-            </select>
+        <p class="screen-title">SYN1 — SUBTRACTIVE VOICE</p>
+        
+        <div class="synth-row">
+          <div class="module-group" style="flex: 2;">
+            <span class="module-group-title">VCO</span>
+            <div class="ctrl"><label>WAVE</label>
+              <select class="dsel" data-synth="syn1" data-param="wave">
+                <option value="sawtooth">SAW</option><option value="square">SQUARE</option>
+                <option value="triangle">TRI</option><option value="sine">SINE</option>
+              </select>
+            </div>
+            <div class="ctrl"><label>OCTAVE</label>
+              <select class="dsel" data-synth="syn1" data-param="octave">
+                <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
+              </select>
+            </div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn1-tune">0</span></div>
+            <div class="ctrl" style="justify-content:center; padding-top:14px;">
+              <button class="btn tgl-btn" data-synth="syn1" data-param="legato">LEGATO OFF</button>
+            </div>
           </div>
-          <div class="ctrl"><label>OCTAVE</label>
-            <select class="dsel" data-synth="syn1" data-param="octave">
-              <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
-            </select>
+          
+          <div class="module-group" style="flex: 2;">
+            <span class="module-group-title">VCF</span>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="cutoff" data-min="0" data-max="1" data-default="0.75"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn1-cutoff">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="reso" data-min="0" data-max="1" data-default="0.15"><i></i></div><label>PEAK</label><span class="val" data-out="syn1-reso">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="envAmt" data-min="-1" data-max="1" data-default="0.4"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn1-envAmt">—</span></div>
           </div>
-          <div class="ctrl" style="justify-content:center; padding-top:14px;">
-            <button class="btn tgl-btn" data-synth="syn1" data-param="legato">LEGATO OFF</button>
-          </div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn1-tune">0</span></div>
-          <div class="divider"></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="cutoff" data-min="0" data-max="1" data-default="0.75"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn1-cutoff">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="reso" data-min="0" data-max="1" data-default="0.15"><i></i></div><label>PEAK</label><span class="val" data-out="syn1-reso">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="envAmt" data-min="-1" data-max="1" data-default="0.4"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn1-envAmt">—</span></div>
-          <div class="divider"></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="attack" data-min="0" data-max="1" data-default="0.05"><i></i></div><label>ATTACK</label><span class="val" data-out="syn1-attack">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="decay" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>DECAY</label><span class="val" data-out="syn1-decay">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="sustain" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn1-sustain">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="release" data-min="0" data-max="1" data-default="0.25"><i></i></div><label>RELEASE</label><span class="val" data-out="syn1-release">—</span></div>
         </div>
-        <div class="row" style="margin-top:14px;">
-          <div class="ctrl"><button class="btn testbtn" data-hold="syn1" style="height: 48px;">HOLD TO TEST ▶</button></div>
-          <div class="ctrl"><div class="knob" data-synth="syn1" data-param="level" data-min="0" data-max="1" data-default="0.7"><i></i></div><label>LEVEL</label><span class="val" data-out="syn1-level">—</span></div>
+
+        <div class="synth-row" style="margin-bottom: 0;">
+          <div class="module-group" style="flex: 3;">
+            <span class="module-group-title">EG (ENVELOPE GENERATOR)</span>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="attack" data-min="0" data-max="1" data-default="0.05"><i></i></div><label>ATTACK</label><span class="val" data-out="syn1-attack">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="decay" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>DECAY</label><span class="val" data-out="syn1-decay">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="sustain" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn1-sustain">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="release" data-min="0" data-max="1" data-default="0.25"><i></i></div><label>RELEASE</label><span class="val" data-out="syn1-release">—</span></div>
+          </div>
+          
+          <div class="module-group" style="flex: 1;">
+            <span class="module-group-title">AMP</span>
+            <div class="ctrl"><div class="knob" data-synth="syn1" data-param="level" data-min="0" data-max="1" data-default="0.7"><i></i></div><label>LEVEL</label><span class="val" data-out="syn1-level">—</span></div>
+            <div class="ctrl" style="justify-content:center; padding-top:8px;">
+              <button class="btn testbtn" data-hold="syn1" style="height: 48px;">HOLD TO TEST ▶</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- SYN2 Panel -->
+      <!-- SYN2 Panel (Balanced Modular Layout) -->
       <div class="panel" data-panel="syn2" style="display:none;">
-        <p class="screen-title">SYN2 — VCO / VCF / VCA / EG</p>
-        <div class="row">
-          <div class="ctrl"><label>WAVE</label>
-            <select class="dsel" data-synth="syn2" data-param="wave">
-              <option value="sawtooth">SAW</option><option value="square" selected>SQUARE</option>
-              <option value="triangle">TRI</option><option value="sine">SINE</option>
-            </select>
+        <p class="screen-title">SYN2 — SUBTRACTIVE VOICE</p>
+        
+        <div class="synth-row">
+          <div class="module-group" style="flex: 2;">
+            <span class="module-group-title">VCO</span>
+            <div class="ctrl"><label>WAVE</label>
+              <select class="dsel" data-synth="syn2" data-param="wave">
+                <option value="sawtooth">SAW</option><option value="square" selected>SQUARE</option>
+                <option value="triangle">TRI</option><option value="sine">SINE</option>
+              </select>
+            </div>
+            <div class="ctrl"><label>OCTAVE</label>
+              <select class="dsel" data-synth="syn2" data-param="octave">
+                <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
+              </select>
+            </div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn2-tune">0</span></div>
+            <div class="ctrl" style="justify-content:center; padding-top:14px;">
+              <button class="btn tgl-btn" data-synth="syn2" data-param="legato">LEGATO OFF</button>
+            </div>
           </div>
-          <div class="ctrl"><label>OCTAVE</label>
-            <select class="dsel" data-synth="syn2" data-param="octave">
-              <option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option>
-            </select>
+          
+          <div class="module-group" style="flex: 2;">
+            <span class="module-group-title">VCF</span>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="cutoff" data-min="0" data-max="1" data-default="0.55"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn2-cutoff">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="reso" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>PEAK</label><span class="val" data-out="syn2-reso">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="envAmt" data-min="-1" data-max="1" data-default="0.5"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn2-envAmt">—</span></div>
           </div>
-          <div class="ctrl" style="justify-content:center; padding-top:14px;">
-            <button class="btn tgl-btn" data-synth="syn2" data-param="legato">LEGATO OFF</button>
-          </div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="tune" data-min="-100" data-max="100" data-default="0"><i></i></div><label>TUNE</label><span class="val" data-out="syn2-tune">0</span></div>
-          <div class="divider"></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="cutoff" data-min="0" data-max="1" data-default="0.55"><i></i></div><label>CUTOFF</label><span class="val" data-out="syn2-cutoff">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="reso" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>PEAK</label><span class="val" data-out="syn2-reso">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="envAmt" data-min="-1" data-max="1" data-default="0.5"><i></i></div><label>EG&gt;VCF</label><span class="val" data-out="syn2-envAmt">—</span></div>
-          <div class="divider"></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="attack" data-min="0" data-max="1" data-default="0.01"><i></i></div><label>ATTACK</label><span class="val" data-out="syn2-attack">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="decay" data-min="0" data-max="1" data-default="0.4"><i></i></div><label>DECAY</label><span class="val" data-out="syn2-decay">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="sustain" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn2-sustain">—</span></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="release" data-min="0" data-max="1" data-default="0.2"><i></i></div><label>RELEASE</label><span class="val" data-out="syn2-release">—</span></div>
         </div>
-        <div class="row" style="margin-top:14px;">
-          <div class="ctrl"><button class="btn testbtn" data-hold="syn2" style="height: 48px;">HOLD TO TEST ▶</button></div>
-          <div class="ctrl"><div class="knob" data-synth="syn2" data-param="level" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>LEVEL</label><span class="val" data-out="syn2-level">—</span></div>
+
+        <div class="synth-row" style="margin-bottom: 0;">
+          <div class="module-group" style="flex: 3;">
+            <span class="module-group-title">EG (ENVELOPE GENERATOR)</span>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="attack" data-min="0" data-max="1" data-default="0.01"><i></i></div><label>ATTACK</label><span class="val" data-out="syn2-attack">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="decay" data-min="0" data-max="1" data-default="0.4"><i></i></div><label>DECAY</label><span class="val" data-out="syn2-decay">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="sustain" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>SUSTAIN</label><span class="val" data-out="syn2-sustain">—</span></div>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="release" data-min="0" data-max="1" data-default="0.2"><i></i></div><label>RELEASE</label><span class="val" data-out="syn2-release">—</span></div>
+          </div>
+          
+          <div class="module-group" style="flex: 1;">
+            <span class="module-group-title">AMP</span>
+            <div class="ctrl"><div class="knob" data-synth="syn2" data-param="level" data-min="0" data-max="1" data-default="0.6"><i></i></div><label>LEVEL</label><span class="val" data-out="syn2-level">—</span></div>
+            <div class="ctrl" style="justify-content:center; padding-top:8px;">
+              <button class="btn testbtn" data-hold="syn2" style="height: 48px;">HOLD TO TEST ▶</button>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- Drum Panel -->
       <div class="panel" data-panel="drum" style="display:none;">
-        <p class="screen-title">DRUM — 4 part percussion</p>
+        <p class="screen-title">DRUM — 4 PART PERCUSSION</p>
         <div class="row" id="drum-parts" style="padding-top: 10px;"></div>
       </div>
 
+      <!-- Patch Bay Panel -->
       <div class="panel" data-panel="patch" style="display:none;">
-        <p class="screen-title">PATCH BAY — route modulation</p>
-        <div class="row" style="margin-bottom:14px;">
-          <div class="ctrl"><label>LFO WAVE</label>
-            <select class="dsel" id="lfo-wave"><option value="sine">SINE</option><option value="triangle">TRI</option><option value="square">SQUARE</option></select>
+        <p class="screen-title">PATCH BAY — ROUTE MODULATION</p>
+        <div class="synth-row">
+          <div class="module-group" style="flex: 1;">
+            <span class="module-group-title">LFO 1 SOURCE</span>
+            <div class="ctrl"><label>LFO WAVE</label>
+              <select class="dsel" id="lfo-wave"><option value="sine">SINE</option><option value="triangle">TRI</option><option value="square">SQUARE</option></select>
+            </div>
+            <div class="ctrl"><div class="knob" id="lfo-rate-knob" data-min="0.1" data-max="20" data-default="4"><i></i></div><label>LFO RATE</label><span class="val" id="lfo-rate-val">—</span></div>
           </div>
-          <div class="ctrl"><div class="knob" id="lfo-rate-knob" data-min="0.1" data-max="20" data-default="4"><i></i></div><label>LFO RATE</label><span class="val" id="lfo-rate-val">—</span></div>
+          <div class="module-group" style="flex: 2; padding-top: 24px;">
+            <span class="module-group-title">MODULATION MATRIX</span>
+            <div class="patch-grid" id="patch-grid" style="margin-top:0;"></div>
+          </div>
         </div>
-        <div class="patch-grid" id="patch-grid"></div>
         <p style="font-size:10px; font-weight:800; color:var(--border-dark); margin-top:20px; opacity: 0.7;">TAP A JACK TO PATCH LFO INTO A DESTINATION, THEN SET DEPTH</p>
       </div>
 
+      <!-- Sequencer Panel -->
       <div class="panel" data-panel="seq" style="display:none;">
-        <p class="screen-title">SEQUENCER — 16 step</p>
+        <p class="screen-title">SEQUENCER — 16 STEP</p>
         <div class="seq-tracks" id="seq-tracks"></div>
         <div class="row" style="margin-bottom:12px; background: rgba(0,0,0,0.04); padding: 12px; border-radius: 6px; border: 1px solid rgba(56,52,46,0.2);">
           <div class="ctrl"><label>PATTERN</label>
             <select class="dsel" id="seq-pattern"><option value="A">A</option><option value="B">B</option></select>
           </div>
-          <div class="ctrl"><label>NOTE (new steps)</label>
+          <div class="ctrl"><label>NOTE (NEW STEPS)</label>
             <select class="dsel" id="seq-note">
               <option value="-12">C3</option><option value="-10">D3</option><option value="-8">E3</option>
               <option value="-5">G3</option><option value="-3">A3</option>
@@ -391,8 +453,9 @@
         </div>
       </div>
 
+      <!-- Song Panel -->
       <div class="panel" data-panel="song" style="display:none;">
-        <p class="screen-title">SONG — chain patterns</p>
+        <p class="screen-title">SONG — CHAIN PATTERNS</p>
         <p style="font-size:10px; font-weight:800; color:var(--border-dark); opacity:0.8;">CLICK A / B TO APPEND TO THE SONG. ALL TRACKS SWITCH PATTERN TOGETHER.</p>
         <div class="row" style="margin:16px 0;">
           <button class="btn" id="song-add-a">+ A</button>
@@ -403,8 +466,9 @@
         <div id="song-chain" class="val" style="font-size:16px; letter-spacing:4px; min-height:40px; width: 100%; justify-content: flex-start; padding: 10px;"></div>
       </div>
 
+      <!-- Kaoss Panel -->
       <div class="panel" data-panel="kaoss" style="display:none;">
-        <p class="screen-title">KAOSS PAD — X: pitch · Y: cutoff</p>
+        <p class="screen-title">KAOSS PAD — X: PITCH · Y: CUTOFF</p>
         <div class="kaoss-wrap">
           <div class="kaoss-pad" id="kaoss-pad"><div class="kaoss-cursor" id="kaoss-cursor"></div></div>
           <div class="side">
@@ -416,17 +480,23 @@
         </div>
       </div>
 
+      <!-- FX Panel -->
       <div class="panel" data-panel="fx" style="display:none;">
         <p class="screen-title">MASTER FX</p>
-        <div class="row">
-          <div class="ctrl"><button class="btn tgl-btn" id="chorus-toggle" style="height: 48px;">CHORUS OFF</button></div>
-          <div class="ctrl"><div class="knob" id="chorus-rate" data-min="0.1" data-max="5" data-default="1.2"><i></i></div><label>RATE</label><span class="val" id="chorus-rate-val">—</span></div>
-          <div class="ctrl"><div class="knob" id="chorus-depth" data-min="0" data-max="1" data-default="0.5"><i></i></div><label>DEPTH</label><span class="val" id="chorus-depth-val">—</span></div>
-          <div class="divider"></div>
-          <div class="ctrl"><button class="btn tgl-btn" id="delay-toggle" style="height: 48px;">DELAY OFF</button></div>
-          <div class="ctrl"><div class="knob" id="delay-time" data-min="0.05" data-max="0.9" data-default="0.32"><i></i></div><label>TIME</label><span class="val" id="delay-time-val">—</span></div>
-          <div class="ctrl"><div class="knob" id="delay-fb" data-min="0" data-max="0.85" data-default="0.35"><i></i></div><label>FEEDBACK</label><span class="val" id="delay-fb-val">—</span></div>
-          <div class="ctrl"><div class="knob" id="delay-mix" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>MIX</label><span class="val" id="delay-mix-val">—</span></div>
+        <div class="synth-row">
+          <div class="module-group" style="flex: 1;">
+            <span class="module-group-title">CHORUS</span>
+            <div class="ctrl" style="justify-content:center;"><button class="btn tgl-btn" id="chorus-toggle" style="height: 48px;">CHORUS OFF</button></div>
+            <div class="ctrl"><div class="knob" id="chorus-rate" data-min="0.1" data-max="5" data-default="1.2"><i></i></div><label>RATE</label><span class="val" id="chorus-rate-val">—</span></div>
+            <div class="ctrl"><div class="knob" id="chorus-depth" data-min="0" data-max="1" data-default="0.5"><i></i></div><label>DEPTH</label><span class="val" id="chorus-depth-val">—</span></div>
+          </div>
+          <div class="module-group" style="flex: 1.2;">
+            <span class="module-group-title">DELAY</span>
+            <div class="ctrl" style="justify-content:center;"><button class="btn tgl-btn" id="delay-toggle" style="height: 48px;">DELAY OFF</button></div>
+            <div class="ctrl"><div class="knob" id="delay-time" data-min="0.05" data-max="0.9" data-default="0.32"><i></i></div><label>TIME</label><span class="val" id="delay-time-val">—</span></div>
+            <div class="ctrl"><div class="knob" id="delay-fb" data-min="0" data-max="0.85" data-default="0.35"><i></i></div><label>FEEDBACK</label><span class="val" id="delay-fb-val">—</span></div>
+            <div class="ctrl"><div class="knob" id="delay-mix" data-min="0" data-max="1" data-default="0.3"><i></i></div><label>MIX</label><span class="val" id="delay-mix-val">—</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -442,8 +512,6 @@
   
   <div class="wood-cheek wood-right"></div>
 </div>
-
-<footer>&copy; 2026 JOSÉ VELÁZQUEZ MA / <a href="https://voltageandwave.co.uk/" target="_blank" rel="noopener noreferrer">VOLTAGE &amp; WAVE</a></footer>
 
 <script>
 /* ============ AUDIO ENGINE ============ */
